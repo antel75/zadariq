@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Pill, Car, Siren, Ship, Moon } from 'lucide-react';
+import { Pill, Car, Siren, Ship, Film } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 
 interface QuickAction {
@@ -40,9 +40,9 @@ export function QuickActions() {
       color: 'bg-primary/10 text-primary',
     },
     {
-      icon: Moon,
-      labelKey: 'quick.nightServices',
-      action: () => navigate('/search?q=night+open'),
+      icon: Film,
+      labelKey: 'quick.cinema',
+      action: () => navigate('/cinema'),
       color: 'bg-secondary text-secondary-foreground',
     },
   ];
