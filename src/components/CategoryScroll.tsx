@@ -22,6 +22,7 @@ const mainCategories = categories.filter(c => !doctorSubcategories.includes(c.id
 const publicServicesSubmenu = [
   { id: 'grad-zadar', labelKey: 'publicServices.gradZadar', route: '/public-services/grad-zadar' },
   { id: 'zadarska-zupanija', labelKey: 'publicServices.zadarskaZupanija', route: '/public-services/zadarska-zupanija' },
+  { id: 'komunalne-tvrtke', labelKey: 'utilities.menuLabel', route: '/utility-companies' },
 ];
 
 interface CategoryScrollProps {

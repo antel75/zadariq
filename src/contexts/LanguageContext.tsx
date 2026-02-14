@@ -195,6 +195,12 @@ const translations: Translations = {
   'publicServices.zadarskaZupanija': { hr: 'Zadarska županija', en: 'Zadar County', de: 'Gespanschaft Zadar', it: 'Contea di Zara' },
   'publicServices.centrala': { hr: 'Centrala', en: 'Switchboard', de: 'Zentrale', it: 'Centralino' },
   'publicServices.departments': { hr: 'Upravni odjeli i stručne službe', en: 'Administrative departments', de: 'Verwaltungsabteilungen', it: 'Dipartimenti amministrativi' },
+  // Utility companies
+  'utilities.menuLabel': { hr: 'Komunalne tvrtke', en: 'Utility Companies', de: 'Versorgungsunternehmen', it: 'Aziende di servizi' },
+  'utilities.title': { hr: 'Komunalne tvrtke', en: 'Utility Companies', de: 'Versorgungsunternehmen', it: 'Aziende di servizi' },
+  'utilities.subtitle': { hr: 'Čistoća, Vodovod, HEP', en: 'Waste, Water, Electricity', de: 'Abfall, Wasser, Strom', it: 'Rifiuti, Acqua, Elettricità' },
+  'utilities.emergency': { hr: 'Hitno', en: 'Emergency', de: 'Notfall', it: 'Emergenza' },
+  'utilities.services': { hr: 'Usluge', en: 'Services', de: 'Dienste', it: 'Servizi' },
   // Transport
   'quick.transport': { hr: 'Prijevoz', en: 'Transport', de: 'Transport', it: 'Trasporti' },
   'transport.title': { hr: 'Prijevoz', en: 'Transport', de: 'Transport', it: 'Trasporti' },
