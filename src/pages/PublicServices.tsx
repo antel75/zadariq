@@ -1,6 +1,6 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { gradZadar } from '@/data/publicServicesData';
+import { publicServiceOrgs } from '@/data/publicServicesData';
 import { ArrowLeft, Phone, ExternalLink, Building2, ChevronDown, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
@@ -16,9 +16,15 @@ const fadeUp = {
 export default function PublicServices() {
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const { orgId } = useParams<{ orgId: string }>();
   const [expandedDept, setExpandedDept] = useState<string | null>(null);
 
-  const org = gradZadar;
+  const org = publicServiceOrgs[orgId || 'grad-zadar'];
+
+  if (!org) {
+    navigate('/');
+    return null;
+  }
 
   return (
     <div className="min-h-screen gradient-bg">
