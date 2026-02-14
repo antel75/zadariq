@@ -63,6 +63,7 @@ export type Database = {
         Row: {
           carrier: string | null
           created_at: string
+          days_of_week: number[] | null
           departure_time: string
           destination: string | null
           enabled: boolean
@@ -80,6 +81,7 @@ export type Database = {
         Insert: {
           carrier?: string | null
           created_at?: string
+          days_of_week?: number[] | null
           departure_time: string
           destination?: string | null
           enabled?: boolean
@@ -97,6 +99,7 @@ export type Database = {
         Update: {
           carrier?: string | null
           created_at?: string
+          days_of_week?: number[] | null
           departure_time?: string
           destination?: string | null
           enabled?: boolean
