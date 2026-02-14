@@ -4,9 +4,9 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { SearchBar } from '@/components/SearchBar';
 import { BusinessCard } from '@/components/BusinessCard';
 import { ReportModal } from '@/components/ReportModal';
-import { searchBusinesses, isBusinessOpen } from '@/data/mockData';
-import { Business } from '@/data/types';
-import { ArrowLeft, Filter } from 'lucide-react';
+import { searchBusinesses, isBusinessOpen, categories } from '@/data/mockData';
+import { Business, CategoryId } from '@/data/types';
+import { ArrowLeft, Filter, X } from 'lucide-react';
 
 export default function SearchResults() {
   const { t } = useLanguage();
@@ -15,13 +15,16 @@ export default function SearchResults() {
   const initialQ = params.get('q') || '';
   const [query, setQuery] = useState(initialQ);
   const [openOnly, setOpenOnly] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<CategoryId | null>(null);
   const [reportTarget, setReportTarget] = useState<Business | null>(null);
 
   const results = useMemo(() => {
-    let r = searchBusinesses(query);
+    let r = searchBusinesses(query, selectedCategory ?? undefined);
     if (openOnly) r = r.filter(isBusinessOpen);
     return r;
-  }, [query, openOnly]);
+  }, [query, openOnly, selectedCategory]);
+
+  const openCount = useMemo(() => results.filter(isBusinessOpen).length, [results]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -34,12 +37,42 @@ export default function SearchResults() {
             <SearchBar value={query} onChange={setQuery} onSubmit={() => {}} />
           </div>
         </div>
+
+        {/* Category filter chips */}
+        <div className="max-w-lg mx-auto px-4 pb-3">
+          <div className="flex gap-2 overflow-x-auto no-scrollbar">
+            {categories
+              .filter(c => c.id !== 'emergency' && c.id !== 'transport')
+              .map((cat) => {
+                const isActive = selectedCategory === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => setSelectedCategory(isActive ? null : cat.id)}
+                    className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                      isActive
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                    }`}
+                  >
+                    {t(cat.labelKey)}
+                    {isActive && <X className="inline ml-1 h-3 w-3" />}
+                  </button>
+                );
+              })}
+          </div>
+        </div>
       </header>
 
       <main className="max-w-lg mx-auto px-4 pb-8">
         <div className="flex items-center justify-between mt-4 mb-4">
           <h2 className="text-sm font-semibold text-foreground">
             {t('search.results')} ({results.length})
+            {openOnly && (
+              <span className="ml-1 text-[hsl(var(--status-open))]">
+                · {openCount} {t('status.open').toLowerCase()}
+              </span>
+            )}
           </h2>
           <button
             onClick={() => setOpenOnly(!openOnly)}
@@ -59,7 +92,21 @@ export default function SearchResults() {
             <BusinessCard key={b.id} business={b} onReport={setReportTarget} />
           ))}
           {results.length === 0 && (
-            <p className="text-center text-muted-foreground py-12 text-sm">No results found</p>
+            <div className="text-center py-12">
+              <p className="text-muted-foreground text-sm mb-2">
+                {query.trim()
+                  ? t('search.noResults') || 'Nema rezultata za ovu pretragu'
+                  : t('search.noResults') || 'Nema rezultata'}
+              </p>
+              {selectedCategory && (
+                <button
+                  onClick={() => setSelectedCategory(null)}
+                  className="text-xs text-primary underline underline-offset-2"
+                >
+                  {t('search.clearFilter') || 'Ukloni filter kategorije'}
+                </button>
+              )}
+            </div>
           )}
         </div>
       </main>

@@ -1,4 +1,5 @@
 import { Business, EmergencyContact, CategoryId, VerificationStatus } from './types';
+import { scoreMatch } from '@/lib/fuzzySearch';
 
 export const categories: { id: CategoryId; icon: string; labelKey: string }[] = [
   { id: 'pharmacy', icon: 'Pill', labelKey: 'category.pharmacy' },
@@ -167,12 +168,14 @@ export function searchBusinesses(query: string, categoryFilter?: CategoryId): Bu
   }
 
   if (query.trim()) {
-    const q = query.toLowerCase();
-    results = results.filter(b =>
-      b.name.toLowerCase().includes(q) ||
-      b.address.toLowerCase().includes(q) ||
-      b.category.toLowerCase().includes(q)
-    );
+    const scored = results
+      .map(b => ({
+        business: b,
+        score: scoreMatch(query, [b.name, b.address, b.category]),
+      }))
+      .filter(item => item.score >= 0)
+      .sort((a, b) => a.score - b.score);
+    results = scored.map(s => s.business);
   }
 
   return results;
