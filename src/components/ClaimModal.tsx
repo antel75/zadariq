@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { UserCheck } from 'lucide-react';
+import { UserCheck, ShieldCheck } from 'lucide-react';
 
 interface ClaimModalProps {
   businessName: string;
@@ -9,18 +9,35 @@ interface ClaimModalProps {
   onClose: () => void;
 }
 
+type Step = 'email' | 'code' | 'success';
+
 export function ClaimModal({ businessName, open, onClose }: ClaimModalProps) {
   const { t } = useLanguage();
   const [email, setEmail] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+  const [code, setCode] = useState('');
+  const [step, setStep] = useState<Step>('email');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSendCode = (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    if (email.trim()) setStep('code');
+  };
+
+  const handleVerify = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (code.trim()) setStep('success');
+  };
+
+  const handleClose = () => {
+    onClose();
+    setTimeout(() => {
+      setStep('email');
+      setEmail('');
+      setCode('');
+    }, 200);
   };
 
   return (
-    <Dialog open={open} onOpenChange={() => { onClose(); setSubmitted(false); setEmail(''); }}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-sm rounded-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -29,12 +46,8 @@ export function ClaimModal({ businessName, open, onClose }: ClaimModalProps) {
           </DialogTitle>
         </DialogHeader>
 
-        {submitted ? (
-          <div className="py-6 text-center">
-            <p className="text-base font-medium text-foreground">{t('claim.success')}</p>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4 py-2">
+        {step === 'email' && (
+          <form onSubmit={handleSendCode} className="flex flex-col gap-4 py-2">
             <p className="text-sm text-muted-foreground">{businessName}</p>
             <input
               type="email"
@@ -51,6 +64,34 @@ export function ClaimModal({ businessName, open, onClose }: ClaimModalProps) {
               {t('claim.submit')}
             </button>
           </form>
+        )}
+
+        {step === 'code' && (
+          <form onSubmit={handleVerify} className="flex flex-col gap-4 py-2">
+            <p className="text-sm text-muted-foreground">{t('claim.codeSent')}</p>
+            <input
+              type="text"
+              required
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              placeholder={t('claim.code')}
+              maxLength={6}
+              className="h-12 px-4 rounded-xl bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent text-center text-lg tracking-widest font-mono"
+            />
+            <button
+              type="submit"
+              className="h-12 rounded-xl bg-accent text-accent-foreground font-semibold hover:bg-accent/90 transition-colors"
+            >
+              {t('claim.verify')}
+            </button>
+          </form>
+        )}
+
+        {step === 'success' && (
+          <div className="py-8 text-center flex flex-col items-center gap-3">
+            <ShieldCheck className="h-10 w-10 text-status-open" />
+            <p className="text-base font-medium text-foreground">{t('claim.success')}</p>
+          </div>
         )}
       </DialogContent>
     </Dialog>
