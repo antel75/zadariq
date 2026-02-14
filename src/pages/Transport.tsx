@@ -23,35 +23,54 @@ const statusConfig: Record<BoardingStatus, { color: string; icon: typeof CheckCi
   closed: { color: 'text-[hsl(var(--status-closed))]', icon: XCircle, labelKey: 'transport.closed' },
 };
 
+function getDaysNote(days: number[] | null): string | null {
+  if (!days) return null;
+  const hasWeekdays = [1,2,3,4,5].every(d => days.includes(d));
+  const hasSat = days.includes(6);
+  const hasSun = days.includes(7);
+  if (hasWeekdays && hasSat && hasSun) return null; // every day
+  if (hasWeekdays && !hasSat && !hasSun) return 'Ne vozi subotom, nedjeljom i praznikom';
+  if (hasWeekdays && hasSat && !hasSun) return 'Ne vozi nedjeljom i praznikom';
+  if (hasSat && !hasSun && !hasWeekdays) return 'Samo subotom';
+  if (hasSun && !hasSat && !hasWeekdays) return 'Samo nedjeljom';
+  return null;
+}
+
 function ScheduleCard({ schedule, t, isNext }: { schedule: TransportSchedule; t: (k: string) => string; isNext: boolean }) {
   const status = getBoardingStatus(schedule.departure_time);
   const sc = statusConfig[status];
   const StatusIcon = sc.icon;
   const isCatamaran = schedule.type === 'catamaran';
+  const daysNote = getDaysNote(schedule.days_of_week);
 
   return (
-    <div className={`p-3 rounded-xl bg-card border ${isNext ? 'border-accent ring-1 ring-accent/30' : 'border-border'} flex items-center justify-between gap-3`}>
-      <div className="flex items-center gap-3 min-w-0">
-        <div className={`p-2 rounded-lg ${isCatamaran ? 'bg-accent/10 text-accent' : 'bg-primary/10 text-primary'}`}>
-          {isCatamaran ? <Anchor className="h-4 w-4" /> : <Ship className="h-4 w-4" />}
+    <div className={`p-3 rounded-xl bg-card border ${isNext ? 'border-accent ring-1 ring-accent/30' : 'border-border'} flex flex-col gap-1.5`}>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className={`p-2 rounded-lg ${isCatamaran ? 'bg-accent/10 text-accent' : 'bg-primary/10 text-primary'}`}>
+            {isCatamaran ? <Anchor className="h-4 w-4" /> : <Ship className="h-4 w-4" />}
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-foreground truncate">{schedule.destination || schedule.route}</p>
+            <p className="text-[11px] text-muted-foreground">{schedule.port_or_station} · {schedule.carrier} · {schedule.line_name}</p>
+          </div>
         </div>
-        <div className="min-w-0">
-          <p className="text-sm font-semibold text-foreground truncate">{schedule.destination || schedule.route}</p>
-          <p className="text-[11px] text-muted-foreground">{schedule.port_or_station} · {schedule.carrier} · {schedule.line_name}</p>
+        <div className="flex items-center gap-3 shrink-0">
+          <div className="text-right">
+            <p className="text-sm font-bold text-foreground">{formatTime(schedule.departure_time)}</p>
+            {status !== 'closed' && (
+              <p className="text-[11px] text-accent font-medium">{getTimeRemaining(schedule.departure_time)}</p>
+            )}
+          </div>
+          <div className={`flex items-center gap-1 ${sc.color}`}>
+            <StatusIcon className="h-3.5 w-3.5" />
+            <span className="text-[10px] font-medium">{t(sc.labelKey)}</span>
+          </div>
         </div>
       </div>
-      <div className="flex items-center gap-3 shrink-0">
-        <div className="text-right">
-          <p className="text-sm font-bold text-foreground">{formatTime(schedule.departure_time)}</p>
-          {status !== 'closed' && (
-            <p className="text-[11px] text-accent font-medium">{getTimeRemaining(schedule.departure_time)}</p>
-          )}
-        </div>
-        <div className={`flex items-center gap-1 ${sc.color}`}>
-          <StatusIcon className="h-3.5 w-3.5" />
-          <span className="text-[10px] font-medium">{t(sc.labelKey)}</span>
-        </div>
-      </div>
+      {daysNote && (
+        <p className="text-[10px] text-muted-foreground italic ml-11">⚠ {daysNote}</p>
+      )}
     </div>
   );
 }
@@ -233,18 +252,24 @@ export default function Transport() {
             />
             {isLoading ? <LoadingState /> : (
               <div className="space-y-2">
-                {intercityBuses.map(d => (
-                  <div key={d.id} className="p-3 rounded-xl bg-card border border-border flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-semibold text-foreground">{d.destination}</p>
-                      <p className="text-[11px] text-muted-foreground">{d.carrier}{d.platform ? ` · ${t('transport.platform')} ${d.platform}` : ''}</p>
+                {intercityBuses.map(d => {
+                  const note = getDaysNote(d.days_of_week);
+                  return (
+                    <div key={d.id} className="p-3 rounded-xl bg-card border border-border">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-semibold text-foreground">{d.destination}</p>
+                          <p className="text-[11px] text-muted-foreground">{d.carrier}{d.platform ? ` · ${t('transport.platform')} ${d.platform}` : ''}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-bold text-foreground">{formatTime(d.departure_time)}</p>
+                          <p className="text-[11px] text-accent font-medium">{getTimeRemaining(d.departure_time)}</p>
+                        </div>
+                      </div>
+                      {note && <p className="text-[10px] text-muted-foreground italic mt-1.5">⚠ {note}</p>}
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm font-bold text-foreground">{formatTime(d.departure_time)}</p>
-                      <p className="text-[11px] text-accent font-medium">{getTimeRemaining(d.departure_time)}</p>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
                 {intercityBuses.length === 0 && (
                   <p className="text-xs text-muted-foreground text-center py-6">{t('transport.noResults')}</p>
                 )}
