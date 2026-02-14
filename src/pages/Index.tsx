@@ -8,11 +8,12 @@ import { CategoryScroll } from '@/components/CategoryScroll';
 import { BusinessCard } from '@/components/BusinessCard';
 import { ReportModal } from '@/components/ReportModal';
 import { FieldReportButton } from '@/components/FieldReportButton';
-import { TodayCard } from '@/components/dashboard/TodayCard';
+import { NowInZadar } from '@/components/dashboard/NowInZadar';
 import { TodayAlerts } from '@/components/dashboard/TodayAlerts';
 import { QuickActions } from '@/components/dashboard/QuickActions';
 import { ForYouSection } from '@/components/dashboard/ForYouSection';
 import { TransportWidget } from '@/components/dashboard/TransportWidget';
+import { TodayCard } from '@/components/dashboard/TodayCard';
 import { FeaturedNearby } from '@/components/FeaturedNearby';
 import { ZadarIQLogo } from '@/components/ZadarIQLogo';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -90,7 +91,7 @@ const Index = () => {
       </header>
 
       <main className="max-w-lg mx-auto px-4 pb-8">
-        {/* Dashboard: Today in Zadar */}
+        {/* SADA U ZADRU — critical info first */}
         <motion.section
           className="mt-4 mb-4"
           variants={fadeUp}
@@ -98,10 +99,10 @@ const Index = () => {
           animate="visible"
           custom={0}
         >
-          <TodayCard />
+          <NowInZadar />
         </motion.section>
 
-        {/* Dashboard: Alerts */}
+        {/* Quick Actions */}
         <motion.section
           className="mb-4"
           variants={fadeUp}
@@ -109,41 +110,52 @@ const Index = () => {
           animate="visible"
           custom={1}
         >
-          <TodayAlerts />
+          <QuickActions />
         </motion.section>
 
-        {/* Dashboard: Quick Actions */}
-        <motion.section
+        {/* Search */}
+        <motion.div
           className="mb-4"
           variants={fadeUp}
           initial="hidden"
           animate="visible"
           custom={2}
         >
-          <QuickActions />
-        </motion.section>
+          <SearchBar value={query} onChange={setQuery} onSubmit={handleSearch} />
+        </motion.div>
 
-        {/* Transport Widget */}
+        {/* Alerts */}
         <motion.section
-          className="mb-5"
+          className="mb-4"
           variants={fadeUp}
           initial="hidden"
           animate="visible"
           custom={3}
         >
-          <TransportWidget />
+          <TodayAlerts />
         </motion.section>
 
-        {/* Search */}
-        <motion.div
-          className="mb-5"
+        {/* Transport Widget */}
+        <motion.section
+          className="mb-4"
           variants={fadeUp}
           initial="hidden"
           animate="visible"
           custom={4}
         >
-          <SearchBar value={query} onChange={setQuery} onSubmit={handleSearch} />
-        </motion.div>
+          <TransportWidget />
+        </motion.section>
+
+        {/* Weather & city metrics — demoted */}
+        <motion.section
+          className="mb-4"
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          custom={5}
+        >
+          <TodayCard />
+        </motion.section>
 
         {/* Categories */}
         <motion.section
@@ -151,7 +163,7 @@ const Index = () => {
           variants={fadeUp}
           initial="hidden"
           animate="visible"
-          custom={5}
+          custom={6}
         >
           <CategoryScroll onSelect={handleCategory} />
         </motion.section>

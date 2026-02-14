@@ -7,7 +7,7 @@ type Translations = Record<string, Record<Language, string>>;
 const translations: Translations = {
   'app.title': { hr: 'ZadarIQ', en: 'ZadarIQ', de: 'ZadarIQ', it: 'ZadarIQ' },
   'app.subtitle': { hr: 'Pametni gradski asistent', en: 'Smart City Assistant', de: 'Smarter Stadtassistent', it: 'Assistente Città Intelligente' },
-  'search.placeholder': { hr: 'Pitaj Zadar bilo što…', en: 'Ask Zadar anything…', de: 'Frag Zadar alles…', it: 'Chiedi qualsiasi cosa a Zara…' },
+  'search.placeholder': { hr: 'Brzo pronađi…', en: 'Quick find…', de: 'Schnell finden…', it: 'Trova veloce…' },
   'search.results': { hr: 'Rezultati pretrage', en: 'Search Results', de: 'Suchergebnisse', it: 'Risultati della ricerca' },
   'status.open': { hr: 'OTVORENO', en: 'OPEN', de: 'GEÖFFNET', it: 'APERTO' },
   'status.closed': { hr: 'ZATVORENO', en: 'CLOSED', de: 'GESCHLOSSEN', it: 'CHIUSO' },
@@ -226,6 +226,16 @@ const translations: Translations = {
   'transport.line': { hr: 'Linija', en: 'Line', de: 'Linie', it: 'Linea' },
   'transport.widget': { hr: 'Prijevoz uskoro', en: 'Transport soon', de: 'Transport bald', it: 'Trasporti a breve' },
   'transport.cachedToday': { hr: 'Offline spremno', en: 'Cached today', de: 'Heute gespeichert', it: 'Salvato oggi' },
+  // Now in Zadar
+  'now.title': { hr: 'Sada u Zadru', en: 'Now in Zadar', de: 'Jetzt in Zadar', it: 'Ora a Zara' },
+  'now.pharmacy': { hr: 'Dežurna ljekarna', en: 'Duty pharmacy', de: 'Dienstapotheke', it: 'Farmacia di turno' },
+  'now.emergencyMedical': { hr: 'Hitna pomoć', en: 'Emergency', de: 'Notfall', it: 'Emergenza' },
+  'now.emergencyMedicalAnswer': { hr: '112 · Hitna medicinska pomoć', en: '112 · Emergency medical', de: '112 · Notarzt', it: '112 · Emergenza medica' },
+  'now.nextFerry': { hr: 'Sljedeći trajekt', en: 'Next ferry', de: 'Nächste Fähre', it: 'Prossimo traghetto' },
+  'now.noFerry': { hr: 'Nema polazaka danas', en: 'No departures today', de: 'Keine Abfahrten heute', it: 'Nessuna partenza oggi' },
+  'now.parking': { hr: 'Parking poluotok', en: 'Peninsula parking', de: 'Halbinsel Parken', it: 'Parcheggio penisola' },
+  'now.parkingFree': { hr: 'Besplatno sada', en: 'Free now', de: 'Jetzt kostenlos', it: 'Gratuito ora' },
+  'now.parkingPaid': { hr: 'Naplata aktivna', en: 'Paid now', de: 'Gebührenpflichtig', it: 'A pagamento' },
 };
 
 interface LanguageContextType {

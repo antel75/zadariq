@@ -21,7 +21,7 @@ export function SearchBar({ value, onChange, onSubmit }: SearchBarProps) {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={t('search.placeholder')}
-        className="w-full h-14 pl-12 pr-4 rounded-2xl bg-card border border-border text-foreground text-base shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all"
+        className="w-full h-12 pl-12 pr-4 rounded-2xl bg-card border border-border text-foreground text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all"
       />
     </form>
   );
