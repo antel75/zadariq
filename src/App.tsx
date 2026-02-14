@@ -16,6 +16,7 @@ import Transport from "./pages/Transport";
 import Parking from "./pages/Parking";
 import Cinema from "./pages/Cinema";
 import PublicServices from "./pages/PublicServices";
+import UtilityCompanies from "./pages/UtilityCompanies";
 import AdminLogin from "./pages/AdminLogin";
 import AdminSignup from "./pages/AdminSignup";
 import AdminPanel from "./pages/AdminPanel";
@@ -43,6 +44,7 @@ const App = () => (
               <Route path="/parking" element={<Parking />} />
               <Route path="/cinema" element={<Cinema />} />
               <Route path="/public-services/:orgId" element={<PublicServices />} />
+              <Route path="/utility-companies" element={<UtilityCompanies />} />
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin/signup" element={<AdminSignup />} />
               <Route path="/admin" element={<AdminPanel />} />
