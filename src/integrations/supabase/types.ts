@@ -247,6 +247,42 @@ export type Database = {
         }
         Relationships: []
       }
+      water_outages: {
+        Row: {
+          area: string
+          created_at: string
+          id: string
+          outage_date: string | null
+          published_date: string
+          raw_text: string
+          time_from: string | null
+          time_until: string | null
+          updated_at: string
+        }
+        Insert: {
+          area: string
+          created_at?: string
+          id?: string
+          outage_date?: string | null
+          published_date: string
+          raw_text: string
+          time_from?: string | null
+          time_until?: string | null
+          updated_at?: string
+        }
+        Update: {
+          area?: string
+          created_at?: string
+          id?: string
+          outage_date?: string | null
+          published_date?: string
+          raw_text?: string
+          time_from?: string | null
+          time_until?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

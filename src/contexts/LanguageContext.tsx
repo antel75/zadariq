@@ -116,6 +116,8 @@ const translations: Translations = {
   'alert.powerOutage': { hr: 'Nestanak struje', en: 'Power outage', de: 'Stromausfall', it: 'Interruzione di corrente' },
   'alert.powerOutageDesc': { hr: '{area} — {time}', en: '{area} — {time}', de: '{area} — {time}', it: '{area} — {time}' },
   'alert.powerOutageMultiple': { hr: '{count} područja bez struje danas', en: '{count} areas without power today', de: '{count} Gebiete ohne Strom heute', it: '{count} aree senza corrente oggi' },
+  'alert.waterOutage': { hr: 'Bez vode', en: 'Water outage', de: 'Wasserausfall', it: 'Interruzione idrica' },
+  'alert.waterOutageMultiple': { hr: '{count} područja bez vode danas', en: '{count} areas without water today', de: '{count} Gebiete ohne Wasser heute', it: '{count} aree senza acqua oggi' },
   // Quick actions
   'quick.pharmacyNow': { hr: 'Ljekarna', en: 'Pharmacy', de: 'Apotheke', it: 'Farmacia' },
   'quick.freeParking': { hr: 'Parking', en: 'Parking', de: 'Parken', it: 'Parcheggio' },
