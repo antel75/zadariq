@@ -14,6 +14,7 @@ export interface TransportSchedule {
   route: string | null;
   port_or_station: string | null;
   platform: string | null;
+  days_of_week: number[] | null;
 }
 
 function getMinutesUntil(timeStr: string): number {
@@ -51,9 +52,13 @@ export function useTransportSchedules(types?: TransportType[]) {
   return useQuery({
     queryKey: ['transport-schedules', types],
     queryFn: async () => {
+      // Get current day of week (1=Mon ... 7=Sun)
+      const jsDay = new Date().getDay(); // 0=Sun, 1=Mon...
+      const isoDay = jsDay === 0 ? 7 : jsDay;
+
       let query = supabase
         .from('transport_schedules')
-        .select('id, type, line_name, departure_time, destination, carrier, route, port_or_station, platform')
+        .select('id, type, line_name, departure_time, destination, carrier, route, port_or_station, platform, days_of_week')
         .eq('enabled', true)
         .order('departure_time', { ascending: true });
 
@@ -63,7 +68,12 @@ export function useTransportSchedules(types?: TransportType[]) {
 
       const { data, error } = await query;
       if (error) throw error;
-      return (data || []) as TransportSchedule[];
+      
+      // Filter by day of week (null = every day)
+      const filtered = (data || []).filter((s: any) => 
+        s.days_of_week === null || s.days_of_week.includes(isoDay)
+      );
+      return filtered as TransportSchedule[];
     },
     staleTime: 5 * 60 * 1000, // 5 min cache
   });
