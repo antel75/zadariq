@@ -7,6 +7,35 @@ import { ReportModal } from '@/components/ReportModal';
 import { Business, CategoryId } from '@/data/types';
 import { ArrowLeft, Filter } from 'lucide-react';
 
+// Extract the meaningful sort key from a business name
+function getSortKey(name: string): string {
+  let n = name;
+  // Remove common prefixes
+  const prefixes = [
+    'Ordinacija dentalne medicine ', 'Ord. dentalne medicine ',
+    'Stomatološka ordinacija ', 'Stom. ordinacija ',
+    'Stomatološka poliklinika ', 'Dentalna poliklinika ',
+    'Dental Practice ', 'Dental Center ', 'Ordinacija dr. ',
+    'Ordinacija ', 'Dr. sc. ', 'Dr. ',
+  ];
+  for (const p of prefixes) {
+    if (n.startsWith(p)) { n = n.slice(p.length); break; }
+  }
+  // Remove trailing titles after comma: ", dr. med. dent." etc.
+  n = n.replace(/,\s*dr\..*$/i, '').trim();
+  // If it looks like "FirstName LastName" (2+ words, no "Dental/Centar/Clinic" etc.), use last word (surname)
+  const words = n.split(/\s+/);
+  const brandWords = ['dental', 'dent', 'centar', 'center', 'clinic', 'medical', 'd.o.o.', 'poliklinika'];
+  const isPersonName = words.length >= 2 && !brandWords.some(bw => n.toLowerCase().includes(bw));
+  if (isPersonName) {
+    // Last word is surname
+    return words[words.length - 1].toLowerCase();
+  }
+  // For brand names, strip generic suffixes like "Dental", "Centar", "Clinic" from the front
+  const significantWords = words.filter(w => !brandWords.includes(w.toLowerCase()) && w !== '—' && w !== '-');
+  return (significantWords[0] || words[0]).toLowerCase();
+}
+
 export default function CategoryBrowse() {
   const { categoryId } = useParams<{ categoryId: string }>();
   const { t } = useLanguage();
@@ -24,6 +53,8 @@ export default function CategoryBrowse() {
       return b.category === categoryId;
     });
     if (openOnly) r = r.filter(isBusinessOpen);
+    // Sort alphabetically by meaningful sort key
+    r.sort((a, b) => getSortKey(a.name).localeCompare(getSortKey(b.name), 'hr'));
     return r;
   }, [categoryId, openOnly]);
 
