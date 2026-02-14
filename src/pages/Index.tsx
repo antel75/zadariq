@@ -7,6 +7,10 @@ import { CategoryScroll } from '@/components/CategoryScroll';
 import { BusinessCard } from '@/components/BusinessCard';
 import { ReportModal } from '@/components/ReportModal';
 import { FieldReportButton } from '@/components/FieldReportButton';
+import { TodayCard } from '@/components/dashboard/TodayCard';
+import { TodayAlerts } from '@/components/dashboard/TodayAlerts';
+import { QuickActions } from '@/components/dashboard/QuickActions';
+import { ForYouSection } from '@/components/dashboard/ForYouSection';
 import { businesses, isBusinessOpen } from '@/data/mockData';
 import { Business, CategoryId } from '@/data/types';
 import { Sparkles, MapPin, Siren } from 'lucide-react';
@@ -64,14 +68,34 @@ const Index = () => {
       </header>
 
       <main className="max-w-lg mx-auto px-4 pb-8">
+        {/* Dashboard: Today in Zadar */}
+        <section className="mt-4 mb-4">
+          <TodayCard />
+        </section>
+
+        {/* Dashboard: Alerts */}
+        <section className="mb-4">
+          <TodayAlerts />
+        </section>
+
+        {/* Dashboard: Quick Actions */}
+        <section className="mb-5">
+          <QuickActions />
+        </section>
+
         {/* Search */}
-        <div className="mt-6 mb-5">
+        <div className="mb-5">
           <SearchBar value={query} onChange={setQuery} onSubmit={handleSearch} />
         </div>
 
         {/* Categories */}
         <section className="mb-6">
           <CategoryScroll onSelect={handleCategory} />
+        </section>
+
+        {/* For You Today */}
+        <section className="mb-6">
+          <ForYouSection onReport={setReportTarget} />
         </section>
 
         {/* Trending */}
