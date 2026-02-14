@@ -2,6 +2,8 @@ export type CategoryId = 'pharmacy' | 'doctor' | 'shops' | 'restaurants' | 'cafe
 
 export type VerificationStatus = 'owner' | 'community' | 'unverified' | 'possibly_incorrect';
 
+export type OccupancyLevel = 'quiet' | 'normal' | 'busy';
+
 export interface WorkingHours {
   mon: string;
   tue: string;
@@ -10,6 +12,12 @@ export interface WorkingHours {
   fri: string;
   sat: string;
   sun: string;
+}
+
+export interface BusinessAnalytics {
+  viewsToday: number;
+  callsClicked: number;
+  navigationClicks: number;
 }
 
 export interface Business {
@@ -31,6 +39,14 @@ export interface Business {
   communityConfirmedAt?: string;
   lastAutoChecked?: string;
   trustScore: number; // 0-100
+  // Business-side fields
+  occupancy?: OccupancyLevel;
+  waitTime?: string;
+  dailyOffer?: string;
+  announcement?: string;
+  nextAppointment?: string;
+  analytics?: BusinessAnalytics;
+  featured?: boolean;
 }
 
 export interface EmergencyContact {

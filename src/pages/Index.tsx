@@ -11,9 +11,10 @@ import { TodayCard } from '@/components/dashboard/TodayCard';
 import { TodayAlerts } from '@/components/dashboard/TodayAlerts';
 import { QuickActions } from '@/components/dashboard/QuickActions';
 import { ForYouSection } from '@/components/dashboard/ForYouSection';
+import { FeaturedNearby } from '@/components/FeaturedNearby';
 import { businesses, isBusinessOpen } from '@/data/mockData';
 import { Business, CategoryId } from '@/data/types';
-import { Sparkles, MapPin, Siren } from 'lucide-react';
+import { Sparkles, MapPin, Siren, Briefcase } from 'lucide-react';
 
 const Index = () => {
   const { t } = useLanguage();
@@ -62,6 +63,13 @@ const Index = () => {
             >
               <Siren className="h-4 w-4" />
             </button>
+            <button
+              onClick={() => navigate('/for-business')}
+              className="p-2 rounded-xl bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
+              title={t('forbiz.title')}
+            >
+              <Briefcase className="h-4 w-4" />
+            </button>
             <LanguageSelector />
           </div>
         </div>
@@ -92,6 +100,9 @@ const Index = () => {
         <section className="mb-6">
           <CategoryScroll onSelect={handleCategory} />
         </section>
+
+        {/* Featured nearby */}
+        <FeaturedNearby />
 
         {/* For You Today */}
         <section className="mb-6">

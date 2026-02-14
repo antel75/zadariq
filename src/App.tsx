@@ -7,8 +7,10 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import Index from "./pages/Index";
 import SearchResults from "./pages/SearchResults";
 import BusinessDetail from "./pages/BusinessDetail";
+import BusinessOwnerPanel from "./pages/BusinessOwnerPanel";
 import CategoryBrowse from "./pages/CategoryBrowse";
 import Emergency from "./pages/Emergency";
+import ForBusiness from "./pages/ForBusiness";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,8 +26,10 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/search" element={<SearchResults />} />
             <Route path="/business/:id" element={<BusinessDetail />} />
+            <Route path="/business/:id/panel" element={<BusinessOwnerPanel />} />
             <Route path="/category/:categoryId" element={<CategoryBrowse />} />
             <Route path="/emergency" element={<Emergency />} />
+            <Route path="/for-business" element={<ForBusiness />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

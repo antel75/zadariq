@@ -6,9 +6,10 @@ import { ReportModal } from '@/components/ReportModal';
 import { ClaimModal } from '@/components/ClaimModal';
 import { TrustBadge } from '@/components/TrustBadge';
 import { TrustScore } from '@/components/TrustScore';
+import { FollowButton } from '@/components/FollowButton';
 import {
   ArrowLeft, Phone, Navigation, BadgeCheck, AlertTriangle,
-  UserCheck, Clock, ShieldCheck, Users, Bot,
+  UserCheck, Clock, ShieldCheck, Users, Bot, Activity, Tag, Megaphone, CalendarClock, Settings,
 } from 'lucide-react';
 
 const dayKeys = ['days.mon', 'days.tue', 'days.wed', 'days.thu', 'days.fri', 'days.sat', 'days.sun'] as const;
@@ -54,6 +55,9 @@ export default function BusinessDetail() {
           )}
           <TrustBadge status={business.verificationStatus} size="md" />
           <span className="text-sm text-muted-foreground">{getTodayHours(business)}</span>
+          <div className="ml-auto">
+            <FollowButton businessId={business.id} businessName={business.name} />
+          </div>
         </div>
 
         {/* Warning */}
@@ -97,6 +101,57 @@ export default function BusinessDetail() {
             )}
           </div>
         </div>
+
+        {/* For customers today */}
+        {(business.occupancy || business.dailyOffer || business.announcement || business.nextAppointment || business.waitTime) && (
+          <div className="mb-6 p-4 rounded-2xl bg-card border border-accent/20">
+            <h2 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+              <Activity className="h-4 w-4 text-accent" />
+              {t('biz.forCustomers')}
+            </h2>
+            <div className="space-y-2.5">
+              {business.occupancy && (
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">{t('biz.liveOccupancy')}</span>
+                  <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
+                    business.occupancy === 'quiet' ? 'bg-status-open/20 text-status-open' :
+                    business.occupancy === 'busy' ? 'bg-destructive/20 text-destructive' :
+                    'bg-accent/20 text-accent'
+                  }`}>
+                    {t(`biz.occupancy.${business.occupancy}`)}
+                  </span>
+                </div>
+              )}
+              {business.waitTime && (
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">{t('biz.waitTime')}</span>
+                  <span className="text-xs font-medium text-foreground">{business.waitTime}</span>
+                </div>
+              )}
+              {business.nextAppointment && (
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground flex items-center gap-1">
+                    <CalendarClock className="h-3 w-3" />
+                    {t('biz.nextAppt')}
+                  </span>
+                  <span className="text-xs font-medium text-foreground">{business.nextAppointment}</span>
+                </div>
+              )}
+              {business.dailyOffer && (
+                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-accent/5 border border-accent/10">
+                  <Tag className="h-3.5 w-3.5 text-accent flex-shrink-0" />
+                  <span className="text-xs text-foreground">{business.dailyOffer}</span>
+                </div>
+              )}
+              {business.announcement && (
+                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-primary/5 border border-primary/10">
+                  <Megaphone className="h-3.5 w-3.5 text-primary flex-shrink-0" />
+                  <span className="text-xs text-foreground">{business.announcement}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Address + Actions */}
         <div className="mb-6 p-4 rounded-2xl bg-card border border-border">
@@ -152,6 +207,15 @@ export default function BusinessDetail() {
             <UserCheck className="h-4 w-4" />
             {t('action.claimOwner')}
           </button>
+          {business.verificationStatus === 'owner' && (
+            <button
+              onClick={() => navigate(`/business/${business.id}/panel`)}
+              className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+            >
+              <Settings className="h-4 w-4" />
+              {t('biz.panel')}
+            </button>
+          )}
         </div>
       </main>
 
