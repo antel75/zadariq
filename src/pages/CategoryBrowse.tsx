@@ -17,7 +17,12 @@ export default function CategoryBrowse() {
   const category = categories.find(c => c.id === categoryId);
 
   const results = useMemo(() => {
-    let r = businesses.filter(b => b.category === categoryId);
+    let r = businesses.filter(b => {
+      if (categoryId === 'doctor') {
+        return b.category === 'doctor' || b.category === 'dentist' || b.category === 'medicine';
+      }
+      return b.category === categoryId;
+    });
     if (openOnly) r = r.filter(isBusinessOpen);
     return r;
   }, [categoryId, openOnly]);
