@@ -165,7 +165,7 @@ export default function BusinessDetail() {
               {t('action.call')}
             </a>
             <a
-              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.address)}`}
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.category === 'restaurants' ? business.name + ' Zadar' : business.address)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-accent text-accent-foreground font-medium text-sm hover:bg-accent/90 transition-colors"
