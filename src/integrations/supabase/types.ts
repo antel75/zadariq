@@ -14,16 +14,141 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      duty_services: {
+        Row: {
+          address: string | null
+          created_at: string
+          enabled: boolean
+          id: string
+          name: string
+          notes: string | null
+          phone: string | null
+          source: Database["public"]["Enums"]["info_source"]
+          type: Database["public"]["Enums"]["duty_service_type"]
+          updated_at: string
+          valid_from: string
+          valid_until: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          name: string
+          notes?: string | null
+          phone?: string | null
+          source?: Database["public"]["Enums"]["info_source"]
+          type: Database["public"]["Enums"]["duty_service_type"]
+          updated_at?: string
+          valid_from?: string
+          valid_until?: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          source?: Database["public"]["Enums"]["info_source"]
+          type?: Database["public"]["Enums"]["duty_service_type"]
+          updated_at?: string
+          valid_from?: string
+          valid_until?: string
+        }
+        Relationships: []
+      }
+      transport_schedules: {
+        Row: {
+          carrier: string | null
+          created_at: string
+          departure_time: string
+          destination: string | null
+          enabled: boolean
+          id: string
+          line_name: string
+          platform: string | null
+          port_or_station: string | null
+          route: string | null
+          source: Database["public"]["Enums"]["info_source"]
+          type: Database["public"]["Enums"]["transport_type"]
+          updated_at: string
+          valid_from: string
+          valid_until: string
+        }
+        Insert: {
+          carrier?: string | null
+          created_at?: string
+          departure_time: string
+          destination?: string | null
+          enabled?: boolean
+          id?: string
+          line_name: string
+          platform?: string | null
+          port_or_station?: string | null
+          route?: string | null
+          source?: Database["public"]["Enums"]["info_source"]
+          type: Database["public"]["Enums"]["transport_type"]
+          updated_at?: string
+          valid_from?: string
+          valid_until?: string
+        }
+        Update: {
+          carrier?: string | null
+          created_at?: string
+          departure_time?: string
+          destination?: string | null
+          enabled?: boolean
+          id?: string
+          line_name?: string
+          platform?: string | null
+          port_or_station?: string | null
+          route?: string | null
+          source?: Database["public"]["Enums"]["info_source"]
+          type?: Database["public"]["Enums"]["transport_type"]
+          updated_at?: string
+          valid_from?: string
+          valid_until?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
+      duty_service_type: "pharmacy" | "dentist" | "doctor" | "night_service"
+      info_source: "phone" | "website" | "official" | "owner_confirmed"
+      transport_type: "ferry" | "catamaran" | "city_bus" | "intercity_bus"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +275,11 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+      duty_service_type: ["pharmacy", "dentist", "doctor", "night_service"],
+      info_source: ["phone", "website", "official", "owner_confirmed"],
+      transport_type: ["ferry", "catamaran", "city_bus", "intercity_bus"],
+    },
   },
 } as const
