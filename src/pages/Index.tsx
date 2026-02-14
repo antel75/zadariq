@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { SearchBar } from '@/components/SearchBar';
@@ -13,9 +14,20 @@ import { QuickActions } from '@/components/dashboard/QuickActions';
 import { ForYouSection } from '@/components/dashboard/ForYouSection';
 import { TransportWidget } from '@/components/dashboard/TransportWidget';
 import { FeaturedNearby } from '@/components/FeaturedNearby';
+import { ZadarIQLogo } from '@/components/ZadarIQLogo';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { businesses, isBusinessOpen } from '@/data/mockData';
 import { Business, CategoryId } from '@/data/types';
 import { Sparkles, MapPin, Siren, Briefcase } from 'lucide-react';
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 16 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.08, duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] as const },
+  }),
+};
 
 const Index = () => {
   const { t } = useLanguage();
@@ -49,15 +61,15 @@ const Index = () => {
     .slice(0, 4);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen gradient-bg gradient-mesh">
       {/* Header */}
-      <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-lg border-b border-border">
+      <header className="sticky top-0 z-30 glass border-b border-border/50">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-foreground tracking-tight">ZadarIQ</h1>
-            <p className="text-[11px] text-muted-foreground">{t('app.subtitle')}</p>
+            <ZadarIQLogo />
+            <p className="text-[11px] text-muted-foreground mt-0.5">{t('app.subtitle')}</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => navigate('/emergency')}
               className="p-2 rounded-xl bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors"
@@ -71,6 +83,7 @@ const Index = () => {
             >
               <Briefcase className="h-4 w-4" />
             </button>
+            <ThemeToggle />
             <LanguageSelector />
           </div>
         </div>
@@ -78,45 +91,100 @@ const Index = () => {
 
       <main className="max-w-lg mx-auto px-4 pb-8">
         {/* Dashboard: Today in Zadar */}
-        <section className="mt-4 mb-4">
+        <motion.section
+          className="mt-4 mb-4"
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          custom={0}
+        >
           <TodayCard />
-        </section>
+        </motion.section>
 
         {/* Dashboard: Alerts */}
-        <section className="mb-4">
+        <motion.section
+          className="mb-4"
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          custom={1}
+        >
           <TodayAlerts />
-        </section>
+        </motion.section>
 
         {/* Dashboard: Quick Actions */}
-        <section className="mb-4">
+        <motion.section
+          className="mb-4"
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          custom={2}
+        >
           <QuickActions />
-        </section>
+        </motion.section>
 
         {/* Transport Widget */}
-        <section className="mb-5">
+        <motion.section
+          className="mb-5"
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          custom={3}
+        >
           <TransportWidget />
-        </section>
+        </motion.section>
 
         {/* Search */}
-        <div className="mb-5">
+        <motion.div
+          className="mb-5"
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          custom={4}
+        >
           <SearchBar value={query} onChange={setQuery} onSubmit={handleSearch} />
-        </div>
+        </motion.div>
 
         {/* Categories */}
-        <section className="mb-6">
+        <motion.section
+          className="mb-6"
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          custom={5}
+        >
           <CategoryScroll onSelect={handleCategory} />
-        </section>
+        </motion.section>
 
         {/* Featured nearby */}
-        <FeaturedNearby />
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          custom={6}
+        >
+          <FeaturedNearby />
+        </motion.div>
 
         {/* For You Today */}
-        <section className="mb-6">
+        <motion.section
+          className="mb-6"
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          custom={7}
+        >
           <ForYouSection onReport={setReportTarget} />
-        </section>
+        </motion.section>
 
         {/* Trending */}
-        <section className="mb-6">
+        <motion.section
+          className="mb-6"
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          custom={8}
+        >
           <div className="flex items-center gap-2 mb-3">
             <Sparkles className="h-4 w-4 text-accent" />
             <h2 className="text-sm font-semibold text-foreground">{t('home.trending')}</h2>
@@ -126,16 +194,21 @@ const Index = () => {
               <button
                 key={s}
                 onClick={() => { setQuery(s); navigate(`/search?q=${encodeURIComponent(s)}`); }}
-                className="px-3 py-1.5 rounded-full bg-secondary text-secondary-foreground text-xs font-medium hover:bg-secondary/80 transition-colors"
+                className="px-3 py-1.5 rounded-full bg-secondary/80 text-secondary-foreground text-xs font-medium hover:bg-accent/15 hover:text-accent transition-all duration-200"
               >
                 {s}
               </button>
             ))}
           </div>
-        </section>
+        </motion.section>
 
         {/* Nearby open */}
-        <section>
+        <motion.section
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          custom={9}
+        >
           <div className="flex items-center gap-2 mb-3">
             <MapPin className="h-4 w-4 text-accent" />
             <h2 className="text-sm font-semibold text-foreground">{t('home.nearby')}</h2>
@@ -145,7 +218,7 @@ const Index = () => {
               <BusinessCard key={b.id} business={b} onReport={setReportTarget} />
             ))}
           </div>
-        </section>
+        </motion.section>
       </main>
 
       <ReportModal
