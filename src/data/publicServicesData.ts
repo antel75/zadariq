@@ -131,3 +131,88 @@ export const gradZadar: PublicServiceOrg = {
     },
   ],
 };
+
+export const zadarskaZupanija: PublicServiceOrg = {
+  id: 'zadarska-zupanija',
+  name: 'Zadarska županija',
+  centralPhone: '023 350 350',
+  website: 'https://www.zadarska-zupanija.hr',
+  address: 'Božidara Petranovića 8, 23000 Zadar',
+  departments: [
+    {
+      id: 'zz-opca-uprava',
+      name: 'Upravni odjel za opću upravu',
+      website: 'https://www.zadarska-zupanija.hr/upravni-odjeli/upravni-odjel-za-op%C4%87u-upravu',
+      subunits: [
+        { name: 'Matični uredi' },
+        { name: 'Registar birača' },
+      ],
+    },
+    {
+      id: 'zz-prostorno',
+      name: 'Upravni odjel za prostorno uređenje, zaštitu okoliša i komunalne poslove',
+      website: 'https://www.zadarska-zupanija.hr/upravni-odjeli/upravni-odjel-za-prostorno-ure%C4%91enje,-za%C5%A1titu-okoli%C5%A1a-i-komunalne-poslove',
+      subunits: [
+        { name: 'Građevinske dozvole' },
+        { name: 'Izmjene i dopune Prostornog plana' },
+        { name: 'Zaštita okoliša' },
+      ],
+    },
+    {
+      id: 'zz-gospodarstvo',
+      name: 'Upravni odjel za gospodarstvo i turizam',
+      website: 'https://www.zadarska-zupanija.hr/upravni-odjeli/upravni-odjel-za-gospodarstvo-i-turizam',
+      subunits: [
+        { name: 'Kategorizacija turističkih objekata' },
+        { name: 'Potpore u turizmu' },
+      ],
+    },
+    {
+      id: 'zz-financije',
+      name: 'Upravni odjel za financije i proračun',
+      website: 'https://www.zadarska-zupanija.hr/upravni-odjeli/financije-i-prora%C4%8Dun',
+      subunits: [
+        { name: 'Proračun Zadarske županije' },
+      ],
+    },
+    {
+      id: 'zz-zdravstvo',
+      name: 'Upravni odjel za zdravstvo',
+      website: 'https://www.zadarska-zupanija.hr/upravni-odjeli/upravni-odjel-za-zdravstvo',
+      subunits: [
+        { name: 'Povjerenstvo za zaštitu prava pacijenata' },
+      ],
+    },
+    {
+      id: 'zz-obrazovanje',
+      name: 'Upravni odjel za obrazovanje, kulturu i šport',
+      website: 'https://www.zadarska-zupanija.hr/upravni-odjeli/obrazovanje-kultura-i-sport',
+      subunits: [
+        { name: 'Javne potrebe u kulturi' },
+        { name: 'Javne potrebe u športu' },
+      ],
+    },
+    {
+      id: 'zz-branitelji',
+      name: 'Upravni odjel za hrvatske branitelje, udruge, demografiju i socijalnu politiku',
+      website: 'https://www.zadarska-zupanija.hr/upravni-odjeli/branitelji-udruge-demografija',
+      subunits: [
+        { name: 'Socijalna skrb i humanitarni rad' },
+        { name: 'Stambeno zbrinjavanje' },
+      ],
+    },
+    {
+      id: 'zz-pomorsko',
+      name: 'Upravni odjel za pomorsko dobro, more i promet',
+      website: 'https://www.zadarska-zupanija.hr/upravni-odjeli/upravni-odjel-za-pomorsko-dobro,-more-i-promet',
+      subunits: [
+        { name: 'Koncesije na pomorskom dobru' },
+      ],
+    },
+  ],
+};
+
+export const publicServiceOrgs: Record<string, PublicServiceOrg> = {
+  'grad-zadar': gradZadar,
+  'zadarska-zupanija': zadarskaZupanija,
+};

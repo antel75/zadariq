@@ -192,6 +192,7 @@ const translations: Translations = {
   'publicServices.title': { hr: 'Javne službe', en: 'Public Services', de: 'Öffentliche Dienste', it: 'Servizi Pubblici' },
   'publicServices.subtitle': { hr: 'Gradske institucije i službe', en: 'City institutions & services', de: 'Städtische Institutionen & Dienste', it: 'Istituzioni e servizi comunali' },
   'publicServices.gradZadar': { hr: 'Grad Zadar', en: 'City of Zadar', de: 'Stadt Zadar', it: 'Città di Zara' },
+  'publicServices.zadarskaZupanija': { hr: 'Zadarska županija', en: 'Zadar County', de: 'Gespanschaft Zadar', it: 'Contea di Zara' },
   'publicServices.centrala': { hr: 'Centrala', en: 'Switchboard', de: 'Zentrale', it: 'Centralino' },
   'publicServices.departments': { hr: 'Upravni odjeli i stručne službe', en: 'Administrative departments', de: 'Verwaltungsabteilungen', it: 'Dipartimenti amministrativi' },
   // Transport
