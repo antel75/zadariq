@@ -40,53 +40,53 @@ export function TodayCard() {
           <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
         </div>
       ) : (
-      <div className="grid grid-cols-3 gap-3">
-        {/* Weather */}
-        <div className="flex flex-col items-center gap-1">
-          <span className="text-2xl">{weatherIcon}</span>
-          <span className="text-lg font-bold text-foreground">{weather?.tempC ?? '--'}°</span>
-          <span className="text-[10px] text-muted-foreground">{t(`weather.${conditionKey}`)}</span>
-        </div>
+        <div className="grid grid-cols-3 gap-3">
+          {/* Weather */}
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-2xl">{weatherIcon}</span>
+            <span className="text-lg font-bold text-foreground">{weather?.tempC ?? '--'}°</span>
+            <span className="text-[10px] text-muted-foreground">{t(`weather.${conditionKey}`)}</span>
+          </div>
 
-        {/* Sea temp */}
-        <div className="flex flex-col items-center gap-1">
-          <Waves className="h-5 w-5 text-accent" />
-          <span className="text-lg font-bold text-foreground">{city.seaTempC}°</span>
-          <span className="text-[10px] text-muted-foreground">{t('dashboard.sea')}</span>
-        </div>
+          {/* Sea temp */}
+          <div className="flex flex-col items-center gap-1">
+            <Waves className="h-5 w-5 text-accent" />
+            <span className="text-lg font-bold text-foreground">{city.seaTempC}°</span>
+            <span className="text-[10px] text-muted-foreground">{t('dashboard.sea')}</span>
+          </div>
 
-        {/* Sunset */}
-        <div className="flex flex-col items-center gap-1">
-          <Sunset className="h-5 w-5 text-[hsl(var(--status-warning))]" />
-          <span className="text-lg font-bold text-foreground">{weather?.sunset ?? '--:--'}</span>
-          <span className="text-[10px] text-muted-foreground">{t('dashboard.sunset')}</span>
-        </div>
+          {/* Sunset */}
+          <div className="flex flex-col items-center gap-1">
+            <Sunset className="h-5 w-5 text-[hsl(var(--status-warning))]" />
+            <span className="text-lg font-bold text-foreground">{weather?.sunset ?? '--:--'}</span>
+            <span className="text-[10px] text-muted-foreground">{t('dashboard.sunset')}</span>
+          </div>
 
-        {/* Wind */}
-        <div className="flex flex-col items-center gap-1">
-          <Wind className="h-5 w-5 text-muted-foreground" />
-          <span className="text-sm font-semibold text-foreground">{weather?.windKmh ?? '--'} km/h</span>
-          <span className="text-[10px] text-muted-foreground">{t(`wind.${windType}`)}</span>
-        </div>
+          {/* Wind */}
+          <div className="flex flex-col items-center gap-1">
+            <Wind className="h-5 w-5 text-muted-foreground" />
+            <span className="text-sm font-semibold text-foreground">{weather?.windKmh ?? '--'} km/h</span>
+            <span className="text-[10px] text-muted-foreground">{t(`wind.${windType}`)}</span>
+          </div>
 
-        {/* Crowd */}
-        <div className="flex flex-col items-center gap-1">
-          <Users className="h-5 w-5 text-muted-foreground" />
-          <span className={`text-sm font-semibold ${crowdColors[city.crowdLevel]}`}>
-            {t(`crowd.${city.crowdLevel}`)}
-          </span>
-          <span className="text-[10px] text-muted-foreground">{t('dashboard.crowd')}</span>
-        </div>
+          {/* Crowd */}
+          <div className="flex flex-col items-center gap-1">
+            <Users className="h-5 w-5 text-muted-foreground" />
+            <span className={`text-sm font-semibold ${crowdColors[city.crowdLevel]}`}>
+              {t(`crowd.${city.crowdLevel}`)}
+            </span>
+            <span className="text-[10px] text-muted-foreground">{t('dashboard.crowd')}</span>
+          </div>
 
-        {/* Parking */}
-        <div className="flex flex-col items-center gap-1">
-          <Car className="h-5 w-5 text-muted-foreground" />
-          <span className={`text-sm font-semibold ${parkingColors[city.parkingPressure]}`}>
-            {t(`parking.${city.parkingPressure}`)}
-          </span>
-          <span className="text-[10px] text-muted-foreground">{t('dashboard.parking')}</span>
+          {/* Parking */}
+          <div className="flex flex-col items-center gap-1">
+            <Car className="h-5 w-5 text-muted-foreground" />
+            <span className={`text-sm font-semibold ${parkingColors[city.parkingPressure]}`}>
+              {t(`parking.${city.parkingPressure}`)}
+            </span>
+            <span className="text-[10px] text-muted-foreground">{t('dashboard.parking')}</span>
+          </div>
         </div>
-      </div>
       )}
     </div>
   );
