@@ -22,6 +22,8 @@ const translations: Translations = {
   'action.back': { hr: 'Natrag', en: 'Back', de: 'Zurück', it: 'Indietro' },
   'category.pharmacy': { hr: 'Ljekarna', en: 'Pharmacy', de: 'Apotheke', it: 'Farmacia' },
   'category.doctor': { hr: 'Doktor / Zubar', en: 'Doctor / Dentist', de: 'Arzt / Zahnarzt', it: 'Medico / Dentista' },
+  'category.dentist': { hr: 'Dentalna medicina', en: 'Dental', de: 'Zahnmedizin', it: 'Odontoiatria' },
+  'category.medicine': { hr: 'Medicina', en: 'Medicine', de: 'Medizin', it: 'Medicina' },
   'category.shops': { hr: 'Trgovine', en: 'Shops', de: 'Geschäfte', it: 'Negozi' },
   'category.restaurants': { hr: 'Restorani', en: 'Restaurants', de: 'Restaurants', it: 'Ristoranti' },
   'category.cafes': { hr: 'Kafići', en: 'Cafes', de: 'Cafés', it: 'Caffè' },
