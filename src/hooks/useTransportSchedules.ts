@@ -23,7 +23,7 @@ function getMinutesUntil(timeStr: string): number {
   const [h, m] = parts;
   const target = new Date();
   target.setHours(h, m, 0, 0);
-  if (target < now) target.setDate(target.getDate() + 1);
+  // Don't wrap to next day — if departure passed today, return negative
   return Math.round((target.getTime() - now.getTime()) / 60000);
 }
 
