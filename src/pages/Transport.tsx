@@ -5,13 +5,16 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import {
   Ship, Anchor, Bus, MapPin, Clock, ArrowLeft, Users,
-  AlertTriangle, CheckCircle2, XCircle, Timer, Navigation, Wifi, WifiOff,
+  AlertTriangle, CheckCircle2, XCircle, Timer, Navigation, Loader2,
 } from 'lucide-react';
 import {
-  ferryDepartures, cityBusLines, intercityDepartures,
-  getTimeRemaining, getNextBusDepartures,
-  type FerryDeparture, type BoardingStatus, type CrowdLevel,
-} from '@/data/transportData';
+  useTransportSchedules,
+  getBoardingStatus,
+  getTimeRemaining,
+  formatTime,
+  type TransportSchedule,
+  type BoardingStatus,
+} from '@/hooks/useTransportSchedules';
 
 const statusConfig: Record<BoardingStatus, { color: string; icon: typeof CheckCircle2; labelKey: string }> = {
   boarding: { color: 'text-[hsl(var(--status-open))]', icon: CheckCircle2, labelKey: 'transport.boarding' },
@@ -20,31 +23,28 @@ const statusConfig: Record<BoardingStatus, { color: string; icon: typeof CheckCi
   closed: { color: 'text-[hsl(var(--status-closed))]', icon: XCircle, labelKey: 'transport.closed' },
 };
 
-const crowdConfig: Record<CrowdLevel, { color: string; labelKey: string }> = {
-  low: { color: 'text-[hsl(var(--status-open))]', labelKey: 'crowd.low' },
-  normal: { color: 'text-[hsl(var(--status-warning))]', labelKey: 'crowd.medium' },
-  high: { color: 'text-[hsl(var(--status-closed))]', labelKey: 'crowd.high' },
-};
-
-function FerryCard({ dep, t, isNext }: { dep: FerryDeparture; t: (k: string) => string; isNext: boolean }) {
-  const sc = statusConfig[dep.status];
+function ScheduleCard({ schedule, t, isNext }: { schedule: TransportSchedule; t: (k: string) => string; isNext: boolean }) {
+  const status = getBoardingStatus(schedule.departure_time);
+  const sc = statusConfig[status];
   const StatusIcon = sc.icon;
+  const isCatamaran = schedule.type === 'catamaran';
+
   return (
     <div className={`p-3 rounded-xl bg-card border ${isNext ? 'border-accent ring-1 ring-accent/30' : 'border-border'} flex items-center justify-between gap-3`}>
       <div className="flex items-center gap-3 min-w-0">
-        <div className={`p-2 rounded-lg ${dep.type === 'catamaran' ? 'bg-accent/10 text-accent' : 'bg-primary/10 text-primary'}`}>
-          {dep.type === 'catamaran' ? <Anchor className="h-4 w-4" /> : <Ship className="h-4 w-4" />}
+        <div className={`p-2 rounded-lg ${isCatamaran ? 'bg-accent/10 text-accent' : 'bg-primary/10 text-primary'}`}>
+          {isCatamaran ? <Anchor className="h-4 w-4" /> : <Ship className="h-4 w-4" />}
         </div>
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-foreground truncate">{dep.destination}</p>
-          <p className="text-[11px] text-muted-foreground">{dep.port}</p>
+          <p className="text-sm font-semibold text-foreground truncate">{schedule.destination || schedule.route}</p>
+          <p className="text-[11px] text-muted-foreground">{schedule.port_or_station} · {schedule.carrier} · {schedule.line_name}</p>
         </div>
       </div>
       <div className="flex items-center gap-3 shrink-0">
         <div className="text-right">
-          <p className="text-sm font-bold text-foreground">{dep.departureTime}</p>
-          {dep.status !== 'closed' && (
-            <p className="text-[11px] text-accent font-medium">{getTimeRemaining(dep.departureTime)}</p>
+          <p className="text-sm font-bold text-foreground">{formatTime(schedule.departure_time)}</p>
+          {status !== 'closed' && (
+            <p className="text-[11px] text-accent font-medium">{getTimeRemaining(schedule.departure_time)}</p>
           )}
         </div>
         <div className={`flex items-center gap-1 ${sc.color}`}>
@@ -56,27 +56,80 @@ function FerryCard({ dep, t, isNext }: { dep: FerryDeparture; t: (k: string) => 
   );
 }
 
+function LoadingState() {
+  return (
+    <div className="flex items-center justify-center py-8">
+      <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+      <span className="ml-2 text-sm text-muted-foreground">Učitavanje rasporeda...</span>
+    </div>
+  );
+}
+
 export default function Transport() {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const [selectedBus, setSelectedBus] = useState(cityBusLines[0].id);
   const [intercitySearch, setIntercitySearch] = useState('');
-  const [useLocation, setUseLocation] = useState(false);
+  const [selectedBusLine, setSelectedBusLine] = useState<string | null>(null);
 
-  const ferries = ferryDepartures.filter(d => d.type === 'ferry');
-  const catamarans = ferryDepartures.filter(d => d.type === 'catamaran');
+  const { data: allSchedules, isLoading } = useTransportSchedules();
 
-  const nextFerryIdx = ferries.findIndex(d => d.status === 'boarding' || d.status === 'scheduled');
-  const nextCatIdx = catamarans.findIndex(d => d.status === 'boarding' || d.status === 'scheduled');
+  const ferries = useMemo(() => 
+    (allSchedules || []).filter(s => s.type === 'ferry'), 
+    [allSchedules]
+  );
+  
+  const catamarans = useMemo(() => 
+    (allSchedules || []).filter(s => s.type === 'catamaran'), 
+    [allSchedules]
+  );
 
-  const selectedLine = cityBusLines.find(l => l.id === selectedBus)!;
-  const nextBuses = getNextBusDepartures(selectedBus);
+  const cityBuses = useMemo(() => 
+    (allSchedules || []).filter(s => s.type === 'city_bus'), 
+    [allSchedules]
+  );
 
-  const filteredIntercity = useMemo(() => {
-    if (!intercitySearch.trim()) return intercityDepartures;
+  const intercityBuses = useMemo(() => {
+    const buses = (allSchedules || []).filter(s => s.type === 'intercity_bus');
+    if (!intercitySearch.trim()) return buses;
     const q = intercitySearch.toLowerCase();
-    return intercityDepartures.filter(d => d.destination.toLowerCase().includes(q));
-  }, [intercitySearch]);
+    return buses.filter(s => 
+      (s.destination || '').toLowerCase().includes(q) || 
+      (s.route || '').toLowerCase().includes(q) ||
+      (s.carrier || '').toLowerCase().includes(q)
+    );
+  }, [allSchedules, intercitySearch]);
+
+  // Get unique bus line names
+  const busLineNames = useMemo(() => {
+    const names = [...new Set(cityBuses.map(b => b.line_name))];
+    return names.sort((a, b) => {
+      const numA = parseInt(a.replace(/\D/g, '')) || 0;
+      const numB = parseInt(b.replace(/\D/g, '')) || 0;
+      return numA - numB;
+    });
+  }, [cityBuses]);
+
+  // Auto-select first bus line
+  const activeBusLine = selectedBusLine || busLineNames[0] || null;
+
+  const filteredBuses = useMemo(() => {
+    if (!activeBusLine) return [];
+    const now = new Date();
+    const nowMins = now.getHours() * 60 + now.getMinutes();
+    return cityBuses
+      .filter(b => b.line_name === activeBusLine)
+      .filter(b => {
+        const [h, m] = b.departure_time.split(':').map(Number);
+        return h * 60 + m > nowMins;
+      })
+      .slice(0, 5);
+  }, [cityBuses, activeBusLine]);
+
+  const selectedBusRoute = cityBuses.find(b => b.line_name === activeBusLine)?.route || '';
+
+  // Find next upcoming for highlighting
+  const nextFerryIdx = ferries.findIndex(d => getBoardingStatus(d.departure_time) !== 'closed');
+  const nextCatIdx = catamarans.findIndex(d => getBoardingStatus(d.departure_time) !== 'closed');
 
   return (
     <div className="min-h-screen bg-background">
@@ -88,10 +141,6 @@ export default function Transport() {
           <div>
             <h1 className="text-lg font-bold text-foreground">{t('transport.title')}</h1>
             <p className="text-[11px] text-muted-foreground">{t('transport.subtitle')}</p>
-          </div>
-          <div className="ml-auto flex items-center gap-1 text-[10px] text-muted-foreground">
-            {useLocation ? <Wifi className="h-3 w-3 text-accent" /> : <WifiOff className="h-3 w-3" />}
-            <span>{t('transport.cachedToday')}</span>
           </div>
         </div>
       </header>
@@ -107,79 +156,71 @@ export default function Transport() {
 
           {/* Ferries */}
           <TabsContent value="ferries" className="space-y-2 mt-3">
-            <p className="text-xs text-muted-foreground mb-1">{t('transport.nextFrom')} <span className="font-medium text-foreground">Zadar Port / Gaženica</span></p>
-            {ferries.map((d, i) => (
-              <FerryCard key={d.id} dep={d} t={t} isNext={i === nextFerryIdx} />
-            ))}
+            <p className="text-xs text-muted-foreground mb-1">{t('transport.nextFrom')} <span className="font-medium text-foreground">Gaženica / Gradska luka</span></p>
+            {isLoading ? <LoadingState /> : ferries.length > 0 ? ferries.map((d, i) => (
+              <ScheduleCard key={d.id} schedule={d} t={t} isNext={i === nextFerryIdx} />
+            )) : (
+              <p className="text-xs text-muted-foreground text-center py-6">Nema trajekata u rasporedu</p>
+            )}
           </TabsContent>
 
           {/* Catamarans */}
           <TabsContent value="catamarans" className="space-y-2 mt-3">
             <p className="text-xs text-muted-foreground mb-1">{t('transport.fastLines')}</p>
-            {catamarans.map((d, i) => (
-              <FerryCard key={d.id} dep={d} t={t} isNext={i === nextCatIdx} />
-            ))}
+            {isLoading ? <LoadingState /> : catamarans.length > 0 ? catamarans.map((d, i) => (
+              <ScheduleCard key={d.id} schedule={d} t={t} isNext={i === nextCatIdx} />
+            )) : (
+              <p className="text-xs text-muted-foreground text-center py-6">Nema katamarana u rasporedu</p>
+            )}
           </TabsContent>
 
           {/* City Bus */}
           <TabsContent value="citybus" className="mt-3">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-xs text-muted-foreground">{t('transport.selectLine')}</p>
-              <button
-                onClick={() => setUseLocation(!useLocation)}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors ${useLocation ? 'bg-accent/15 text-accent' : 'bg-secondary text-secondary-foreground'}`}
-              >
-                <Navigation className="h-3 w-3" />
-                {t('transport.useLocation')}
-              </button>
-            </div>
+            {isLoading ? <LoadingState /> : (
+              <>
+                <p className="text-xs text-muted-foreground mb-3">{t('transport.selectLine')}</p>
 
-            <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
-              {cityBusLines.map(line => (
-                <button
-                  key={line.id}
-                  onClick={() => setSelectedBus(line.id)}
-                  className={`flex flex-col items-center min-w-[56px] px-3 py-2 rounded-xl border transition-all ${selectedBus === line.id ? 'border-accent bg-accent/10 text-accent' : 'border-border bg-card text-foreground hover:border-accent/40'}`}
-                >
-                  <span className="text-base font-bold">{line.lineNumber}</span>
-                </button>
-              ))}
-            </div>
-
-            <div className="mt-3 p-4 rounded-xl bg-card border border-border">
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <p className="text-sm font-semibold text-foreground">{t('transport.line')} {selectedLine.lineNumber}</p>
-                  <p className="text-[11px] text-muted-foreground">{selectedLine.route}</p>
+                <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
+                  {busLineNames.map(name => (
+                    <button
+                      key={name}
+                      onClick={() => setSelectedBusLine(name)}
+                      className={`flex flex-col items-center min-w-[56px] px-3 py-2 rounded-xl border transition-all ${activeBusLine === name ? 'border-accent bg-accent/10 text-accent' : 'border-border bg-card text-foreground hover:border-accent/40'}`}
+                    >
+                      <span className="text-xs font-bold">{name.replace('Linija ', '')}</span>
+                    </button>
+                  ))}
                 </div>
-                <div className={`flex items-center gap-1 ${crowdConfig[selectedLine.crowdLevel].color}`}>
-                  <Users className="h-3.5 w-3.5" />
-                  <span className="text-[11px] font-medium">{t(crowdConfig[selectedLine.crowdLevel].labelKey)}</span>
-                </div>
-              </div>
 
-              {useLocation && (
-                <div className="flex items-center gap-1.5 mb-3 text-[11px] text-accent">
-                  <MapPin className="h-3 w-3" />
-                  <span>{t('transport.nearestStop')}: <span className="font-medium">{selectedLine.nearestStop}</span></span>
-                </div>
-              )}
-
-              <p className="text-[11px] text-muted-foreground mb-2">{t('transport.nextDepartures')}</p>
-              <div className="space-y-2">
-                {nextBuses.length > 0 ? nextBuses.map((time, i) => (
-                  <div key={time} className={`flex items-center justify-between p-2.5 rounded-lg ${i === 0 ? 'bg-accent/10 border border-accent/20' : 'bg-secondary/50'}`}>
-                    <div className="flex items-center gap-2">
-                      <Timer className="h-3.5 w-3.5 text-accent" />
-                      <span className="text-sm font-semibold text-foreground">{time}</span>
+                {activeBusLine && (
+                  <div className="mt-3 p-4 rounded-xl bg-card border border-border">
+                    <div className="mb-3">
+                      <p className="text-sm font-semibold text-foreground">{activeBusLine}</p>
+                      {selectedBusRoute && <p className="text-[11px] text-muted-foreground">{selectedBusRoute}</p>}
                     </div>
-                    <span className="text-xs font-medium text-accent">{getTimeRemaining(time)}</span>
+
+                    <p className="text-[11px] text-muted-foreground mb-2">{t('transport.nextDepartures')}</p>
+                    <div className="space-y-2">
+                      {filteredBuses.length > 0 ? filteredBuses.map((bus, i) => (
+                        <div key={bus.id} className={`flex items-center justify-between p-2.5 rounded-lg ${i === 0 ? 'bg-accent/10 border border-accent/20' : 'bg-secondary/50'}`}>
+                          <div className="flex items-center gap-2">
+                            <Timer className="h-3.5 w-3.5 text-accent" />
+                            <span className="text-sm font-semibold text-foreground">{formatTime(bus.departure_time)}</span>
+                          </div>
+                          <span className="text-xs font-medium text-accent">{getTimeRemaining(bus.departure_time)}</span>
+                        </div>
+                      )) : (
+                        <p className="text-xs text-muted-foreground text-center py-3">{t('transport.noMore')}</p>
+                      )}
+                    </div>
                   </div>
-                )) : (
-                  <p className="text-xs text-muted-foreground text-center py-3">{t('transport.noMore')}</p>
                 )}
-              </div>
-            </div>
+
+                {busLineNames.length === 0 && (
+                  <p className="text-xs text-muted-foreground text-center py-6">Nema gradskih autobusa u rasporedu</p>
+                )}
+              </>
+            )}
           </TabsContent>
 
           {/* Intercity */}
@@ -190,26 +231,25 @@ export default function Transport() {
               onChange={e => setIntercitySearch(e.target.value)}
               className="mb-3"
             />
-            <div className="space-y-2">
-              {filteredIntercity.map(d => {
-                const remaining = getTimeRemaining(d.departureTime);
-                return (
+            {isLoading ? <LoadingState /> : (
+              <div className="space-y-2">
+                {intercityBuses.map(d => (
                   <div key={d.id} className="p-3 rounded-xl bg-card border border-border flex items-center justify-between">
                     <div>
                       <p className="text-sm font-semibold text-foreground">{d.destination}</p>
                       <p className="text-[11px] text-muted-foreground">{d.carrier}{d.platform ? ` · ${t('transport.platform')} ${d.platform}` : ''}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-bold text-foreground">{d.departureTime}</p>
-                      <p className="text-[11px] text-accent font-medium">{remaining}</p>
+                      <p className="text-sm font-bold text-foreground">{formatTime(d.departure_time)}</p>
+                      <p className="text-[11px] text-accent font-medium">{getTimeRemaining(d.departure_time)}</p>
                     </div>
                   </div>
-                );
-              })}
-              {filteredIntercity.length === 0 && (
-                <p className="text-xs text-muted-foreground text-center py-6">{t('transport.noResults')}</p>
-              )}
-            </div>
+                ))}
+                {intercityBuses.length === 0 && (
+                  <p className="text-xs text-muted-foreground text-center py-6">{t('transport.noResults')}</p>
+                )}
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </main>
