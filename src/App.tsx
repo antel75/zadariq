@@ -12,6 +12,7 @@ import CategoryBrowse from "./pages/CategoryBrowse";
 import Emergency from "./pages/Emergency";
 import ForBusiness from "./pages/ForBusiness";
 import Transport from "./pages/Transport";
+import Parking from "./pages/Parking";
 import AdminLogin from "./pages/AdminLogin";
 import AdminSignup from "./pages/AdminSignup";
 import AdminPanel from "./pages/AdminPanel";
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/emergency" element={<Emergency />} />
             <Route path="/for-business" element={<ForBusiness />} />
             <Route path="/transport" element={<Transport />} />
+            <Route path="/parking" element={<Parking />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/signup" element={<AdminSignup />} />
             <Route path="/admin" element={<AdminPanel />} />
