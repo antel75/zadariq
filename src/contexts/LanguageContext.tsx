@@ -113,6 +113,9 @@ const translations: Translations = {
   'alert.eventTonightDesc': { hr: 'Glazbeni večer na Forumu, 20:00', en: 'Music night at Forum, 8 PM', de: 'Musikabend am Forum, 20 Uhr', it: 'Serata musicale al Foro, 20:00' },
   'alert.strongWind': { hr: 'Jak vjetar', en: 'Strong wind', de: 'Starker Wind', it: 'Vento forte' },
   'alert.strongWindDesc': { hr: 'Bura — udari do 55 km/h', en: 'Bura — gusts up to 55 km/h', de: 'Bura — Böen bis 55 km/h', it: 'Bora — raffiche fino a 55 km/h' },
+  'alert.powerOutage': { hr: 'Nestanak struje', en: 'Power outage', de: 'Stromausfall', it: 'Interruzione di corrente' },
+  'alert.powerOutageDesc': { hr: '{area} — {time}', en: '{area} — {time}', de: '{area} — {time}', it: '{area} — {time}' },
+  'alert.powerOutageMultiple': { hr: '{count} područja bez struje danas', en: '{count} areas without power today', de: '{count} Gebiete ohne Strom heute', it: '{count} aree senza corrente oggi' },
   // Quick actions
   'quick.pharmacyNow': { hr: 'Ljekarna', en: 'Pharmacy', de: 'Apotheke', it: 'Farmacia' },
   'quick.freeParking': { hr: 'Parking', en: 'Parking', de: 'Parken', it: 'Parcheggio' },

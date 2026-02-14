@@ -136,6 +136,42 @@ export type Database = {
         }
         Relationships: []
       }
+      power_outages: {
+        Row: {
+          area: string
+          created_at: string
+          id: string
+          outage_date: string
+          raw_text: string | null
+          reason: string | null
+          time_from: string | null
+          time_until: string | null
+          updated_at: string
+        }
+        Insert: {
+          area: string
+          created_at?: string
+          id?: string
+          outage_date: string
+          raw_text?: string | null
+          reason?: string | null
+          time_from?: string | null
+          time_until?: string | null
+          updated_at?: string
+        }
+        Update: {
+          area?: string
+          created_at?: string
+          id?: string
+          outage_date?: string
+          raw_text?: string | null
+          reason?: string | null
+          time_from?: string | null
+          time_until?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       transport_schedules: {
         Row: {
           carrier: string | null
