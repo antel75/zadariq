@@ -24,14 +24,13 @@ export function BusinessCard({ business, onReport }: BusinessCardProps) {
       onClick={() => navigate(`/business/${business.id}`)}
     >
       {/* Name + Trust badge + Status */}
-      <div className="flex items-start justify-between mb-2">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1 flex-wrap">
-            <h3 className="font-semibold text-foreground truncate">{business.name}</h3>
+      <div className="mb-2">
+        <h3 className="font-semibold text-foreground mb-1">{business.name}</h3>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 flex-wrap min-w-0">
             <TrustBadge status={business.verificationStatus} />
+            <p className="text-sm text-muted-foreground truncate">{business.address}</p>
           </div>
-          <p className="text-sm text-muted-foreground truncate">{business.address}</p>
-        </div>
         {hideOpenBadge ? (
           <span className="ml-2 px-3 py-1 rounded-full text-xs font-bold flex-shrink-0 bg-status-warning/20 text-status-warning">
             ⚠
@@ -47,6 +46,7 @@ export function BusinessCard({ business, onReport }: BusinessCardProps) {
             {open ? t('status.open') : t('status.closed')}
           </span>
         )}
+        </div>
       </div>
 
       <p className="text-sm text-muted-foreground mb-2">{todayHours}</p>
