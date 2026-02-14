@@ -133,16 +133,18 @@ export default function Transport() {
 
   const filteredBuses = useMemo(() => {
     if (!activeBusLine) return [];
+    return cityBuses.filter(b => b.line_name === activeBusLine);
+  }, [cityBuses, activeBusLine]);
+
+  // Find the index of the next upcoming departure
+  const nextBusIdx = useMemo(() => {
     const now = new Date();
     const nowMins = now.getHours() * 60 + now.getMinutes();
-    return cityBuses
-      .filter(b => b.line_name === activeBusLine)
-      .filter(b => {
-        const [h, m] = b.departure_time.split(':').map(Number);
-        return h * 60 + m > nowMins;
-      })
-      .slice(0, 5);
-  }, [cityBuses, activeBusLine]);
+    return filteredBuses.findIndex(b => {
+      const [h, m] = b.departure_time.split(':').map(Number);
+      return h * 60 + m > nowMins;
+    });
+  }, [filteredBuses]);
 
   const selectedBusRoute = cityBuses.find(b => b.line_name === activeBusLine)?.route || '';
 
@@ -216,19 +218,33 @@ export default function Transport() {
                     <div className="mb-3">
                       <p className="text-sm font-semibold text-foreground">{activeBusLine}</p>
                       {selectedBusRoute && <p className="text-[11px] text-muted-foreground">{selectedBusRoute}</p>}
+                      {(() => {
+                        const note = getDaysNote(filteredBuses[0]?.days_of_week);
+                        return note ? <p className="text-[10px] text-muted-foreground italic mt-1">⚠ {note}</p> : null;
+                      })()}
                     </div>
 
-                    <p className="text-[11px] text-muted-foreground mb-2">{t('transport.nextDepartures')}</p>
-                    <div className="space-y-2">
-                      {filteredBuses.length > 0 ? filteredBuses.map((bus, i) => (
-                        <div key={bus.id} className={`flex items-center justify-between p-2.5 rounded-lg ${i === 0 ? 'bg-accent/10 border border-accent/20' : 'bg-secondary/50'}`}>
-                          <div className="flex items-center gap-2">
-                            <Timer className="h-3.5 w-3.5 text-accent" />
-                            <span className="text-sm font-semibold text-foreground">{formatTime(bus.departure_time)}</span>
+                    <p className="text-[11px] text-muted-foreground mb-2">Cijeli dnevni raspored</p>
+                    <div className="space-y-1.5 max-h-[50vh] overflow-y-auto">
+                      {filteredBuses.length > 0 ? filteredBuses.map((bus, i) => {
+                        const isPassed = i < nextBusIdx || nextBusIdx === -1;
+                        const isNext = i === nextBusIdx;
+                        return (
+                          <div key={bus.id} className={`flex items-center justify-between p-2.5 rounded-lg ${isNext ? 'bg-accent/10 border border-accent/20' : isPassed ? 'bg-secondary/30 opacity-50' : 'bg-secondary/50'}`}>
+                            <div className="flex items-center gap-2">
+                              <Timer className="h-3.5 w-3.5 text-accent" />
+                              <span className="text-sm font-semibold text-foreground">{formatTime(bus.departure_time)}</span>
+                            </div>
+                            {isNext ? (
+                              <span className="text-xs font-medium text-accent">{getTimeRemaining(bus.departure_time)}</span>
+                            ) : !isPassed ? (
+                              <span className="text-[11px] text-muted-foreground">{getTimeRemaining(bus.departure_time)}</span>
+                            ) : (
+                              <span className="text-[11px] text-muted-foreground">prošlo</span>
+                            )}
                           </div>
-                          <span className="text-xs font-medium text-accent">{getTimeRemaining(bus.departure_time)}</span>
-                        </div>
-                      )) : (
+                        );
+                      }) : (
                         <p className="text-xs text-muted-foreground text-center py-3">{t('transport.noMore')}</p>
                       )}
                     </div>
