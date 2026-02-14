@@ -1,0 +1,96 @@
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+
+export type TransportType = 'ferry' | 'catamaran' | 'city_bus' | 'intercity_bus';
+export type BoardingStatus = 'boarding' | 'closed' | 'delayed' | 'scheduled';
+
+export interface TransportSchedule {
+  id: string;
+  type: TransportType;
+  line_name: string;
+  departure_time: string; // HH:mm:ss
+  destination: string | null;
+  carrier: string | null;
+  route: string | null;
+  port_or_station: string | null;
+  platform: string | null;
+}
+
+function getMinutesUntil(timeStr: string): number {
+  const now = new Date();
+  const parts = timeStr.split(':').map(Number);
+  const [h, m] = parts;
+  const target = new Date();
+  target.setHours(h, m, 0, 0);
+  if (target < now) target.setDate(target.getDate() + 1);
+  return Math.round((target.getTime() - now.getTime()) / 60000);
+}
+
+export function getTimeRemaining(timeStr: string): string {
+  const mins = getMinutesUntil(timeStr);
+  if (mins < 1) return 'sada';
+  if (mins < 60) return `${mins} min`;
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return m > 0 ? `${h}h ${m}m` : `${h}h`;
+}
+
+export function formatTime(timeStr: string): string {
+  // Convert HH:mm:ss to HH:mm
+  return timeStr.substring(0, 5);
+}
+
+export function getBoardingStatus(timeStr: string): BoardingStatus {
+  const mins = getMinutesUntil(timeStr);
+  if (mins <= 0) return 'closed';
+  if (mins <= 15) return 'boarding';
+  return 'scheduled';
+}
+
+export function useTransportSchedules(types?: TransportType[]) {
+  return useQuery({
+    queryKey: ['transport-schedules', types],
+    queryFn: async () => {
+      let query = supabase
+        .from('transport_schedules')
+        .select('id, type, line_name, departure_time, destination, carrier, route, port_or_station, platform')
+        .eq('enabled', true)
+        .order('departure_time', { ascending: true });
+
+      if (types && types.length > 0) {
+        query = query.in('type', types);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return (data || []) as TransportSchedule[];
+    },
+    staleTime: 5 * 60 * 1000, // 5 min cache
+  });
+}
+
+export function useNextFerry() {
+  const { data: schedules, ...rest } = useTransportSchedules(['ferry', 'catamaran']);
+  
+  const nextFerry = schedules?.find(s => {
+    const status = getBoardingStatus(s.departure_time);
+    return status === 'boarding' || status === 'scheduled';
+  }) || null;
+
+  return { nextFerry, ...rest };
+}
+
+export function useNextBusDeparture(lineId?: string) {
+  const { data: schedules, ...rest } = useTransportSchedules(['city_bus']);
+  
+  const now = new Date();
+  const nowMins = now.getHours() * 60 + now.getMinutes();
+  
+  const filtered = schedules?.filter(s => {
+    if (lineId && s.line_name !== lineId) return false;
+    const [h, m] = s.departure_time.split(':').map(Number);
+    return h * 60 + m > nowMins;
+  }) || [];
+
+  return { nextBuses: filtered, ...rest };
+}
