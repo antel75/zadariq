@@ -83,7 +83,7 @@ export function BusinessCard({ business, onReport }: BusinessCardProps) {
           {t('action.call')}
         </a>
         <a
-          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.address)}`}
+          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.category === 'restaurants' ? business.name + ' Zadar' : business.address)}`}
           target="_blank"
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
