@@ -1,5 +1,5 @@
 import { useLanguage } from '@/contexts/LanguageContext';
-import { AlertTriangle, Pill, Construction, PartyPopper, Wind, Zap } from 'lucide-react';
+import { AlertTriangle, Pill, Construction, PartyPopper, Wind, Zap, Droplets } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -29,9 +29,26 @@ function useTodayOutages() {
   });
 }
 
+function useTodayWaterOutages() {
+  return useQuery({
+    queryKey: ['water-outages-today'],
+    queryFn: async () => {
+      const today = new Date().toISOString().split('T')[0];
+      const { data, error } = await supabase
+        .from('water_outages')
+        .select('*')
+        .eq('outage_date', today);
+      if (error) throw error;
+      return data || [];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
 export function TodayAlerts() {
   const { t } = useLanguage();
   const { data: outages } = useTodayOutages();
+  const { data: waterOutages } = useTodayWaterOutages();
   
   const alerts: Alert[] = [];
   const hour = new Date().getHours();
@@ -67,6 +84,31 @@ export function TodayAlerts() {
         title: t('alert.powerOutage'),
         desc: t('alert.powerOutageMultiple').replace('{count}', String(outages.length)),
         link: 'https://www.hep.hr/ods/bez-struje/19?dp=zadar',
+      });
+    }
+  }
+
+  // Water outages from DB
+  if (waterOutages && waterOutages.length > 0) {
+    if (waterOutages.length === 1) {
+      const w = waterOutages[0];
+      const timeStr = w.time_from && w.time_until ? `${w.time_from} - ${w.time_until}` : '';
+      alerts.push({
+        id: 'water-outage',
+        icon: Droplets,
+        iconColor: 'text-blue-500',
+        title: t('alert.waterOutage'),
+        desc: timeStr ? `${w.area} — ${timeStr}` : w.area,
+        link: 'https://www.vodovod-zadar.hr/obavijesti',
+      });
+    } else {
+      alerts.push({
+        id: 'water-outage',
+        icon: Droplets,
+        iconColor: 'text-blue-500',
+        title: t('alert.waterOutage'),
+        desc: t('alert.waterOutageMultiple').replace('{count}', String(waterOutages.length)),
+        link: 'https://www.vodovod-zadar.hr/obavijesti',
       });
     }
   }
