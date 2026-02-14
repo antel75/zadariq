@@ -14,6 +14,83 @@ export type Database = {
   }
   public: {
     Tables: {
+      cinema_movies: {
+        Row: {
+          age_rating: string | null
+          cinestar_url: string | null
+          created_at: string
+          description: string | null
+          duration: string | null
+          genre: string | null
+          id: string
+          poster_url: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          age_rating?: string | null
+          cinestar_url?: string | null
+          created_at?: string
+          description?: string | null
+          duration?: string | null
+          genre?: string | null
+          id?: string
+          poster_url?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          age_rating?: string | null
+          cinestar_url?: string | null
+          created_at?: string
+          description?: string | null
+          duration?: string | null
+          genre?: string | null
+          id?: string
+          poster_url?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cinema_screenings: {
+        Row: {
+          created_at: string
+          format: string | null
+          hall: string | null
+          id: string
+          movie_id: string
+          screening_date: string
+          screening_time: string
+        }
+        Insert: {
+          created_at?: string
+          format?: string | null
+          hall?: string | null
+          id?: string
+          movie_id: string
+          screening_date: string
+          screening_time: string
+        }
+        Update: {
+          created_at?: string
+          format?: string | null
+          hall?: string | null
+          id?: string
+          movie_id?: string
+          screening_date?: string
+          screening_time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cinema_screenings_movie_id_fkey"
+            columns: ["movie_id"]
+            isOneToOne: false
+            referencedRelation: "cinema_movies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       duty_services: {
         Row: {
           address: string | null
