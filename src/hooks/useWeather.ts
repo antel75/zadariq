@@ -1,0 +1,63 @@
+import { useState, useEffect } from 'react';
+
+interface WeatherData {
+  tempC: number;
+  isDay: boolean;
+  weatherCode: number;
+  windKmh: number;
+  sunset: string;
+}
+
+const ZADAR_LAT = 44.12;
+const ZADAR_LON = 15.23;
+
+export function useWeather() {
+  const [data, setData] = useState<WeatherData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${ZADAR_LAT}&longitude=${ZADAR_LON}&current=temperature_2m,weather_code,wind_speed_10m,is_day&daily=sunset&timezone=Europe%2FZagreb&forecast_days=1`;
+
+    fetch(url)
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then(json => {
+        const sunsetRaw = json.daily?.sunset?.[0] ?? '';
+        const sunsetTime = sunsetRaw ? sunsetRaw.split('T')[1]?.slice(0, 5) : '--:--';
+
+        setData({
+          tempC: Math.round(json.current.temperature_2m),
+          isDay: json.current.is_day === 1,
+          weatherCode: json.current.weather_code,
+          windKmh: Math.round(json.current.wind_speed_10m),
+          sunset: sunsetTime,
+        });
+      })
+      .catch(err => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  return { data, loading, error };
+}
+
+/** Map WMO weather codes to emoji + translation key */
+export function getWeatherInfo(code: number, isDay: boolean): { icon: string; conditionKey: string } {
+  if (code === 0) return { icon: isDay ? '☀️' : '🌙', conditionKey: isDay ? 'sunny' : 'clear_night' };
+  if (code <= 3) return { icon: isDay ? '⛅' : '☁️', conditionKey: 'partly_cloudy' };
+  if (code <= 48) return { icon: '🌫️', conditionKey: 'foggy' };
+  if (code <= 67) return { icon: '🌧️', conditionKey: 'rainy' };
+  if (code <= 77) return { icon: '🌨️', conditionKey: 'snowy' };
+  if (code <= 82) return { icon: '🌧️', conditionKey: 'rainy' };
+  if (code <= 99) return { icon: '⛈️', conditionKey: 'stormy' };
+  return { icon: '🌤️', conditionKey: 'sunny' };
+}
+
+/** Determine wind type for Adriatic based on speed */
+export function getWindType(kmh: number): string {
+  if (kmh < 15) return 'calm';
+  if (kmh < 40) return 'moderate';
+  return 'bura';
+}
