@@ -3,7 +3,7 @@ import { isBusinessOpen, getTodayHours, getRelativeTime } from '@/data/mockData'
 import { useLanguage } from '@/contexts/LanguageContext';
 import { TrustBadge } from '@/components/TrustBadge';
 import { TrustScore } from '@/components/TrustScore';
-import { Phone, Navigation, AlertTriangle, ShieldCheck, Users, Bot } from 'lucide-react';
+import { Phone, Navigation, AlertTriangle, ShieldCheck, Users, Bot, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface BusinessCardProps {
@@ -73,7 +73,7 @@ export function BusinessCard({ business, onReport }: BusinessCardProps) {
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap">
         <a
           href={`tel:${business.phone}`}
           onClick={(e) => e.stopPropagation()}
@@ -92,6 +92,18 @@ export function BusinessCard({ business, onReport }: BusinessCardProps) {
           <Navigation className="h-3.5 w-3.5" />
           {t('action.navigate')}
         </a>
+        {business.category === 'restaurants' && (
+          <a
+            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.name + ' Zadar')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-yellow-500/15 text-yellow-600 dark:text-yellow-400 text-xs font-medium hover:bg-yellow-500/25 transition-colors"
+          >
+            <Star className="h-3.5 w-3.5" />
+            Recenzije
+          </a>
+        )}
         <button
           onClick={(e) => { e.stopPropagation(); onReport(business); }}
           className="ml-auto text-xs text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2"

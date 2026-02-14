@@ -9,7 +9,7 @@ import { TrustScore } from '@/components/TrustScore';
 import { FollowButton } from '@/components/FollowButton';
 import {
   ArrowLeft, Phone, Navigation, BadgeCheck, AlertTriangle,
-  UserCheck, Clock, ShieldCheck, Users, Bot, Activity, Tag, Megaphone, CalendarClock, Settings,
+  UserCheck, Clock, ShieldCheck, Users, Bot, Activity, Tag, Megaphone, CalendarClock, Settings, Star,
 } from 'lucide-react';
 
 const dayKeys = ['days.mon', 'days.tue', 'days.wed', 'days.thu', 'days.fri', 'days.sat', 'days.sun'] as const;
@@ -174,6 +174,17 @@ export default function BusinessDetail() {
               {t('action.navigate')}
             </a>
           </div>
+          {business.category === 'restaurants' && (
+            <a
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.name + ' Zadar')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 flex items-center justify-center gap-2 py-3 rounded-xl bg-yellow-500/15 text-yellow-600 dark:text-yellow-400 font-medium text-sm hover:bg-yellow-500/25 transition-colors"
+            >
+              <Star className="h-4 w-4" />
+              Google Recenzije
+            </a>
+          )}
         </div>
 
         {/* Working hours */}
