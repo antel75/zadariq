@@ -271,7 +271,7 @@ export default function Transport() {
                 {intercityBuses.map(d => {
                   const note = getDaysNote(d.days_of_week);
                   return (
-                    <div key={d.id} className="p-3 rounded-xl bg-card border border-border">
+                    <div key={d.id} className={`p-3 rounded-xl bg-card border border-border ${getBoardingStatus(d.departure_time) === 'closed' ? 'opacity-50' : ''}`}>
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-sm font-semibold text-foreground">{d.destination}</p>
@@ -279,7 +279,11 @@ export default function Transport() {
                         </div>
                         <div className="text-right">
                           <p className="text-sm font-bold text-foreground">{formatTime(d.departure_time)}</p>
-                          <p className="text-[11px] text-accent font-medium">{getTimeRemaining(d.departure_time)}</p>
+                          {getBoardingStatus(d.departure_time) === 'closed' ? (
+                            <p className="text-[11px] text-muted-foreground">prošlo</p>
+                          ) : (
+                            <p className="text-[11px] text-accent font-medium">{getTimeRemaining(d.departure_time)}</p>
+                          )}
                         </div>
                       </div>
                       {note && <p className="text-[10px] text-muted-foreground italic mt-1.5">⚠ {note}</p>}
