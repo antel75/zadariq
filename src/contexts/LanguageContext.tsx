@@ -188,6 +188,12 @@ const translations: Translations = {
   'forbiz.trustEconomy.rule3': { hr: 'Nema plaćenog rangiranja — samo aktivnost i pouzdanost.', en: 'No paid ranking — only activity and reliability.', de: 'Kein bezahltes Ranking — nur Aktivität und Zuverlässigkeit.', it: 'Nessun posizionamento a pagamento — solo attività e affidabilità.' },
   'forbiz.cta': { hr: 'Preuzmi svoj profil', en: 'Claim your profile', de: 'Profil beanspruchen', it: 'Rivendica il tuo profilo' },
   'forbiz.free': { hr: 'Potpuno besplatno. Zauvijek.', en: 'Completely free. Forever.', de: 'Komplett kostenlos. Für immer.', it: 'Completamente gratuito. Per sempre.' },
+  // Public services
+  'publicServices.title': { hr: 'Javne službe', en: 'Public Services', de: 'Öffentliche Dienste', it: 'Servizi Pubblici' },
+  'publicServices.subtitle': { hr: 'Gradske institucije i službe', en: 'City institutions & services', de: 'Städtische Institutionen & Dienste', it: 'Istituzioni e servizi comunali' },
+  'publicServices.gradZadar': { hr: 'Grad Zadar', en: 'City of Zadar', de: 'Stadt Zadar', it: 'Città di Zara' },
+  'publicServices.centrala': { hr: 'Centrala', en: 'Switchboard', de: 'Zentrale', it: 'Centralino' },
+  'publicServices.departments': { hr: 'Upravni odjeli i stručne službe', en: 'Administrative departments', de: 'Verwaltungsabteilungen', it: 'Dipartimenti amministrativi' },
   // Transport
   'quick.transport': { hr: 'Prijevoz', en: 'Transport', de: 'Transport', it: 'Trasporti' },
   'transport.title': { hr: 'Prijevoz', en: 'Transport', de: 'Transport', it: 'Trasporti' },

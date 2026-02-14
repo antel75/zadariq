@@ -15,6 +15,7 @@ import ForBusiness from "./pages/ForBusiness";
 import Transport from "./pages/Transport";
 import Parking from "./pages/Parking";
 import Cinema from "./pages/Cinema";
+import PublicServices from "./pages/PublicServices";
 import AdminLogin from "./pages/AdminLogin";
 import AdminSignup from "./pages/AdminSignup";
 import AdminPanel from "./pages/AdminPanel";
@@ -41,6 +42,7 @@ const App = () => (
               <Route path="/transport" element={<Transport />} />
               <Route path="/parking" element={<Parking />} />
               <Route path="/cinema" element={<Cinema />} />
+              <Route path="/public-services/grad-zadar" element={<PublicServices />} />
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin/signup" element={<AdminSignup />} />
               <Route path="/admin" element={<AdminPanel />} />
