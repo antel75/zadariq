@@ -24,7 +24,7 @@ export function QuickActions() {
     {
       icon: Car,
       labelKey: 'quick.freeParking',
-      action: () => navigate('/category/parking'),
+      action: () => navigate('/parking'),
       color: 'bg-accent/10 text-accent',
     },
     {

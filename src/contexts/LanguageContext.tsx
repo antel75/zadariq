@@ -102,6 +102,8 @@ const translations: Translations = {
   'parking.easy': { hr: 'Lako', en: 'Easy', de: 'Einfach', it: 'Facile' },
   'parking.normal': { hr: 'Normalno', en: 'Normal', de: 'Normal', it: 'Normale' },
   'parking.full': { hr: 'Puno', en: 'Full', de: 'Voll', it: 'Pieno' },
+  'parking.free': { hr: 'Besplatno', en: 'Free', de: 'Kostenlos', it: 'Gratuito' },
+  'parking.paid': { hr: 'Naplata', en: 'Paid', de: 'Gebühr', it: 'A pagamento' },
   // Alerts
   'alert.dutyPharmacy': { hr: 'Dežurna ljekarna', en: 'Pharmacy on duty', de: 'Dienstapotheke', it: 'Farmacia di turno' },
   'alert.dutyPharmacyDesc': { hr: 'Ljekarna Bili Brig — otvorena do 21:00', en: 'Ljekarna Bili Brig — open until 21:00', de: 'Ljekarna Bili Brig — geöffnet bis 21:00', it: 'Ljekarna Bili Brig — aperta fino alle 21:00' },

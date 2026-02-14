@@ -1,13 +1,15 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Waves, Sunset, Wind, Users, Car, Loader2 } from 'lucide-react';
 import { useWeather, getWeatherInfo, getWindType } from '@/hooks/useWeather';
+import { getParkingStatus } from '@/data/parkingData';
 
 function getMockCityData() {
   const hour = new Date().getHours();
+  const parkingStatus = getParkingStatus();
   return {
     seaTempC: 15,
     crowdLevel: hour >= 10 && hour <= 18 ? (hour >= 12 && hour <= 15 ? 'high' : 'medium') : 'low',
-    parkingPressure: hour >= 9 && hour <= 17 ? (hour >= 11 && hour <= 14 ? 'full' : 'normal') : 'easy',
+    parkingStatus,
   };
 }
 
@@ -18,9 +20,8 @@ const crowdColors: Record<string, string> = {
 };
 
 const parkingColors: Record<string, string> = {
-  easy: 'text-[hsl(var(--status-open))]',
-  normal: 'text-[hsl(var(--status-warning))]',
-  full: 'text-[hsl(var(--status-closed))]',
+  free: 'text-[hsl(var(--status-open))]',
+  paid: 'text-[hsl(var(--status-warning))]',
 };
 
 export function TodayCard() {
@@ -81,8 +82,8 @@ export function TodayCard() {
           {/* Parking */}
           <div className="flex flex-col items-center gap-1">
             <Car className="h-5 w-5 text-muted-foreground" />
-            <span className={`text-sm font-semibold ${parkingColors[city.parkingPressure]}`}>
-              {t(`parking.${city.parkingPressure}`)}
+            <span className={`text-sm font-semibold ${parkingColors[city.parkingStatus]}`}>
+              {t(`parking.${city.parkingStatus}`)}
             </span>
             <span className="text-[10px] text-muted-foreground">{t('dashboard.parking')}</span>
           </div>
