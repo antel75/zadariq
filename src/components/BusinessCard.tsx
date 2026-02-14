@@ -1,7 +1,9 @@
-import { Business, CategoryId } from '@/data/types';
-import { isBusinessOpen, getTodayHours } from '@/data/mockData';
+import { Business } from '@/data/types';
+import { isBusinessOpen, getTodayHours, getRelativeTime } from '@/data/mockData';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Phone, Navigation, AlertTriangle, BadgeCheck } from 'lucide-react';
+import { TrustBadge } from '@/components/TrustBadge';
+import { TrustScore } from '@/components/TrustScore';
+import { Phone, Navigation, AlertTriangle, ShieldCheck, Users, Bot } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface BusinessCardProps {
@@ -14,44 +16,63 @@ export function BusinessCard({ business, onReport }: BusinessCardProps) {
   const navigate = useNavigate();
   const open = isBusinessOpen(business);
   const todayHours = getTodayHours(business);
+  const hideOpenBadge = business.reportCount >= 5;
 
   return (
     <div
       className="bg-card rounded-2xl border border-border p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
       onClick={() => navigate(`/business/${business.id}`)}
     >
+      {/* Name + Trust badge + Status */}
       <div className="flex items-start justify-between mb-2">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
             <h3 className="font-semibold text-foreground truncate">{business.name}</h3>
-            {business.verified && (
-              <BadgeCheck className="h-4 w-4 text-accent flex-shrink-0" />
-            )}
+            <TrustBadge status={business.verificationStatus} />
           </div>
           <p className="text-sm text-muted-foreground truncate">{business.address}</p>
         </div>
-        <span
-          className={`ml-2 px-3 py-1 rounded-full text-xs font-bold flex-shrink-0 ${
-            open
-              ? 'bg-status-open text-status-open-foreground'
-              : 'bg-status-closed text-status-closed-foreground'
-          }`}
-        >
-          {open ? t('status.open') : t('status.closed')}
-        </span>
+        {hideOpenBadge ? (
+          <span className="ml-2 px-3 py-1 rounded-full text-xs font-bold flex-shrink-0 bg-status-warning/20 text-status-warning">
+            ⚠
+          </span>
+        ) : (
+          <span
+            className={`ml-2 px-3 py-1 rounded-full text-xs font-bold flex-shrink-0 ${
+              open
+                ? 'bg-status-open text-status-open-foreground'
+                : 'bg-status-closed text-status-closed-foreground'
+            }`}
+          >
+            {open ? t('status.open') : t('status.closed')}
+          </span>
+        )}
       </div>
 
-      <p className="text-sm text-muted-foreground mb-3">
-        {todayHours}
-      </p>
+      <p className="text-sm text-muted-foreground mb-2">{todayHours}</p>
 
-      {business.reportCount >= 3 && (
-        <div className="flex items-center gap-1.5 mb-3 text-status-warning">
+      {/* Warning for 5+ reports */}
+      {business.reportCount >= 5 && (
+        <div className="flex items-center gap-1.5 mb-2 p-2 rounded-lg bg-status-warning/10 border border-status-warning/20">
+          <AlertTriangle className="h-3.5 w-3.5 text-status-warning" />
+          <span className="text-xs font-medium text-status-warning">{t('trust.warningHidden')}</span>
+        </div>
+      )}
+
+      {/* Warning for 3-4 reports */}
+      {business.reportCount >= 3 && business.reportCount < 5 && (
+        <div className="flex items-center gap-1.5 mb-2 text-status-warning">
           <AlertTriangle className="h-3.5 w-3.5" />
           <span className="text-xs font-medium">{t('status.possiblyIncorrect')}</span>
         </div>
       )}
 
+      {/* Trust score bar */}
+      <div className="mb-3">
+        <TrustScore score={business.trustScore} />
+      </div>
+
+      {/* Actions */}
       <div className="flex items-center gap-2">
         <a
           href={`tel:${business.phone}`}
@@ -79,10 +100,26 @@ export function BusinessCard({ business, onReport }: BusinessCardProps) {
         </button>
       </div>
 
-      <div className="mt-2 flex items-center gap-2 text-[10px] text-muted-foreground">
-        <span>{t('detail.lastVerified')}: {business.lastVerified}</span>
-        <span>·</span>
-        <span>{business.verified ? t('status.verified') : t('status.community')}</span>
+      {/* Last confirmed timestamps */}
+      <div className="mt-2 flex items-center gap-2 text-[10px] text-muted-foreground flex-wrap">
+        {business.ownerVerifiedAt && (
+          <span className="flex items-center gap-0.5">
+            <ShieldCheck className="h-2.5 w-2.5 text-status-open" />
+            {getRelativeTime(business.ownerVerifiedAt)}
+          </span>
+        )}
+        {business.communityConfirmedAt && (
+          <span className="flex items-center gap-0.5">
+            <Users className="h-2.5 w-2.5 text-accent" />
+            {getRelativeTime(business.communityConfirmedAt)}
+          </span>
+        )}
+        {business.lastAutoChecked && (
+          <span className="flex items-center gap-0.5">
+            <Bot className="h-2.5 w-2.5" />
+            {t('trust.autoChecked')}
+          </span>
+        )}
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Business } from '@/data/types';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { AlertTriangle, X } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 
 interface ReportModalProps {
   business: Business | null;
@@ -41,7 +41,7 @@ export function ReportModal({ business, open, onClose }: ReportModalProps) {
         ) : (
           <div className="flex flex-col gap-2 py-2">
             <p className="text-sm text-muted-foreground mb-2">{business.name}</p>
-            {['closed', 'moved', 'wrongHours'].map((type) => (
+            {['closed', 'moved', 'wrongHours', 'phoneIncorrect'].map((type) => (
               <button
                 key={type}
                 onClick={() => handleReport(type)}

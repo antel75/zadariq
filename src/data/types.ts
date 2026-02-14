@@ -1,5 +1,7 @@
 export type CategoryId = 'pharmacy' | 'doctor' | 'shops' | 'restaurants' | 'cafes' | 'parking' | 'transport' | 'emergency' | 'events' | 'publicServices';
 
+export type VerificationStatus = 'owner' | 'community' | 'unverified' | 'possibly_incorrect';
+
 export interface WorkingHours {
   mon: string;
   tue: string;
@@ -23,6 +25,12 @@ export interface Business {
   reportCount: number;
   lat?: number;
   lng?: number;
+  // Trust layer fields
+  verificationStatus: VerificationStatus;
+  ownerVerifiedAt?: string;
+  communityConfirmedAt?: string;
+  lastAutoChecked?: string;
+  trustScore: number; // 0-100
 }
 
 export interface EmergencyContact {
@@ -34,6 +42,6 @@ export interface EmergencyContact {
 
 export interface Report {
   businessId: string;
-  type: 'closed' | 'moved' | 'wrongHours';
+  type: 'closed' | 'moved' | 'wrongHours' | 'phoneIncorrect';
   timestamp: string;
 }

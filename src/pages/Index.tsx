@@ -6,6 +6,7 @@ import { SearchBar } from '@/components/SearchBar';
 import { CategoryScroll } from '@/components/CategoryScroll';
 import { BusinessCard } from '@/components/BusinessCard';
 import { ReportModal } from '@/components/ReportModal';
+import { FieldReportButton } from '@/components/FieldReportButton';
 import { businesses, isBusinessOpen } from '@/data/mockData';
 import { Business, CategoryId } from '@/data/types';
 import { Sparkles, MapPin, Siren } from 'lucide-react';
@@ -111,6 +112,7 @@ const Index = () => {
         open={!!reportTarget}
         onClose={() => setReportTarget(null)}
       />
+      <FieldReportButton />
     </div>
   );
 };
