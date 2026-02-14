@@ -12,6 +12,8 @@ import CategoryBrowse from "./pages/CategoryBrowse";
 import Emergency from "./pages/Emergency";
 import ForBusiness from "./pages/ForBusiness";
 import Transport from "./pages/Transport";
+import AdminLogin from "./pages/AdminLogin";
+import AdminPanel from "./pages/AdminPanel";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +34,8 @@ const App = () => (
             <Route path="/emergency" element={<Emergency />} />
             <Route path="/for-business" element={<ForBusiness />} />
             <Route path="/transport" element={<Transport />} />
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin" element={<AdminPanel />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
