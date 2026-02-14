@@ -11,6 +11,7 @@ import BusinessOwnerPanel from "./pages/BusinessOwnerPanel";
 import CategoryBrowse from "./pages/CategoryBrowse";
 import Emergency from "./pages/Emergency";
 import ForBusiness from "./pages/ForBusiness";
+import Transport from "./pages/Transport";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/category/:categoryId" element={<CategoryBrowse />} />
             <Route path="/emergency" element={<Emergency />} />
             <Route path="/for-business" element={<ForBusiness />} />
+            <Route path="/transport" element={<Transport />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

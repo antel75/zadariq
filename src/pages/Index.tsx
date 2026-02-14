@@ -11,6 +11,7 @@ import { TodayCard } from '@/components/dashboard/TodayCard';
 import { TodayAlerts } from '@/components/dashboard/TodayAlerts';
 import { QuickActions } from '@/components/dashboard/QuickActions';
 import { ForYouSection } from '@/components/dashboard/ForYouSection';
+import { TransportWidget } from '@/components/dashboard/TransportWidget';
 import { FeaturedNearby } from '@/components/FeaturedNearby';
 import { businesses, isBusinessOpen } from '@/data/mockData';
 import { Business, CategoryId } from '@/data/types';
@@ -87,8 +88,13 @@ const Index = () => {
         </section>
 
         {/* Dashboard: Quick Actions */}
-        <section className="mb-5">
+        <section className="mb-4">
           <QuickActions />
+        </section>
+
+        {/* Transport Widget */}
+        <section className="mb-5">
+          <TransportWidget />
         </section>
 
         {/* Search */}
