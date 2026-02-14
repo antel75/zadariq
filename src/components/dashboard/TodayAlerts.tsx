@@ -8,6 +8,7 @@ interface Alert {
   iconColor: string;
   titleKey: string;
   descKey: string;
+  link?: string;
 }
 
 function getMockAlerts(): Alert[] {
@@ -19,6 +20,7 @@ function getMockAlerts(): Alert[] {
       iconColor: 'text-[hsl(var(--status-open))]',
       titleKey: 'alert.dutyPharmacy',
       descKey: 'alert.dutyPharmacyDesc',
+      link: 'https://maps.app.goo.gl/MzSeHLC1RCqsJ45b6?g_st=ic',
     },
   ];
 
@@ -73,7 +75,8 @@ export function TodayAlerts() {
           return (
             <div
               key={alert.id}
-              className="flex-shrink-0 w-52 rounded-xl bg-card border border-border p-3 flex items-start gap-2.5"
+              className={`flex-shrink-0 w-52 rounded-xl bg-card border border-border p-3 flex items-start gap-2.5 ${alert.link ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}`}
+              onClick={() => alert.link && window.open(alert.link, '_blank', 'noopener,noreferrer')}
             >
               <Icon className={`h-4 w-4 mt-0.5 flex-shrink-0 ${alert.iconColor}`} />
               <div className="min-w-0">

@@ -106,7 +106,7 @@ const translations: Translations = {
   'parking.paid': { hr: 'Naplata', en: 'Paid', de: 'Gebühr', it: 'A pagamento' },
   // Alerts
   'alert.dutyPharmacy': { hr: 'Dežurna ljekarna', en: 'Pharmacy on duty', de: 'Dienstapotheke', it: 'Farmacia di turno' },
-  'alert.dutyPharmacyDesc': { hr: 'Ljekarna Bili Brig — otvorena do 21:00', en: 'Ljekarna Bili Brig — open until 21:00', de: 'Ljekarna Bili Brig — geöffnet bis 21:00', it: 'Ljekarna Bili Brig — aperta fino alle 21:00' },
+  'alert.dutyPharmacyDesc': { hr: 'Ljekarna Centar - Jadran, Put Murvice 2', en: 'Ljekarna Centar - Jadran, Put Murvice 2', de: 'Ljekarna Centar - Jadran, Put Murvice 2', it: 'Ljekarna Centar - Jadran, Put Murvice 2' },
   'alert.roadClosed': { hr: 'Cesta zatvorena', en: 'Road closed', de: 'Straße gesperrt', it: 'Strada chiusa' },
   'alert.roadClosedDesc': { hr: 'Široka ulica — radovi do 18h', en: 'Široka ulica — works until 6 PM', de: 'Široka ulica — Bauarbeiten bis 18 Uhr', it: 'Široka ulica — lavori fino alle 18' },
   'alert.eventTonight': { hr: 'Događanje večeras', en: 'Event tonight', de: 'Event heute Abend', it: 'Evento stasera' },
