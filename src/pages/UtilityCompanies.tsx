@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { utilityCompanies } from '@/data/utilityCompaniesData';
-import { ArrowLeft, Phone, ExternalLink, Building2, Wrench, AlertTriangle, Mail, Clock } from 'lucide-react';
+import { ArrowLeft, Phone, ExternalLink, Building2, Wrench, AlertTriangle, Mail, Clock, MapPin, MessageSquareWarning, Link } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const fadeUp = {
@@ -100,26 +100,72 @@ export default function UtilityCompanies() {
               <p className="text-xs font-semibold text-foreground mb-2">{t('utilities.services')}</p>
               <div className="flex flex-col gap-1.5">
                 {company.services.map((svc, j) => (
-                  <div key={j} className="flex items-center justify-between gap-2 py-1">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <Wrench className="h-3 w-3 text-muted-foreground shrink-0" />
-                      <span className="text-xs text-muted-foreground">{svc.name}</span>
+                  <div key={j} className="flex items-start justify-between gap-2 py-1.5">
+                    <div className="flex items-start gap-2 min-w-0 flex-1">
+                      <Wrench className="h-3 w-3 text-muted-foreground shrink-0 mt-0.5" />
+                      <div className="min-w-0">
+                        {svc.link ? (
+                          <a href={svc.link} target="_blank" rel="noopener noreferrer" className="text-xs text-accent font-medium hover:underline">
+                            {svc.name}
+                          </a>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">{svc.name}</span>
+                        )}
+                        {svc.description && (
+                          <p className="text-[10px] text-muted-foreground/70 mt-0.5">{svc.description}</p>
+                        )}
+                      </div>
                     </div>
-                    {svc.phone && (
-                      <a
-                        href={`tel:${svc.phone.replace(/\s/g, '')}`}
-                        className="text-xs text-accent font-medium shrink-0 hover:underline"
-                      >
-                        {svc.phone}
-                      </a>
-                    )}
-                    {!svc.phone && svc.description && (
-                      <span className="text-xs text-muted-foreground shrink-0">{svc.description}</span>
-                    )}
+                    <div className="flex items-center gap-2 shrink-0">
+                      {svc.email && (
+                        <a href={`mailto:${svc.email}`} className="text-[10px] text-accent hover:underline">
+                          <Mail className="h-3 w-3" />
+                        </a>
+                      )}
+                      {svc.phone && (
+                        <a
+                          href={`tel:${svc.phone.replace(/\s/g, '')}`}
+                          className="text-xs text-accent font-medium hover:underline"
+                        >
+                          {svc.phone}
+                        </a>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
+
+            {/* Complaints info */}
+            {company.complaintsInfo && (
+              <div className="border-t border-border/50 px-4 py-3">
+                <div className="flex items-start gap-2">
+                  <MessageSquareWarning className="h-3.5 w-3.5 text-amber-500 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-xs font-semibold text-foreground mb-1">Prigovori i reklamacije</p>
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">{company.complaintsInfo}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Branches */}
+            {company.branches && company.branches.length > 0 && (
+              <div className="border-t border-border/50 bg-secondary/10 px-4 py-3">
+                <p className="text-xs font-semibold text-foreground mb-2">Ispostave</p>
+                <div className="flex flex-col gap-2">
+                  {company.branches.map((branch, k) => (
+                    <div key={k} className="flex items-start gap-2">
+                      <MapPin className="h-3 w-3 text-muted-foreground shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-xs font-medium text-foreground">{branch.name}</p>
+                        <p className="text-[10px] text-muted-foreground">{branch.address}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </motion.div>
         ))}
       </main>
