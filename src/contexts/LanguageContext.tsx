@@ -277,7 +277,7 @@ const translations: Translations = {
   'now.oldTownBusy': { hr: 'Gužva — očekuj čekanje', en: 'Busy — expect crowds', de: 'Voll — Wartezeiten', it: 'Affollato — aspettati coda' },
   'now.openFood': { hr: 'Otvorena hrana', en: 'Open food', de: 'Essen offen', it: 'Cibo aperto' },
   'now.bakery24': { hr: 'Pekara Ražnjević — 0-24', en: 'Bakery Ražnjević — 24h', de: 'Bäckerei Ražnjević — 24h', it: 'Panificio Ražnjević — 24h' },
-  'now.gasStation': { hr: 'Benzinska — INA Gaženica', en: 'Gas station — INA Gaženica', de: 'Tankstelle — INA Gaženica', it: 'Distributore — INA Gaženica' },
+  'now.gasStation': { hr: 'Benzinska — INA Put Murvice', en: 'Gas station — INA Put Murvice', de: 'Tankstelle — INA Put Murvice', it: 'Distributore — INA Put Murvice' },
   'now.morningAdvice': { hr: 'Jutarnji savjet', en: 'Morning advice', de: 'Morgenhinweis', it: 'Consiglio mattutino' },
 };
 
