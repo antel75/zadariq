@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { businesses, isBusinessOpen, categories } from '@/data/mockData';
 import { BusinessCard } from '@/components/BusinessCard';
@@ -40,7 +40,8 @@ export default function CategoryBrowse() {
   const { categoryId } = useParams<{ categoryId: string }>();
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const [openOnly, setOpenOnly] = useState(false);
+  const [searchParams] = useSearchParams();
+  const [openOnly, setOpenOnly] = useState(searchParams.get('open') === '1');
   const [reportTarget, setReportTarget] = useState<Business | null>(null);
 
   const category = categories.find(c => c.id === categoryId);
