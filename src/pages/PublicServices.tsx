@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { publicServiceOrgs } from '@/data/publicServicesData';
-import { ArrowLeft, Phone, ExternalLink, Building2, ChevronDown, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Phone, ExternalLink, Building2, ChevronDown, ChevronRight, Mail, User } from 'lucide-react';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 
@@ -86,7 +86,7 @@ export default function PublicServices() {
           <h3 className="text-sm font-semibold text-foreground mb-2">{t('publicServices.departments')}</h3>
           <div className="flex flex-col gap-2">
             {org.departments.map((dept, i) => {
-              const hasSubunits = dept.subunits && dept.subunits.length > 0;
+              const hasExpandable = (dept.contacts && dept.contacts.length > 0) || (dept.subunits && dept.subunits.length > 0);
               const isExpanded = expandedDept === dept.id;
 
               return (
@@ -96,11 +96,16 @@ export default function PublicServices() {
                   variants={fadeUp} initial="hidden" animate="visible" custom={i + 2}
                 >
                   <button
-                    onClick={() => hasSubunits ? setExpandedDept(isExpanded ? null : dept.id) : undefined}
-                    className={`w-full flex items-center gap-3 p-3 text-left ${hasSubunits ? 'cursor-pointer hover:bg-secondary/30' : ''} transition-colors`}
+                    onClick={() => hasExpandable ? setExpandedDept(isExpanded ? null : dept.id) : undefined}
+                    className={`w-full flex items-center gap-3 p-3 text-left ${hasExpandable ? 'cursor-pointer hover:bg-secondary/30' : ''} transition-colors`}
                   >
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-foreground leading-snug">{dept.name}</p>
+                      {dept.contacts && dept.contacts.length > 0 && !isExpanded && (
+                        <p className="text-[11px] text-muted-foreground mt-0.5">
+                          {dept.contacts[0].name} — {dept.contacts[0].title}
+                        </p>
+                      )}
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
                       {dept.website && (
@@ -114,21 +119,79 @@ export default function PublicServices() {
                           <ExternalLink className="h-3.5 w-3.5" />
                         </a>
                       )}
-                      {hasSubunits && (
+                      {hasExpandable && (
                         <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
                       )}
                     </div>
                   </button>
 
-                  {/* Subunits */}
-                  {hasSubunits && isExpanded && (
-                    <div className="border-t border-border/50 bg-secondary/20 px-3 py-2">
-                      {dept.subunits!.map((sub, j) => (
-                        <div key={j} className="flex items-center gap-2 py-1.5">
-                          <ChevronRight className="h-3 w-3 text-muted-foreground shrink-0" />
-                          <span className="text-xs text-muted-foreground">{sub.name}</span>
+                  {/* Expanded content */}
+                  {hasExpandable && isExpanded && (
+                    <div className="border-t border-border/50">
+                      {/* Contacts */}
+                      {dept.contacts && dept.contacts.length > 0 && (
+                        <div className="bg-primary/5 px-3 py-2.5">
+                          <p className="text-[11px] font-semibold text-primary uppercase tracking-wider mb-1.5">Kontakti</p>
+                          <div className="flex flex-col gap-2">
+                            {dept.contacts.map((contact, j) => (
+                              <div key={j} className="flex items-start gap-2">
+                                <User className="h-3.5 w-3.5 text-primary/60 mt-0.5 shrink-0" />
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-xs font-medium text-foreground">{contact.name}</p>
+                                  <p className="text-[11px] text-muted-foreground">{contact.title}</p>
+                                  <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-0.5">
+                                    {contact.phone && (
+                                      <a href={`tel:${contact.phone.replace(/\s/g, '')}`} className="text-[11px] text-accent hover:underline flex items-center gap-1">
+                                        <Phone className="h-2.5 w-2.5" />
+                                        {contact.phone}
+                                      </a>
+                                    )}
+                                    {contact.email && (
+                                      <a href={`mailto:${contact.email}`} className="text-[11px] text-accent hover:underline flex items-center gap-1 truncate">
+                                        <Mail className="h-2.5 w-2.5 shrink-0" />
+                                        <span className="truncate">{contact.email}</span>
+                                      </a>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      ))}
+                      )}
+
+                      {/* Subunits */}
+                      {dept.subunits && dept.subunits.length > 0 && (
+                        <div className="bg-secondary/20 px-3 py-2">
+                          {dept.contacts && dept.contacts.length > 0 && (
+                            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Odsjeci</p>
+                          )}
+                          {dept.subunits.map((sub, j) => (
+                            <div key={j} className="flex items-start gap-2 py-1.5">
+                              <ChevronRight className="h-3 w-3 text-muted-foreground shrink-0 mt-0.5" />
+                              <div className="min-w-0">
+                                <span className="text-xs text-muted-foreground">{sub.name}</span>
+                                {(sub.phone || sub.email) && (
+                                  <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-0.5">
+                                    {sub.phone && (
+                                      <a href={`tel:${sub.phone.replace(/\s/g, '')}`} className="text-[11px] text-accent hover:underline flex items-center gap-1">
+                                        <Phone className="h-2.5 w-2.5" />
+                                        {sub.phone}
+                                      </a>
+                                    )}
+                                    {sub.email && (
+                                      <a href={`mailto:${sub.email}`} className="text-[11px] text-accent hover:underline flex items-center gap-1">
+                                        <Mail className="h-2.5 w-2.5" />
+                                        {sub.email}
+                                      </a>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
                 </motion.div>
