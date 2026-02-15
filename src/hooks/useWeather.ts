@@ -6,6 +6,9 @@ interface WeatherData {
   weatherCode: number;
   windKmh: number;
   sunset: string;
+  sunrise: string;
+  sunsetISO: string;
+  sunriseNextISO: string;
 }
 
 const ZADAR_LAT = 44.12;
@@ -17,7 +20,7 @@ export function useWeather() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${ZADAR_LAT}&longitude=${ZADAR_LON}&current=temperature_2m,weather_code,wind_speed_10m,is_day&daily=sunset&timezone=Europe%2FZagreb&forecast_days=1`;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${ZADAR_LAT}&longitude=${ZADAR_LON}&current=temperature_2m,weather_code,wind_speed_10m,is_day&daily=sunset,sunrise&timezone=Europe%2FZagreb&forecast_days=2`;
 
     fetch(url)
       .then(res => {
@@ -27,6 +30,10 @@ export function useWeather() {
       .then(json => {
         const sunsetRaw = json.daily?.sunset?.[0] ?? '';
         const sunsetTime = sunsetRaw ? sunsetRaw.split('T')[1]?.slice(0, 5) : '--:--';
+        const sunriseRaw = json.daily?.sunrise?.[0] ?? '';
+        const sunriseTime = sunriseRaw ? sunriseRaw.split('T')[1]?.slice(0, 5) : '--:--';
+        // Tomorrow's sunrise for after-sunset display
+        const sunriseNextRaw = json.daily?.sunrise?.[1] ?? sunriseRaw;
 
         setData({
           tempC: Math.round(json.current.temperature_2m),
@@ -34,6 +41,9 @@ export function useWeather() {
           weatherCode: json.current.weather_code,
           windKmh: Math.round(json.current.wind_speed_10m),
           sunset: sunsetTime,
+          sunrise: sunriseTime,
+          sunsetISO: sunsetRaw,
+          sunriseNextISO: sunriseNextRaw,
         });
       })
       .catch(err => setError(err.message))

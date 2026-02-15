@@ -241,6 +241,18 @@ const translations: Translations = {
   'now.powerOutage': { hr: 'Nestanak struje', en: 'Power outage', de: 'Stromausfall', it: 'Interruzione corrente' },
   'now.waterOutage': { hr: 'Bez vode', en: 'Water outage', de: 'Wasserausfall', it: 'Interruzione idrica' },
   'now.areasAffected': { hr: 'područja', en: 'areas', de: 'Gebiete', it: 'aree' },
+  'now.sunrise': { hr: 'Izlazak sunca', en: 'Sunrise', de: 'Sonnenaufgang', it: 'Alba' },
+  'now.meteoAlert': { hr: 'Meteo upozorenje', en: 'Weather alert', de: 'Wetterwarnung', it: 'Allerta meteo' },
+  'meteo.type.wind': { hr: 'Jak vjetar', en: 'Strong wind', de: 'Starker Wind', it: 'Vento forte' },
+  'meteo.type.rain': { hr: 'Obilna kiša', en: 'Heavy rain', de: 'Starkregen', it: 'Pioggia intensa' },
+  'meteo.type.thunderstorm': { hr: 'Grmljavina', en: 'Thunderstorm', de: 'Gewitter', it: 'Temporale' },
+  'meteo.type.snow': { hr: 'Snijeg', en: 'Snow', de: 'Schnee', it: 'Neve' },
+  'meteo.type.fog': { hr: 'Magla', en: 'Fog', de: 'Nebel', it: 'Nebbia' },
+  'meteo.type.extreme_heat': { hr: 'Toplinski val', en: 'Heat wave', de: 'Hitzewelle', it: 'Ondata di calore' },
+  'meteo.type.extreme_cold': { hr: 'Jak mraz', en: 'Extreme cold', de: 'Extreme Kälte', it: 'Freddo estremo' },
+  'meteo.type.ice': { hr: 'Poledica', en: 'Ice', de: 'Glatteis', it: 'Ghiaccio' },
+  'meteo.type.flood': { hr: 'Poplava', en: 'Flood', de: 'Hochwasser', it: 'Alluvione' },
+  'meteo.type.coastal': { hr: 'Obalni valovi', en: 'Coastal waves', de: 'Küstenwellen', it: 'Onde costiere' },
 };
 
 interface LanguageContextType {

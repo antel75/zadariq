@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Pill, Stethoscope, Ship, Car, Sun, Sunset, CloudRain, Zap, Droplets, Thermometer, Wind } from 'lucide-react';
+import { Pill, Stethoscope, Ship, Car, Sun, Sunset, Sunrise, CloudRain, Zap, Droplets, Thermometer, Wind, AlertTriangle } from 'lucide-react';
 import { useNextFerry, formatTime, getTimeRemaining } from '@/hooks/useTransportSchedules';
 import { getParkingStatus } from '@/data/parkingData';
 import { useWeather, getWeatherInfo, getWindType } from '@/hooks/useWeather';
@@ -47,12 +47,38 @@ function useTodayOutages() {
   return { powerOutages: power.data || [], waterOutages: water.data || [] };
 }
 
+function useMeteoAlerts() {
+  return useQuery({
+    queryKey: ['meteoalarm-zadar'],
+    queryFn: async () => {
+      const res = await supabase.functions.invoke('meteoalarm');
+      if (res.error) throw res.error;
+      return (res.data?.alerts || []) as Array<{
+        title: string;
+        level: string;
+        levelNum: number;
+        type: string;
+        description: string;
+      }>;
+    },
+    staleTime: 30 * 60 * 1000, // 30 min cache
+    retry: 1,
+  });
+}
+
+/** Check if sunset has already passed today */
+function hasSunsetPassed(sunsetISO: string): boolean {
+  if (!sunsetISO) return false;
+  return new Date() > new Date(sunsetISO);
+}
+
 export function NowInZadar() {
   const { t, language } = useLanguage();
   const navigate = useNavigate();
   const { nextFerry, isLoading: ferryLoading } = useNextFerry();
   const { data: weather } = useWeather();
   const { powerOutages, waterOutages } = useTodayOutages();
+  const { data: meteoAlerts } = useMeteoAlerts();
 
   const parkingStatus = getParkingStatus();
   const hour = new Date().getHours();
@@ -75,15 +101,46 @@ export function NowInZadar() {
     });
   }
 
-  // 2. Sunset — show from 14:00 onwards
-  if (weather?.sunset && hour >= 14) {
+  // 2. Sunset/Sunrise — smart logic
+  if (weather) {
+    const sunsetPassed = hasSunsetPassed(weather.sunsetISO);
+    if (sunsetPassed) {
+      // Show tomorrow's sunrise
+      const nextSunrise = weather.sunriseNextISO
+        ? weather.sunriseNextISO.split('T')[1]?.slice(0, 5) || '--:--'
+        : '--:--';
+      cards.push({
+        icon: Sunrise,
+        iconColor: 'text-amber-400',
+        label: t('now.sunrise'),
+        answer: `🌅 ${nextSunrise}`,
+        action: () => {},
+        priority: 8,
+      });
+    } else if (hour >= 14) {
+      cards.push({
+        icon: Sunset,
+        iconColor: 'text-orange-400',
+        label: t('now.sunset'),
+        answer: `🌅 ${weather.sunset}`,
+        action: () => {},
+        priority: hour >= 17 ? 2 : 8,
+      });
+    }
+  }
+
+  // 2b. Meteo alerts — high priority
+  if (meteoAlerts && meteoAlerts.length > 0) {
+    const top = meteoAlerts[0];
+    const levelEmoji = top.level === 'red' ? '🔴' : top.level === 'orange' ? '🟠' : '🟡';
+    const typeLabel = t(`meteo.type.${top.type}`) !== `meteo.type.${top.type}` ? t(`meteo.type.${top.type}`) : t('now.meteoAlert');
     cards.push({
-      icon: Sunset,
-      iconColor: 'text-orange-400',
-      label: t('now.sunset'),
-      answer: `🌅 ${weather.sunset}`,
-      action: () => {},
-      priority: hour >= 17 ? 2 : 8,
+      icon: AlertTriangle,
+      iconColor: top.level === 'red' ? 'text-destructive' : top.level === 'orange' ? 'text-orange-500' : 'text-yellow-500',
+      label: t('now.meteoAlert'),
+      answer: `${levelEmoji} ${typeLabel}${meteoAlerts.length > 1 ? ` +${meteoAlerts.length - 1}` : ''}`,
+      action: () => window.open('https://meteoalarm.org/en/live/', '_blank'),
+      priority: top.levelNum >= 3 ? 0 : 2, // red/orange = critical
     });
   }
 
