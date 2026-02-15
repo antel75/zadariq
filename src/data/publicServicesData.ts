@@ -215,8 +215,20 @@ export const zadarskaZupanija: PublicServiceOrg = {
       id: 'zz-opca-uprava',
       name: 'Upravni odjel za opću upravu',
       website: 'https://www.zadarska-zupanija.hr/upravni-odjeli/upravni-odjel-za-op%C4%87u-upravu',
+      contacts: [
+        { name: 'Marija Matković', title: 'Pročelnica' },
+      ],
       subunits: [
-        { name: 'Matični uredi' },
+        { name: 'Matični ured Zadar' },
+        { name: 'Matični ured Nin' },
+        { name: 'Matični ured Posedarje' },
+        { name: 'Matični ured Preko' },
+        { name: 'Matični ured Zemunik' },
+        { name: 'Matični ured Benkovac' },
+        { name: 'Matični ured Biograd na Moru' },
+        { name: 'Matični ured Gračac' },
+        { name: 'Matični ured Obrovac' },
+        { name: 'Matični ured Pag' },
         { name: 'Registar birača' },
       ],
     },
@@ -224,8 +236,11 @@ export const zadarskaZupanija: PublicServiceOrg = {
       id: 'zz-prostorno',
       name: 'Upravni odjel za prostorno uređenje, zaštitu okoliša i komunalne poslove',
       website: 'https://www.zadarska-zupanija.hr/upravni-odjeli/upravni-odjel-za-prostorno-ure%C4%91enje,-za%C5%A1titu-okoli%C5%A1a-i-komunalne-poslove',
+      contacts: [
+        { name: 'Martin Varenina', title: 'Pročelnik', phone: '023 350 356' },
+      ],
       subunits: [
-        { name: 'Građevinske dozvole' },
+        { name: 'Građevinske dozvole', phone: '023 254 775' },
         { name: 'Izmjene i dopune Prostornog plana' },
         { name: 'Zaštita okoliša' },
       ],
@@ -234,9 +249,13 @@ export const zadarskaZupanija: PublicServiceOrg = {
       id: 'zz-gospodarstvo',
       name: 'Upravni odjel za gospodarstvo i turizam',
       website: 'https://www.zadarska-zupanija.hr/upravni-odjeli/upravni-odjel-za-gospodarstvo-i-turizam',
+      contacts: [
+        { name: 'Ante Sjauš', title: 'Pročelnik' },
+      ],
       subunits: [
         { name: 'Kategorizacija turističkih objekata' },
         { name: 'Potpore u turizmu' },
+        { name: 'Infrastruktura i energetika' },
       ],
     },
     {
@@ -251,6 +270,9 @@ export const zadarskaZupanija: PublicServiceOrg = {
       id: 'zz-zdravstvo',
       name: 'Upravni odjel za zdravstvo',
       website: 'https://www.zadarska-zupanija.hr/upravni-odjeli/upravni-odjel-za-zdravstvo',
+      contacts: [
+        { name: 'Anita Mijić', title: 'Službenica privremeno ovlaštena za poslove pročelnice' },
+      ],
       subunits: [
         { name: 'Povjerenstvo za zaštitu prava pacijenata' },
       ],
@@ -277,8 +299,13 @@ export const zadarskaZupanija: PublicServiceOrg = {
       id: 'zz-pomorsko',
       name: 'Upravni odjel za pomorsko dobro, more i promet',
       website: 'https://www.zadarska-zupanija.hr/upravni-odjeli/upravni-odjel-za-pomorsko-dobro,-more-i-promet',
+      address: 'Franka Lisice 77, 23000 Zadar',
+      contacts: [
+        { name: 'Krešimir Laštro', title: 'Pročelnik' },
+      ],
       subunits: [
         { name: 'Koncesije na pomorskom dobru' },
+        { name: 'Cestovni promet i licencije' },
       ],
     },
   ],
