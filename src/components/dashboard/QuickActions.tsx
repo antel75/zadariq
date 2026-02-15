@@ -18,7 +18,7 @@ export function QuickActions() {
     {
       icon: Pill,
       labelKey: 'quick.pharmacyNow',
-      action: () => navigate('/search?q=pharmacy+open+now'),
+      action: () => navigate('/category/pharmacy?open=1'),
       color: 'bg-[hsl(var(--status-open))]/10 text-[hsl(var(--status-open))]',
     },
     {
