@@ -271,7 +271,7 @@ export function NowInZadar() {
     candidates.push({
       icon: Phone, iconColor: 'text-accent',
       label: t('now.taxi'),
-      answer: `${taxiContact.name} — ${taxiContact.phone}`,
+      answer: t('now.taxiGoogleSearch'),
       action: () => window.open('https://www.google.com/search?q=taxi+zadar', '_blank'),
       priority: isEveningOrNight(hour) ? 95 : 45,
       isActionable: true,
@@ -378,7 +378,7 @@ export function NowInZadar() {
     {
       icon: Phone, iconColor: 'text-accent',
       label: t('now.taxi'),
-      answer: taxiContact ? `${taxiContact.name} — ${taxiContact.phone}` : t('now.taxiAvailable'),
+      answer: t('now.taxiGoogleSearch'),
       action: () => window.open('https://www.google.com/search?q=taxi+zadar', '_blank'),
       priority: 90, isActionable: true,
     },
