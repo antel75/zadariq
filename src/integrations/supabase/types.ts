@@ -172,6 +172,83 @@ export type Database = {
         }
         Relationships: []
       }
+      kino_zona_movies: {
+        Row: {
+          country: string | null
+          created_at: string
+          description: string | null
+          duration: string | null
+          genre: string | null
+          id: string
+          kino_zona_url: string | null
+          poster_url: string | null
+          title: string
+          trailer_url: string | null
+          updated_at: string
+          year: string | null
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          description?: string | null
+          duration?: string | null
+          genre?: string | null
+          id?: string
+          kino_zona_url?: string | null
+          poster_url?: string | null
+          title: string
+          trailer_url?: string | null
+          updated_at?: string
+          year?: string | null
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          description?: string | null
+          duration?: string | null
+          genre?: string | null
+          id?: string
+          kino_zona_url?: string | null
+          poster_url?: string | null
+          title?: string
+          trailer_url?: string | null
+          updated_at?: string
+          year?: string | null
+        }
+        Relationships: []
+      }
+      kino_zona_screenings: {
+        Row: {
+          created_at: string
+          id: string
+          movie_id: string
+          screening_date: string
+          screening_time: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          movie_id: string
+          screening_date: string
+          screening_time: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          movie_id?: string
+          screening_date?: string
+          screening_time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kino_zona_screenings_movie_id_fkey"
+            columns: ["movie_id"]
+            isOneToOne: false
+            referencedRelation: "kino_zona_movies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       open_now_places: {
         Row: {
           address: string | null
