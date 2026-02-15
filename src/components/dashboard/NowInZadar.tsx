@@ -7,24 +7,17 @@ import { useWeather, getWeatherInfo, getWindType } from '@/hooks/useWeather';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-type TimeSlot = 'morning' | 'day' | 'evening' | 'night';
-
 interface NowCard {
   icon: React.ElementType;
   iconColor: string;
   label: string;
   answer: string;
   action: () => void;
-  priority: number;
+  priority: number; // 0-100, higher = more important
+  isActionable: boolean; // true = solves a problem; false = informational
 }
 
-function getTimeSlot(): TimeSlot {
-  const h = new Date().getHours();
-  if (h >= 6 && h < 12) return 'morning';
-  if (h >= 12 && h < 20) return 'day';
-  if (h >= 20) return 'evening';
-  return 'night';
-}
+// ── Helpers ──
 
 function getWeatherAdvice(
   weatherCode: number,
@@ -39,7 +32,6 @@ function getWeatherAdvice(
   if (windType === 'bura') return t('advice.buraWind');
   if (tempC >= 32) return t('advice.hotSunscreen');
   if (tempC <= 5) return t('advice.coldJacket');
-  if (tempC <= 15) return t('advice.warmNoJacket').replace('bez jakne 😎', '').trim() ? t('advice.coldJacket') : t('advice.coldJacket');
   if (tempC >= 18 && weatherCode <= 3) return t('advice.niceDay');
   return t('advice.warmNoJacket');
 }
@@ -90,6 +82,41 @@ function useMeteoAlerts() {
   });
 }
 
+// ── Priority Algorithm ──
+// All candidate cards get a priority score (0-100).
+// Night rule (00-06): discard anything below 70.
+// Sort descending, take exactly 4.
+// If actionable cards exist, they replace informational ones.
+
+function selectTopCards(candidates: NowCard[], hour: number): NowCard[] {
+  const isNight = hour >= 0 && hour < 6;
+
+  let pool = candidates;
+
+  // Night rule: ignore low-priority cards
+  if (isNight) {
+    pool = pool.filter(c => c.priority >= 70);
+  }
+
+  // Sort: priority desc, then actionable first
+  pool.sort((a, b) => {
+    if (b.priority !== a.priority) return b.priority - a.priority;
+    return (b.isActionable ? 1 : 0) - (a.isActionable ? 1 : 0);
+  });
+
+  // If we have more than 4, prefer actionable over informational
+  if (pool.length > 4) {
+    const actionable = pool.filter(c => c.isActionable);
+    const informational = pool.filter(c => !c.isActionable);
+    // Fill with actionable first, then informational
+    pool = [...actionable, ...informational].slice(0, 4);
+    // Re-sort by priority for display order
+    pool.sort((a, b) => b.priority - a.priority);
+  }
+
+  return pool.slice(0, 4);
+}
+
 export function NowInZadar() {
   const { t } = useLanguage();
   const navigate = useNavigate();
@@ -98,24 +125,24 @@ export function NowInZadar() {
   const { powerOutages, waterOutages } = useTodayOutages();
   const { data: meteoAlerts } = useMeteoAlerts();
   const parkingStatus = getParkingStatus();
-  const slot = getTimeSlot();
   const hour = new Date().getHours();
 
-  const cards: NowCard[] = [];
+  const candidates: NowCard[] = [];
 
-  // ── CRITICAL ALERTS (always shown, any time slot) ──
+  // ── PRIORITY 100+: Critical alerts (safety) ──
 
   if (meteoAlerts && meteoAlerts.length > 0) {
     const top = meteoAlerts[0];
     const levelEmoji = top.level === 'red' ? '🔴' : top.level === 'orange' ? '🟠' : '🟡';
     const typeLabel = t(`meteo.type.${top.type}`) !== `meteo.type.${top.type}` ? t(`meteo.type.${top.type}`) : t('now.meteoAlert');
-    cards.push({
+    candidates.push({
       icon: AlertTriangle,
       iconColor: top.level === 'red' ? 'text-destructive' : top.level === 'orange' ? 'text-orange-500' : 'text-yellow-500',
       label: t('now.meteoAlert'),
       answer: `${levelEmoji} ${typeLabel}${meteoAlerts.length > 1 ? ` +${meteoAlerts.length - 1}` : ''}`,
       action: () => window.open('https://meteoalarm.org/en/live/', '_blank'),
-      priority: 0,
+      priority: 110,
+      isActionable: true,
     });
   }
 
@@ -123,7 +150,7 @@ export function NowInZadar() {
     const firstArea = powerOutages[0].area;
     const timeRange = powerOutages[0].time_from && powerOutages[0].time_until
       ? `${powerOutages[0].time_from}–${powerOutages[0].time_until}` : '';
-    cards.push({
+    candidates.push({
       icon: Zap,
       iconColor: 'text-yellow-400',
       label: t('now.powerOutage'),
@@ -131,12 +158,13 @@ export function NowInZadar() {
         ? `⚡ ${powerOutages.length} ${t('now.areasAffected')}`
         : `⚡ ${firstArea}${timeRange ? ` ${timeRange}` : ''}`,
       action: () => navigate('/utility-companies'),
-      priority: 0,
+      priority: 105,
+      isActionable: true,
     });
   }
 
   if (waterOutages.length > 0) {
-    cards.push({
+    candidates.push({
       icon: Droplets,
       iconColor: 'text-blue-400',
       label: t('now.waterOutage'),
@@ -144,241 +172,154 @@ export function NowInZadar() {
         ? `💧 ${waterOutages.length} ${t('now.areasAffected')}`
         : `💧 ${waterOutages[0].area}`,
       action: () => navigate('/utility-companies'),
-      priority: 0,
+      priority: 105,
+      isActionable: true,
     });
   }
 
-  // ── TIME-SLOT SPECIFIC CARDS ──
+  // ── PRIORITY 100: Health / Safety / 24h ──
 
-  if (slot === 'morning') {
-    // Weather advice (not temperature!)
-    if (weather) {
-      cards.push({
-        icon: weather.weatherCode > 60 ? CloudRain : Sunrise,
-        iconColor: 'text-accent',
-        label: t('now.weatherAdvice'),
-        answer: getWeatherAdvice(weather.weatherCode, weather.tempC, weather.windKmh, t),
-        action: () => {},
-        priority: 1,
-      });
-    }
+  // Duty pharmacy (always relevant — 0-24)
+  candidates.push({
+    icon: Pill,
+    iconColor: 'text-[hsl(var(--status-open))]',
+    label: t('now.pharmacy'),
+    answer: 'Ljekarna Jadran — 0-24',
+    action: () => window.open('https://maps.app.goo.gl/MzSeHLC1RCqsJ45b6?g_st=ic', '_blank'),
+    priority: 100,
+    isActionable: true,
+  });
 
-    // Next ferry
-    if (!ferryLoading) {
-      if (isToday && ferry) {
-        cards.push({
-          icon: Ship,
-          iconColor: 'text-accent',
-          label: t('now.nextFerry'),
-          answer: `${ferry.destination || ferry.route} — ${formatTime(ferry.departure_time)} (${getTimeRemaining(ferry.departure_time)})`,
-          action: () => navigate('/transport'),
-          priority: 2,
-        });
-      }
-    }
+  // Emergency medical (boost at night)
+  candidates.push({
+    icon: Stethoscope,
+    iconColor: 'text-destructive',
+    label: t('now.emergencyMedical'),
+    answer: t('now.emergencyMedicalAnswer'),
+    action: () => navigate('/emergency'),
+    priority: hour >= 0 && hour < 6 ? 100 : 50, // high at night, low otherwise
+    isActionable: true,
+  });
 
-    // Old town crowd (morning = quiet)
-    cards.push({
-      icon: MapPin,
-      iconColor: 'text-[hsl(var(--status-open))]',
-      label: t('now.oldTown'),
-      answer: hour < 9 ? t('now.oldTownQuiet') : t('now.oldTownBusy'),
-      action: () => {},
-      priority: 3,
-    });
+  // Open 24/7 (gas station) — boosted at night/evening
+  candidates.push({
+    icon: Fuel,
+    iconColor: 'text-accent',
+    label: t('now.open247'),
+    answer: t('now.gasStation'),
+    action: () => window.open('https://maps.app.goo.gl/EBvz4DCnxbKLmFwJ8?g_st=ic', '_blank'),
+    priority: (hour >= 20 || hour < 6) ? 100 : 60,
+    isActionable: true,
+  });
 
-    // Parking
-    cards.push({
-      icon: Car,
-      iconColor: parkingStatus === 'free' ? 'text-[hsl(var(--status-open))]' : 'text-primary',
-      label: t('now.parking'),
-      answer: parkingStatus === 'free' ? t('now.parkingFree') : t('now.parkingPaid'),
-      action: () => navigate('/parking'),
-      priority: 4,
-    });
-  }
+  // ── PRIORITY 90: Movement / getting home ──
 
-  if (slot === 'day') {
-    // Duty pharmacy
-    cards.push({
-      icon: Pill,
-      iconColor: 'text-[hsl(var(--status-open))]',
-      label: t('now.pharmacy'),
-      answer: 'Ljekarna Jadran — 0-24',
-      action: () => window.open('https://maps.app.goo.gl/MzSeHLC1RCqsJ45b6?g_st=ic', '_blank'),
-      priority: 1,
-    });
+  // Taxi (boosted at night/evening)
+  candidates.push({
+    icon: Phone,
+    iconColor: 'text-accent',
+    label: t('now.taxi'),
+    answer: t('now.taxiAvailable'),
+    action: () => window.open('tel:023251400'),
+    priority: (hour >= 20 || hour < 6) ? 90 : 45,
+    isActionable: true,
+  });
 
-    // Next ferry/catamaran
-    if (!ferryLoading && isToday && ferry) {
-      cards.push({
+  // Ferry/catamaran — smart: next today OR first tomorrow
+  if (!ferryLoading) {
+    if (isToday && ferry) {
+      const isLast = hour >= 18; // rough heuristic
+      candidates.push({
         icon: Ship,
-        iconColor: 'text-accent',
-        label: t('now.nextFerry'),
+        iconColor: isLast ? 'text-orange-400' : 'text-accent',
+        label: isLast ? t('now.lastFerry') : t('now.nextFerry'),
         answer: `${ferry.destination || ferry.route} — ${formatTime(ferry.departure_time)} (${getTimeRemaining(ferry.departure_time)})`,
         action: () => navigate('/transport'),
-        priority: 2,
+        priority: 90,
+        isActionable: true,
       });
-    }
-
-    // Parking
-    cards.push({
-      icon: Car,
-      iconColor: parkingStatus === 'free' ? 'text-[hsl(var(--status-open))]' : 'text-primary',
-      label: t('now.parking'),
-      answer: parkingStatus === 'free' ? t('now.parkingFree') : t('now.parkingPaid'),
-      action: () => navigate('/parking'),
-      priority: 3,
-    });
-
-    // Weather advice
-    if (weather) {
-      cards.push({
-        icon: weather.weatherCode > 60 ? CloudRain : Sunset,
-        iconColor: 'text-accent',
-        label: t('now.weatherAdvice'),
-        answer: getWeatherAdvice(weather.weatherCode, weather.tempC, weather.windKmh, t),
-        action: () => {},
-        priority: 4,
-      });
-    }
-
-    // Sunset if afternoon
-    if (weather && hour >= 14) {
-      cards.push({
-        icon: Sunset,
-        iconColor: 'text-orange-400',
-        label: t('now.sunset'),
-        answer: `🌅 ${weather.sunset}`,
-        action: () => {},
-        priority: 5,
-      });
-    }
-  }
-
-  if (slot === 'evening') {
-    // Open food / bakery
-    cards.push({
-      icon: Fuel,
-      iconColor: 'text-accent',
-      label: t('now.open247'),
-      answer: t('now.gasStation'),
-      action: () => window.open('https://maps.app.goo.gl/EBvz4DCnxbKLmFwJ8?g_st=ic', '_blank'),
-      priority: 1,
-    });
-
-    // Last or first ferry tomorrow
-    if (!ferryLoading) {
-      if (isToday && ferry) {
-        cards.push({
-          icon: Ship,
-          iconColor: 'text-orange-400',
-          label: t('now.lastFerry'),
-          answer: `${ferry.destination || ferry.route} — ${formatTime(ferry.departure_time)} (${getTimeRemaining(ferry.departure_time)})`,
-          action: () => navigate('/transport'),
-          priority: 2,
-        });
-      } else if (firstFerry) {
-        cards.push({
-          icon: Ship,
-          iconColor: 'text-accent',
-          label: t('now.firstFerry'),
-          answer: `${firstFerry.destination || firstFerry.route} — ${formatTime(firstFerry.departure_time)}`,
-          action: () => navigate('/transport'),
-          priority: 2,
-        });
-      }
-    }
-
-    // Taxi
-    cards.push({
-      icon: Phone,
-      iconColor: 'text-accent',
-      label: t('now.taxi'),
-      answer: t('now.taxiAvailable'),
-      action: () => window.open('tel:023251400'),
-      priority: 3,
-    });
-
-    // Night pharmacy
-    cards.push({
-      icon: Pill,
-      iconColor: 'text-[hsl(var(--status-open))]',
-      label: t('now.pharmacy'),
-      answer: 'Ljekarna Jadran — 0-24',
-      action: () => window.open('https://maps.app.goo.gl/MzSeHLC1RCqsJ45b6?g_st=ic', '_blank'),
-      priority: 4,
-    });
-  }
-
-  if (slot === 'night') {
-    // First morning ferry
-    if (!ferryLoading && firstFerry) {
-      cards.push({
+    } else if (firstFerry) {
+      // No more ferries today → show first tomorrow
+      candidates.push({
         icon: Ship,
         iconColor: 'text-accent',
         label: t('now.firstFerry'),
         answer: `${firstFerry.destination || firstFerry.route} — ${formatTime(firstFerry.departure_time)}`,
         action: () => navigate('/transport'),
-        priority: 1,
-      });
-    }
-
-    // Open now 0-24
-    cards.push({
-      icon: Fuel,
-      iconColor: 'text-accent',
-      label: t('now.open247'),
-      answer: t('now.gasStation'),
-      action: () => window.open('https://maps.app.goo.gl/EBvz4DCnxbKLmFwJ8?g_st=ic', '_blank'),
-      priority: 2,
-    });
-
-    // Gas station
-    cards.push({
-      icon: Fuel,
-      iconColor: 'text-accent',
-      label: t('now.open247'),
-      answer: t('now.gasStation'),
-      action: () => window.open('https://maps.app.goo.gl/EBvz4DCnxbKLmFwJ8?g_st=ic', '_blank'),
-      priority: 3,
-    });
-
-    // Emergency
-    cards.push({
-      icon: Stethoscope,
-      iconColor: 'text-destructive',
-      label: t('now.emergencyMedical'),
-      answer: t('now.emergencyMedicalAnswer'),
-      action: () => navigate('/emergency'),
-      priority: 4,
-    });
-
-    // Taxi
-    cards.push({
-      icon: Phone,
-      iconColor: 'text-accent',
-      label: t('now.taxi'),
-      answer: t('now.taxiAvailable'),
-      action: () => window.open('tel:023251400'),
-      priority: 5,
-    });
-
-    // Morning weather advice
-    if (weather) {
-      cards.push({
-        icon: Sunrise,
-        iconColor: 'text-amber-400',
-        label: t('now.morningAdvice'),
-        answer: getWeatherAdvice(weather.weatherCode, weather.tempC, weather.windKmh, t),
-        action: () => {},
-        priority: 6,
+        priority: (hour >= 0 && hour < 6) ? 90 : 70,
+        isActionable: true,
       });
     }
   }
 
-  // Sort by priority, take top 6
-  const sortedCards = cards.sort((a, b) => a.priority - b.priority).slice(0, 6);
+  // ── PRIORITY 70: City navigation ──
+
+  // Parking
+  candidates.push({
+    icon: Car,
+    iconColor: parkingStatus === 'free' ? 'text-[hsl(var(--status-open))]' : 'text-primary',
+    label: t('now.parking'),
+    answer: parkingStatus === 'free' ? t('now.parkingFree') : t('now.parkingPaid'),
+    action: () => navigate('/parking'),
+    priority: (hour >= 7 && hour < 20) ? 70 : 35,
+    isActionable: true,
+  });
+
+  // Old town crowd
+  const crowdLevel = hour < 9 || hour >= 22 ? t('now.oldTownQuiet') : t('now.oldTownBusy');
+  candidates.push({
+    icon: MapPin,
+    iconColor: 'text-[hsl(var(--status-open))]',
+    label: t('now.oldTown'),
+    answer: crowdLevel,
+    action: () => {},
+    priority: (hour >= 8 && hour < 20) ? 70 : 30,
+    isActionable: false,
+  });
+
+  // ── PRIORITY 40: Informational ──
+
+  // Weather advice
+  if (weather) {
+    candidates.push({
+      icon: weather.weatherCode > 60 ? CloudRain : (hour < 12 ? Sunrise : Sunset),
+      iconColor: 'text-accent',
+      label: t('now.weatherAdvice'),
+      answer: getWeatherAdvice(weather.weatherCode, weather.tempC, weather.windKmh, t),
+      action: () => {},
+      priority: 40,
+      isActionable: false,
+    });
+  }
+
+  // Sunset (afternoon only)
+  if (weather && hour >= 14 && hour < 21) {
+    candidates.push({
+      icon: Sunset,
+      iconColor: 'text-orange-400',
+      label: t('now.sunset'),
+      answer: `🌅 ${weather.sunset}`,
+      action: () => {},
+      priority: 40,
+      isActionable: false,
+    });
+  }
+
+  // Sunrise (night/early morning)
+  if (weather && (hour >= 0 && hour < 7)) {
+    candidates.push({
+      icon: Sunrise,
+      iconColor: 'text-amber-400',
+      label: t('now.morningAdvice'),
+      answer: getWeatherAdvice(weather.weatherCode, weather.tempC, weather.windKmh, t),
+      action: () => {},
+      priority: 40,
+      isActionable: false,
+    });
+  }
+
+  // ── Select top 4 ──
+  const topCards = selectTopCards(candidates, hour);
 
   return (
     <div>
@@ -386,7 +327,7 @@ export function NowInZadar() {
         {t('now.title')}
       </h2>
       <div className="grid grid-cols-2 gap-2">
-        {sortedCards.map((card, i) => {
+        {topCards.map((card, i) => {
           const Icon = card.icon;
           return (
             <button
