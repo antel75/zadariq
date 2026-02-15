@@ -15,6 +15,7 @@ import ForBusiness from "./pages/ForBusiness";
 import Transport from "./pages/Transport";
 import Parking from "./pages/Parking";
 import Cinema from "./pages/Cinema";
+import KinoZona from "./pages/KinoZona";
 import PublicServices from "./pages/PublicServices";
 import PublicServicesMenu from "./pages/PublicServicesMenu";
 import UtilityCompanies from "./pages/UtilityCompanies";
@@ -44,6 +45,7 @@ const App = () => (
               <Route path="/transport" element={<Transport />} />
               <Route path="/parking" element={<Parking />} />
               <Route path="/cinema" element={<Cinema />} />
+              <Route path="/kino-zona" element={<KinoZona />} />
               <Route path="/public-services" element={<PublicServicesMenu />} />
               <Route path="/public-services/:orgId" element={<PublicServices />} />
               <Route path="/utility-companies" element={<UtilityCompanies />} />
