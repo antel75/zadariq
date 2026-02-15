@@ -259,11 +259,11 @@ export function NowInZadar() {
   if (slot === 'evening') {
     // Open food / bakery
     cards.push({
-      icon: Coffee,
+      icon: Fuel,
       iconColor: 'text-accent',
-      label: t('now.openFood'),
-      answer: t('now.bakery24'),
-      action: () => window.open('https://maps.google.com/?q=Pekara+Ražnjević+Zadar', '_blank'),
+      label: t('now.open247'),
+      answer: t('now.gasStation'),
+      action: () => window.open('https://maps.google.com/?q=INA+Gaženica+Zadar', '_blank'),
       priority: 1,
     });
 
@@ -326,11 +326,11 @@ export function NowInZadar() {
 
     // Open now 0-24
     cards.push({
-      icon: Coffee,
+      icon: Fuel,
       iconColor: 'text-accent',
       label: t('now.open247'),
-      answer: t('now.bakery24'),
-      action: () => window.open('https://maps.google.com/?q=Pekara+Ražnjević+Zadar', '_blank'),
+      answer: t('now.gasStation'),
+      action: () => window.open('https://maps.google.com/?q=INA+Gaženica+Zadar', '_blank'),
       priority: 2,
     });
 
