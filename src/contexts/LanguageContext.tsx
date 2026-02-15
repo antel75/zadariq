@@ -279,6 +279,7 @@ const translations: Translations = {
   'now.bakery24': { hr: 'Pekara Ražnjević — 0-24', en: 'Bakery Ražnjević — 24h', de: 'Bäckerei Ražnjević — 24h', it: 'Panificio Ražnjević — 24h' },
   'now.gasStation': { hr: 'Benzinska — INA Put Murvice', en: 'Gas station — INA Put Murvice', de: 'Tankstelle — INA Put Murvice', it: 'Distributore — INA Put Murvice' },
   'now.morningAdvice': { hr: 'Jutarnji savjet', en: 'Morning advice', de: 'Morgenhinweis', it: 'Consiglio mattutino' },
+  'now.pharmacyNoData': { hr: 'Podatak nije unesen — nazovi 112', en: 'No data — call 112', de: 'Keine Daten — 112 anrufen', it: 'Nessun dato — chiama 112' },
 };
 
 interface LanguageContextType {

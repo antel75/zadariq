@@ -91,6 +91,42 @@ export type Database = {
           },
         ]
       }
+      city_contacts: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          id: string
+          maps_url: string | null
+          name: string
+          phone: string | null
+          type: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          maps_url?: string | null
+          name: string
+          phone?: string | null
+          type: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          maps_url?: string | null
+          name?: string
+          phone?: string | null
+          type?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       duty_services: {
         Row: {
           address: string | null
@@ -133,6 +169,51 @@ export type Database = {
           updated_at?: string
           valid_from?: string
           valid_until?: string
+        }
+        Relationships: []
+      }
+      open_now_places: {
+        Row: {
+          address: string | null
+          category: string
+          created_at: string
+          enabled: boolean
+          id: string
+          maps_url: string | null
+          name: string
+          open_247: boolean
+          open_from: string | null
+          open_until: string | null
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          category: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          maps_url?: string | null
+          name: string
+          open_247?: boolean
+          open_from?: string | null
+          open_until?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          category?: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          maps_url?: string | null
+          name?: string
+          open_247?: boolean
+          open_from?: string | null
+          open_until?: string | null
+          phone?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
