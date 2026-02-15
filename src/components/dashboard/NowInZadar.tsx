@@ -263,7 +263,7 @@ export function NowInZadar() {
       iconColor: 'text-accent',
       label: t('now.open247'),
       answer: t('now.gasStation'),
-      action: () => window.open('https://maps.google.com/?q=INA+Gaženica+Zadar', '_blank'),
+      action: () => window.open('https://www.google.com/maps/place/INA/@44.1084,15.2316,17z/', '_blank'),
       priority: 1,
     });
 
@@ -330,7 +330,7 @@ export function NowInZadar() {
       iconColor: 'text-accent',
       label: t('now.open247'),
       answer: t('now.gasStation'),
-      action: () => window.open('https://maps.google.com/?q=INA+Gaženica+Zadar', '_blank'),
+      action: () => window.open('https://www.google.com/maps/place/INA/@44.1084,15.2316,17z/', '_blank'),
       priority: 2,
     });
 
@@ -340,7 +340,7 @@ export function NowInZadar() {
       iconColor: 'text-accent',
       label: t('now.open247'),
       answer: t('now.gasStation'),
-      action: () => window.open('https://maps.google.com/?q=INA+Gaženica+Zadar', '_blank'),
+      action: () => window.open('https://www.google.com/maps/place/INA/@44.1084,15.2316,17z/', '_blank'),
       priority: 3,
     });
 
