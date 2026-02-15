@@ -38,7 +38,7 @@ export function CategoryScroll({ onSelect }: CategoryScrollProps) {
     if (id === 'doctor') {
       setOpenSubmenu(openSubmenu === 'doctor' ? null : 'doctor');
     } else if (id === 'publicServices') {
-      setOpenSubmenu(openSubmenu === 'publicServices' ? null : 'publicServices');
+      navigate('/public-services');
     } else {
       setOpenSubmenu(null);
       onSelect(id);
@@ -95,23 +95,7 @@ export function CategoryScroll({ onSelect }: CategoryScrollProps) {
         </div>
       )}
 
-      {/* Public Services subcategories */}
-      {openSubmenu === 'publicServices' && (
-        <div className="flex gap-2 pl-1 animate-in slide-in-from-top-2 duration-200">
-          {publicServicesSubmenu.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => { navigate(item.route); setOpenSubmenu(null); }}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-accent/10 border border-accent/30 hover:bg-accent/20 transition-all active:scale-95"
-            >
-              <Landmark className="h-4 w-4 text-accent" />
-              <span className="text-xs font-medium text-foreground whitespace-nowrap">
-                {t(item.labelKey)}
-              </span>
-            </button>
-          ))}
-        </div>
-      )}
+      {/* Public Services - now navigates to dedicated page, no inline submenu */}
     </div>
   );
 }
