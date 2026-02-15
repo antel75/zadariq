@@ -104,3 +104,27 @@ export function useNextBusDeparture(lineId?: string) {
 
   return { nextBuses: filtered, ...rest };
 }
+
+/** Returns next ferry/catamaran, or first one tomorrow if none left today */
+export function useSmartFerry() {
+  const { data: schedules, ...rest } = useTransportSchedules(['ferry', 'catamaran']);
+  
+  const now = new Date();
+  const nowMins = now.getHours() * 60 + now.getMinutes();
+
+  // Find next upcoming today
+  const nextToday = schedules?.find(s => {
+    const [h, m] = s.departure_time.split(':').map(Number);
+    return h * 60 + m > nowMins;
+  }) || null;
+
+  // First departure of the day (for "first morning ferry" fallback)
+  const firstTomorrow = schedules?.[0] || null;
+
+  return {
+    ferry: nextToday,
+    firstFerry: firstTomorrow,
+    isToday: !!nextToday,
+    ...rest,
+  };
+}

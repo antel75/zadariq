@@ -255,6 +255,30 @@ const translations: Translations = {
   'meteo.type.ice': { hr: 'Poledica', en: 'Ice', de: 'Glatteis', it: 'Ghiaccio' },
   'meteo.type.flood': { hr: 'Poplava', en: 'Flood', de: 'Hochwasser', it: 'Alluvione' },
   'meteo.type.coastal': { hr: 'Obalni valovi', en: 'Coastal waves', de: 'Küstenwellen', it: 'Onde costiere' },
+  // Contextual weather advice
+  'advice.rainUmbrella': { hr: 'Kiša — ponesi kišobran ☂️', en: 'Rain — bring umbrella ☂️', de: 'Regen — Schirm mitnehmen ☂️', it: 'Pioggia — porta ombrello ☂️' },
+  'advice.stormStayIn': { hr: 'Oluja — izbjegavaj otvoreno ⛈️', en: 'Storm — stay indoors ⛈️', de: 'Sturm — drinnen bleiben ⛈️', it: 'Temporale — resta al chiuso ⛈️' },
+  'advice.hotSunscreen': { hr: 'Vrućina — krema i voda 🧴', en: 'Hot — sunscreen & water 🧴', de: 'Heiß — Sonnencreme & Wasser 🧴', it: 'Caldo — crema solare e acqua 🧴' },
+  'advice.warmNoJacket': { hr: 'Toplo jutro — bez jakne 😎', en: 'Warm morning — no jacket 😎', de: 'Warmer Morgen — keine Jacke 😎', it: 'Mattina calda — niente giacca 😎' },
+  'advice.coldJacket': { hr: 'Hladno — uzmi jaknu 🧥', en: 'Cold — bring a jacket 🧥', de: 'Kalt — Jacke mitnehmen 🧥', it: 'Freddo — porta una giacca 🧥' },
+  'advice.fogCareful': { hr: 'Magla — oprez u vožnji 🌫️', en: 'Fog — careful driving 🌫️', de: 'Nebel — vorsichtig fahren 🌫️', it: 'Nebbia — guida con cautela 🌫️' },
+  'advice.buraWind': { hr: 'Bura puše — pazi na mostove 💨', en: 'Bura wind — watch bridges 💨', de: 'Bura — Brücken beachten 💨', it: 'Bora — attenzione ai ponti 💨' },
+  'advice.niceDay': { hr: 'Lijepo vrijeme — uživaj vani ☀️', en: 'Nice day — enjoy outside ☀️', de: 'Schönes Wetter — draußen genießen ☀️', it: 'Bel tempo — goditi all\'aperto ☀️' },
+  'advice.coldMorning': { hr: 'Ujutro bura — hladno 🌬️', en: 'Morning bura — cold 🌬️', de: 'Morgens Bura — kalt 🌬️', it: 'Mattina bora — freddo 🌬️' },
+  // Time-slot card labels
+  'now.firstFerry': { hr: 'Prvi trajekt', en: 'First ferry', de: 'Erste Fähre', it: 'Primo traghetto' },
+  'now.lastFerry': { hr: 'Zadnji trajekt', en: 'Last ferry', de: 'Letzte Fähre', it: 'Ultimo traghetto' },
+  'now.open247': { hr: 'Otvoreno 0-24', en: 'Open 24h', de: '24h geöffnet', it: 'Aperto 24h' },
+  'now.weatherAdvice': { hr: 'Savjet za danas', en: 'Today\'s advice', de: 'Tageshinweis', it: 'Consiglio di oggi' },
+  'now.taxi': { hr: 'Taxi', en: 'Taxi', de: 'Taxi', it: 'Taxi' },
+  'now.taxiAvailable': { hr: 'Taxi Zadar — 023 251 400', en: 'Taxi Zadar — 023 251 400', de: 'Taxi Zadar — 023 251 400', it: 'Taxi Zadar — 023 251 400' },
+  'now.oldTown': { hr: 'Stari grad', en: 'Old Town', de: 'Altstadt', it: 'Centro storico' },
+  'now.oldTownQuiet': { hr: 'Mirno — dobro za šetnju', en: 'Quiet — good for a walk', de: 'Ruhig — gut für Spaziergang', it: 'Tranquillo — bello per passeggiare' },
+  'now.oldTownBusy': { hr: 'Gužva — očekuj čekanje', en: 'Busy — expect crowds', de: 'Voll — Wartezeiten', it: 'Affollato — aspettati coda' },
+  'now.openFood': { hr: 'Otvorena hrana', en: 'Open food', de: 'Essen offen', it: 'Cibo aperto' },
+  'now.bakery24': { hr: 'Pekara Ražnjević — 0-24', en: 'Bakery Ražnjević — 24h', de: 'Bäckerei Ražnjević — 24h', it: 'Panificio Ražnjević — 24h' },
+  'now.gasStation': { hr: 'Benzinska — INA Gaženica', en: 'Gas station — INA Gaženica', de: 'Tankstelle — INA Gaženica', it: 'Distributore — INA Gaženica' },
+  'now.morningAdvice': { hr: 'Jutarnji savjet', en: 'Morning advice', de: 'Morgenhinweis', it: 'Consiglio mattutino' },
 };
 
 interface LanguageContextType {
