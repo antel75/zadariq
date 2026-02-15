@@ -66,12 +66,6 @@ function useMeteoAlerts() {
   });
 }
 
-/** Check if sunset has already passed today */
-function hasSunsetPassed(sunsetISO: string): boolean {
-  if (!sunsetISO) return false;
-  return new Date() > new Date(sunsetISO);
-}
-
 export function NowInZadar() {
   const { t, language } = useLanguage();
   const navigate = useNavigate();
@@ -101,11 +95,10 @@ export function NowInZadar() {
     });
   }
 
-  // 2. Sunset/Sunrise — smart logic
+  // 2. Sunset/Sunrise — use isDay from API (reliable, no timezone issues)
   if (weather) {
-    const sunsetPassed = hasSunsetPassed(weather.sunsetISO);
-    if (sunsetPassed) {
-      // Show tomorrow's sunrise
+    if (!weather.isDay) {
+      // Nighttime: show tomorrow's sunrise
       const nextSunrise = weather.sunriseNextISO
         ? weather.sunriseNextISO.split('T')[1]?.slice(0, 5) || '--:--'
         : '--:--';
@@ -115,9 +108,10 @@ export function NowInZadar() {
         label: t('now.sunrise'),
         answer: `🌅 ${nextSunrise}`,
         action: () => {},
-        priority: 8,
+        priority: 3,
       });
     } else if (hour >= 14) {
+      // Afternoon: show today's sunset
       cards.push({
         icon: Sunset,
         iconColor: 'text-orange-400',
