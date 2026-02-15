@@ -242,7 +242,7 @@ export function NowInZadar() {
       icon: ShieldAlert, iconColor: 'text-destructive',
       label: t('now.emergencyMedical'),
       answer: `${emergencyContact.name} — ${emergencyContact.phone}`,
-      action: () => window.open(`tel:${emergencyContact.phone}`),
+      action: () => navigate('/emergency'),
       priority: isNightHour(hour) ? 110 : 50,
       isActionable: true,
     });
@@ -272,7 +272,7 @@ export function NowInZadar() {
       icon: Phone, iconColor: 'text-accent',
       label: t('now.taxi'),
       answer: `${taxiContact.name} — ${taxiContact.phone}`,
-      action: () => window.open(`tel:${taxiContact.phone}`),
+      action: () => window.open('https://www.google.com/search?q=taxi+zadar', '_blank'),
       priority: isEveningOrNight(hour) ? 95 : 45,
       isActionable: true,
     });
@@ -362,8 +362,8 @@ export function NowInZadar() {
     {
       icon: ShieldAlert, iconColor: 'text-destructive',
       label: t('now.emergencyMedical'),
-      answer: emergencyContact ? `${emergencyContact.name} — ${emergencyContact.phone}` : '112',
-      action: () => window.open('tel:112'),
+      answer: emergencyContact ? `${emergencyContact.name} — ${emergencyContact.phone}` : '194',
+      action: () => navigate('/emergency'),
       priority: 110, isActionable: true,
     },
     // 2) Pharmacy fallback
@@ -379,7 +379,7 @@ export function NowInZadar() {
       icon: Phone, iconColor: 'text-accent',
       label: t('now.taxi'),
       answer: taxiContact ? `${taxiContact.name} — ${taxiContact.phone}` : t('now.taxiAvailable'),
-      action: () => window.open(`tel:${taxiContact?.phone || '023251400'}`),
+      action: () => window.open('https://www.google.com/search?q=taxi+zadar', '_blank'),
       priority: 90, isActionable: true,
     },
     // 4) Open now fallback
