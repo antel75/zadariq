@@ -9,6 +9,7 @@ import { BusinessCard } from '@/components/BusinessCard';
 import { ReportModal } from '@/components/ReportModal';
 import { FieldReportButton } from '@/components/FieldReportButton';
 import { NowInZadar } from '@/components/dashboard/NowInZadar';
+import { ZadarClock } from '@/components/dashboard/ZadarClock';
 import { TodayAlerts } from '@/components/dashboard/TodayAlerts';
 import { QuickActions } from '@/components/dashboard/QuickActions';
 import { ForYouSection } from '@/components/dashboard/ForYouSection';
@@ -91,9 +92,14 @@ const Index = () => {
       </header>
 
       <main className="max-w-lg mx-auto px-4 pb-8">
+        {/* Zadar Clock */}
+        <div className="mt-3 mb-1">
+          <ZadarClock />
+        </div>
+
         {/* SADA U ZADRU — critical info first */}
         <motion.section
-          className="mt-4 mb-4"
+          className="mb-4"
           variants={fadeUp}
           initial="hidden"
           animate="visible"

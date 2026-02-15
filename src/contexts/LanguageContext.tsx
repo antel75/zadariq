@@ -226,6 +226,8 @@ const translations: Translations = {
   'transport.line': { hr: 'Linija', en: 'Line', de: 'Linie', it: 'Linea' },
   'transport.widget': { hr: 'Prijevoz uskoro', en: 'Transport soon', de: 'Transport bald', it: 'Trasporti a breve' },
   'transport.cachedToday': { hr: 'Offline spremno', en: 'Cached today', de: 'Heute gespeichert', it: 'Salvato oggi' },
+  // Clock
+  'clock.zadarTime': { hr: 'Zadar', en: 'Zadar time', de: 'Zadar-Zeit', it: 'Ora di Zara' },
   // Now in Zadar
   'now.title': { hr: 'Sada u Zadru', en: 'Now in Zadar', de: 'Jetzt in Zadar', it: 'Ora a Zara' },
   'now.pharmacy': { hr: 'Dežurna ljekarna', en: 'Duty pharmacy', de: 'Dienstapotheke', it: 'Farmacia di turno' },
