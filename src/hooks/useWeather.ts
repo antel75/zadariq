@@ -5,6 +5,7 @@ interface WeatherData {
   isDay: boolean;
   weatherCode: number;
   windKmh: number;
+  humidity: number;
   sunset: string;
   sunrise: string;
   sunsetISO: string;
@@ -20,7 +21,7 @@ export function useWeather() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${ZADAR_LAT}&longitude=${ZADAR_LON}&current=temperature_2m,weather_code,wind_speed_10m,is_day&daily=sunset,sunrise&timezone=Europe%2FZagreb&forecast_days=2`;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${ZADAR_LAT}&longitude=${ZADAR_LON}&current=temperature_2m,weather_code,wind_speed_10m,is_day,relative_humidity_2m&daily=sunset,sunrise&timezone=Europe%2FZagreb&forecast_days=2`;
 
     fetch(url)
       .then(res => {
@@ -32,7 +33,6 @@ export function useWeather() {
         const sunsetTime = sunsetRaw ? sunsetRaw.split('T')[1]?.slice(0, 5) : '--:--';
         const sunriseRaw = json.daily?.sunrise?.[0] ?? '';
         const sunriseTime = sunriseRaw ? sunriseRaw.split('T')[1]?.slice(0, 5) : '--:--';
-        // Tomorrow's sunrise for after-sunset display
         const sunriseNextRaw = json.daily?.sunrise?.[1] ?? sunriseRaw;
 
         setData({
@@ -40,6 +40,7 @@ export function useWeather() {
           isDay: json.current.is_day === 1,
           weatherCode: json.current.weather_code,
           windKmh: Math.round(json.current.wind_speed_10m),
+          humidity: Math.round(json.current.relative_humidity_2m ?? 50),
           sunset: sunsetTime,
           sunrise: sunriseTime,
           sunsetISO: sunsetRaw,
