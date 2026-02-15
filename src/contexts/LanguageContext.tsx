@@ -236,6 +236,11 @@ const translations: Translations = {
   'now.parking': { hr: 'Parking poluotok', en: 'Peninsula parking', de: 'Halbinsel Parken', it: 'Parcheggio penisola' },
   'now.parkingFree': { hr: 'Besplatno sada', en: 'Free now', de: 'Jetzt kostenlos', it: 'Gratuito ora' },
   'now.parkingPaid': { hr: 'Naplata aktivna', en: 'Paid now', de: 'Gebührenpflichtig', it: 'A pagamento' },
+  'now.weather': { hr: 'Vrijeme sada', en: 'Weather now', de: 'Wetter jetzt', it: 'Meteo ora' },
+  'now.sunset': { hr: 'Zalazak sunca', en: 'Sunset', de: 'Sonnenuntergang', it: 'Tramonto' },
+  'now.powerOutage': { hr: 'Nestanak struje', en: 'Power outage', de: 'Stromausfall', it: 'Interruzione corrente' },
+  'now.waterOutage': { hr: 'Bez vode', en: 'Water outage', de: 'Wasserausfall', it: 'Interruzione idrica' },
+  'now.areasAffected': { hr: 'područja', en: 'areas', de: 'Gebiete', it: 'aree' },
 };
 
 interface LanguageContextType {
