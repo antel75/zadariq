@@ -52,10 +52,10 @@ const Index = () => {
   };
 
   const trendingSearches = [
-    'Ljekarna otvorena sada',
-    'Parking stari grad',
-    'Zubar Zadar',
-    'Kafić uz more',
+    { label: 'Ljekarna otvorena sada', path: '/category/pharmacy?open=1' },
+    { label: 'Parking stari grad', path: '/parking' },
+    { label: 'Zubar Zadar', path: '/category/dentist' },
+    { label: 'Kafić uz more', path: '/category/cafes' },
   ];
 
   const nearbyOpen = businesses
@@ -210,11 +210,11 @@ const Index = () => {
           <div className="flex flex-wrap gap-2">
             {trendingSearches.map((s) => (
               <button
-                key={s}
-                onClick={() => { setQuery(s); navigate(`/search?q=${encodeURIComponent(s)}`); }}
+                key={s.label}
+                onClick={() => navigate(s.path)}
                 className="px-3 py-1.5 rounded-full bg-secondary/80 text-secondary-foreground text-xs font-medium hover:bg-accent/15 hover:text-accent transition-all duration-200"
               >
-                {s}
+                {s.label}
               </button>
             ))}
           </div>
