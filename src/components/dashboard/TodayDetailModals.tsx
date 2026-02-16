@@ -53,7 +53,7 @@ export function WeatherDetailModal({ open, onClose, tempC, humidity, windKmh, wi
           variant="outline"
           size="sm"
           className="w-full mt-2"
-          onClick={() => window.open('https://www.dhmz.htnet.hr/prognoza/prognoza_detail.php?grad_id=100', '_blank')}
+          onClick={() => window.open('https://meteo.hr/prognoze.php?Code=Zadar&id=prognoza&section=prognoze_model&param=3d', '_blank')}
         >
           <ExternalLink className="h-3.5 w-3.5 mr-1" />
           {t('detail.openForecast')}
