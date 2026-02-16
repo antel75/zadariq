@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.verify-ownership-code]
 verify_jwt = false
+
+[functions.submit-correction]
+verify_jwt = false

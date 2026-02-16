@@ -363,6 +363,13 @@ const translations: Translations = {
   'mode.cinemaTonightAnswer': { hr: 'Projekcije večeras 🎬', en: 'Screenings tonight 🎬', de: 'Vorführungen heute Abend 🎬', it: 'Proiezioni stasera 🎬' },
   'mode.indoorActivity': { hr: 'Zatvorene aktivnosti', en: 'Indoor activities', de: 'Indoor-Aktivitäten', it: 'Attività al chiuso' },
   'mode.indoorActivityAnswer': { hr: 'Kino, muzej, shopping 🏠', en: 'Cinema, museum, shopping 🏠', de: 'Kino, Museum, Shopping 🏠', it: 'Cinema, museo, shopping 🏠' },
+  // Correction popup
+  'correction.isCorrect': { hr: 'Je li ovaj podatak točan?', en: 'Is this data correct?', de: 'Sind diese Daten korrekt?', it: 'Questo dato è corretto?' },
+  'correction.correct': { hr: 'Točno', en: 'Correct', de: 'Korrekt', it: 'Corretto' },
+  'correction.suggest': { hr: 'Predloži ispravak', en: 'Suggest correction', de: 'Korrektur vorschlagen', it: 'Suggerisci correzione' },
+  'correction.notExists': { hr: 'Ne postoji više', en: 'No longer exists', de: 'Existiert nicht mehr', it: 'Non esiste più' },
+  'correction.suggestNew': { hr: 'Unesite ispravnu vrijednost:', en: 'Enter the correct value:', de: 'Geben Sie den korrekten Wert ein:', it: 'Inserisci il valore corretto:' },
+  'correction.submit': { hr: 'Pošalji', en: 'Submit', de: 'Absenden', it: 'Invia' },
 };
 
 interface LanguageContextType {

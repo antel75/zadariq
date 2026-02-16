@@ -405,6 +405,54 @@ export type Database = {
         }
         Relationships: []
       }
+      pending_changes: {
+        Row: {
+          confidence_score: number
+          created_at: string
+          entity_id: string
+          entity_type: string
+          field_name: string
+          fingerprint_hash: string
+          id: string
+          ip_hash: string | null
+          old_value: string | null
+          proposed_value: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+        }
+        Insert: {
+          confidence_score?: number
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          field_name: string
+          fingerprint_hash: string
+          id?: string
+          ip_hash?: string | null
+          old_value?: string | null
+          proposed_value?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Update: {
+          confidence_score?: number
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          field_name?: string
+          fingerprint_hash?: string
+          id?: string
+          ip_hash?: string | null
+          old_value?: string | null
+          proposed_value?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       power_outages: {
         Row: {
           area: string
