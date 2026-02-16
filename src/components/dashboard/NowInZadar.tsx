@@ -116,16 +116,33 @@ function useSportsForNow() {
   return useQuery({
     queryKey: ['sports-now-in-zadar'],
     queryFn: async () => {
-      const now = new Date();
-      const past3h = new Date(now.getTime() - 3 * 60 * 60 * 1000).toISOString();
-      const next12h = new Date(now.getTime() + 12 * 60 * 60 * 1000).toISOString();
-      const { data } = await supabase
-        .from('sports_events')
-        .select('*')
-        .gte('start_time', past3h)
-        .lte('start_time', next12h)
-        .order('start_time', { ascending: true });
-      return data || [];
+      const now = new Date().toISOString();
+
+      // 1) Live
+      const { data: live } = await supabase
+        .from('sports_events').select('*').eq('match_status', 'live').order('start_time', { ascending: true });
+      if (live && live.length > 0) return { events: live, tier: 'live' as const };
+
+      // 2) Today (next 24h upcoming)
+      const next24h = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+      const { data: today } = await supabase
+        .from('sports_events').select('*').eq('match_status', 'upcoming')
+        .gte('start_time', now).lte('start_time', next24h).order('start_time', { ascending: true });
+      if (today && today.length > 0) return { events: today, tier: 'today' as const };
+
+      // 3) Next match
+      const { data: next } = await supabase
+        .from('sports_events').select('*').eq('match_status', 'upcoming')
+        .gte('start_time', now).order('start_time', { ascending: true }).limit(1);
+      if (next && next.length > 0) return { events: next, tier: 'next' as const };
+
+      // 4) Last result
+      const { data: last } = await supabase
+        .from('sports_events').select('*').eq('match_status', 'finished')
+        .order('start_time', { ascending: false }).limit(1);
+      if (last && last.length > 0) return { events: last, tier: 'last' as const };
+
+      return { events: [], tier: 'none' as const };
     },
     staleTime: 30 * 1000,
     refetchInterval: 60 * 1000,
@@ -316,46 +333,56 @@ export function NowInZadar({ mode = 'day', appMode = 'normal' }: NowInZadarProps
     });
   }
 
-  // ── SPORT CARDS (highest priority when live) ──
+  // ── SPORT CARDS (always show at least one) ──
 
-  if (sportsEvents && sportsEvents.length > 0) {
-    for (const ev of sportsEvents) {
-      const now = Date.now();
-      const startMs = new Date(ev.start_time).getTime();
-      const hoursUntil = (startMs - now) / (1000 * 60 * 60);
-      const hoursSince = (now - startMs) / (1000 * 60 * 60);
+  if (sportsEvents && sportsEvents.events.length > 0) {
+    const tier = sportsEvents.tier;
+    for (const ev of sportsEvents.events) {
       const emoji = ev.team_tag?.includes('basketball') || ev.team_tag === 'kk_zadar' ? '🏀' : '⚽';
 
-      if (ev.match_status === 'live') {
+      if (tier === 'live') {
         candidates.push({
           icon: Trophy,
           iconColor: 'text-destructive',
-          label: `${emoji} ${t('happening.liveBadge')}`,
+          label: `${emoji} ${t('happening.liveMatch')}`,
           answer: `${ev.home_team} ${ev.home_score ?? 0}:${ev.away_score ?? 0} ${ev.away_team}${ev.match_minute ? ` (${ev.match_minute}')` : ''}`,
           action: () => {},
           priority: 120,
           isActionable: true,
           pinFirst: true,
         });
-      } else if (ev.match_status === 'upcoming' && hoursUntil > 0 && hoursUntil <= 3) {
+      } else if (tier === 'today') {
         candidates.push({
           icon: Trophy,
           iconColor: 'text-[hsl(var(--status-warning))]',
-          label: `${emoji} ${t('happening.tonight')}`,
+          label: `${emoji} ${t('happening.todayPlays')}`,
           answer: `${ev.home_team} – ${ev.away_team} ${t('happening.at')} ${new Date(ev.start_time).toLocaleTimeString('hr-HR', { hour: '2-digit', minute: '2-digit' })}`,
           action: () => {},
           priority: 116,
           isActionable: true,
         });
-      } else if (ev.match_status === 'finished' && hoursSince >= 0 && hoursSince <= 2) {
+      } else if (tier === 'next') {
+        const date = new Date(ev.start_time);
+        const dayStr = date.toLocaleDateString('hr-HR', { weekday: 'short', day: 'numeric', month: 'short' });
+        const timeStr = date.toLocaleTimeString('hr-HR', { hour: '2-digit', minute: '2-digit' });
+        candidates.push({
+          icon: Trophy,
+          iconColor: 'text-muted-foreground',
+          label: `${emoji} ${t('happening.nextMatch')}`,
+          answer: `${ev.home_team} – ${ev.away_team} · ${dayStr} ${timeStr}`,
+          action: () => {},
+          priority: 50,
+          isActionable: false,
+        });
+      } else if (tier === 'last') {
         candidates.push({
           icon: Trophy,
           iconColor: 'text-[hsl(var(--status-open))]',
-          label: `${emoji} ${t('happening.finishedBadge')}`,
+          label: `${emoji} ${t('happening.lastResult')}`,
           answer: `${ev.home_team} ${ev.home_score ?? 0}:${ev.away_score ?? 0} ${ev.away_team}`,
           action: () => {},
-          priority: 105,
-          isActionable: true,
+          priority: 40,
+          isActionable: false,
         });
       }
     }
