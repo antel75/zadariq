@@ -19,6 +19,7 @@ interface NowCard {
   action: () => void;
   priority: number;
   isActionable: boolean;
+  pinFirst?: boolean; // Lock to position #1 (live sport, critical alerts)
 }
 
 // ── Helpers ──
@@ -194,33 +195,41 @@ function selectTopCards(
   fallbacks: NowCard[],
   hour: number
 ): NowCard[] {
-  let pool = [...candidates];
+  // Separate pinned cards (live sport, critical alerts) from the rest
+  const pinned = candidates.filter(c => c.pinFirst);
+  const rest = candidates.filter(c => !c.pinFirst);
 
-  // Sort: priority desc, actionable first on tie
-  pool.sort((a, b) => {
+  // Sort rest by priority desc
+  rest.sort((a, b) => {
     if (b.priority !== a.priority) return b.priority - a.priority;
     return (b.isActionable ? 1 : 0) - (a.isActionable ? 1 : 0);
   });
 
-  // If >4, prefer actionable
-  if (pool.length > 4) {
+  // If >4 in rest, prefer actionable
+  const slotsForRest = 4 - pinned.length;
+  let pool = rest;
+  if (pool.length > slotsForRest) {
     const actionable = pool.filter(c => c.isActionable);
     const informational = pool.filter(c => !c.isActionable);
-    pool = [...actionable, ...informational].slice(0, 4);
-    pool.sort((a, b) => b.priority - a.priority);
+    pool = [...actionable, ...informational].slice(0, slotsForRest);
   }
 
+  // Pinned first (sorted by priority), then rest
+  pinned.sort((a, b) => b.priority - a.priority);
+  pool.sort((a, b) => b.priority - a.priority);
+  let result = [...pinned, ...pool];
+
   // Guarantee exactly 4: fill with fallbacks
-  if (pool.length < 4) {
+  if (result.length < 4) {
     for (const fb of fallbacks) {
-      if (pool.length >= 4) break;
-      if (!pool.some(c => c.label === fb.label)) {
-        pool.push(fb);
+      if (result.length >= 4) break;
+      if (!result.some(c => c.label === fb.label)) {
+        result.push(fb);
       }
     }
   }
 
-  return pool.slice(0, 4);
+  return result.slice(0, 4);
 }
 
 // ── Component ──
@@ -323,7 +332,8 @@ export function NowInZadar({ mode = 'day' }: NowInZadarProps) {
           answer: `${ev.home_team} ${ev.home_score ?? 0}:${ev.away_score ?? 0} ${ev.away_team}${ev.match_minute ? ` (${ev.match_minute}')` : ''}`,
           action: () => {},
           priority: 120,
-          isActionable: true, // Must be true to survive selectTopCards filter
+          isActionable: true,
+          pinFirst: true,
         });
       } else if (ev.match_status === 'upcoming' && hoursUntil > 0 && hoursUntil <= 3) {
         candidates.push({
