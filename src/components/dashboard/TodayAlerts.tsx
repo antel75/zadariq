@@ -155,18 +155,45 @@ export function TodayAlerts() {
   // Sort by priority desc
   alerts.sort((a, b) => b.priority - a.priority);
 
-  // Auto-scroll logic
+  // For infinite loop: duplicate alerts so we can seamlessly wrap
+  const displayAlerts = alerts.length >= 2 ? [...alerts, ...alerts, ...alerts] : alerts;
+
+  // Auto-scroll logic with seamless infinite loop
   const scrollNext = useCallback(() => {
     const el = scrollRef.current;
-    if (!el) return;
-    const cardWidth = 220; // w-[210px] + gap
-    const maxScroll = el.scrollWidth - el.clientWidth;
-    if (el.scrollLeft >= maxScroll - 10) {
-      el.scrollTo({ left: 0, behavior: 'smooth' });
-    } else {
-      el.scrollBy({ left: cardWidth, behavior: 'smooth' });
+    if (!el || alerts.length < 2) return;
+    const cardWidth = 222; // 210px card + 12px gap (gap-2.5 ≈ 10px + borders)
+    const singleSetWidth = alerts.length * cardWidth;
+
+    // If we've scrolled past the second set, jump back to the first set (no visual change)
+    if (el.scrollLeft >= singleSetWidth * 2 - el.clientWidth) {
+      el.scrollLeft = el.scrollLeft - singleSetWidth;
     }
-  }, []);
+
+    el.scrollBy({ left: cardWidth, behavior: 'smooth' });
+  }, [alerts.length]);
+
+  // Initialize scroll position to start of second set (so we can scroll back too)
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el || alerts.length < 2) return;
+    const cardWidth = 222;
+    el.scrollLeft = alerts.length * cardWidth;
+  }, [alerts.length]);
+
+  // Handle manual scroll: seamless wrap on both ends
+  const handleScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el || alerts.length < 2) return;
+    const cardWidth = 222;
+    const singleSetWidth = alerts.length * cardWidth;
+
+    if (el.scrollLeft <= cardWidth / 2) {
+      el.scrollLeft += singleSetWidth;
+    } else if (el.scrollLeft >= singleSetWidth * 2) {
+      el.scrollLeft -= singleSetWidth;
+    }
+  }, [alerts.length]);
 
   useEffect(() => {
     if (alerts.length <= 1) return;
@@ -190,18 +217,20 @@ export function TodayAlerts() {
       </h2>
       <div
         ref={scrollRef}
-        className="flex gap-2.5 overflow-x-auto scrollbar-hide pb-1 snap-x snap-mandatory"
+        className="flex gap-2.5 overflow-x-auto scrollbar-hide pb-1"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
         onTouchStart={() => setIsPaused(true)}
         onTouchEnd={() => setTimeout(() => setIsPaused(false), 3000)}
+        onScroll={handleScroll}
+        style={{ scrollSnapType: 'none' }}
       >
-        {alerts.map((alert) => {
+        {displayAlerts.map((alert, idx) => {
           const Icon = alert.icon;
           return (
             <div
-              key={alert.id}
-              className={`flex-shrink-0 w-[210px] snap-start rounded-xl bg-card border border-border p-3 flex flex-col gap-1.5 ${alert.link ? 'cursor-pointer hover:shadow-md hover:border-primary/30 transition-all' : ''}`}
+              key={`${alert.id}-${idx}`}
+              className={`flex-shrink-0 w-[210px] rounded-xl bg-card border border-border p-3 flex flex-col gap-1.5 ${alert.link ? 'cursor-pointer hover:shadow-md hover:border-primary/30 transition-all' : ''}`}
               onClick={() => alert.link && window.open(alert.link, '_blank', 'noopener,noreferrer')}
             >
               <div className="flex items-center gap-2">
