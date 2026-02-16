@@ -16,6 +16,7 @@ import { QuickActions } from '@/components/dashboard/QuickActions';
 import { ForYouSection } from '@/components/dashboard/ForYouSection';
 import { TransportWidget } from '@/components/dashboard/TransportWidget';
 import { TodayCard } from '@/components/dashboard/TodayCard';
+import { CityPulseSection } from '@/components/dashboard/CityPulseSection';
 import { FeaturedNearby } from '@/components/FeaturedNearby';
 import { ZadarIQLogo } from '@/components/ZadarIQLogo';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -215,6 +216,17 @@ const Index = () => {
             <FeaturedNearby />
           </motion.div>
         )}
+
+        {/* City Pulse */}
+        <motion.section
+          className="mb-6"
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          custom={sectionIndex++}
+        >
+          <CityPulseSection />
+        </motion.section>
 
         {/* For You Today */}
         {show.forYou && (
