@@ -1,11 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Pill, Stethoscope, Ship, Car, CloudRain, Zap, Droplets, AlertTriangle, Sunset, Sunrise, Phone, MapPin, Fuel, ShieldAlert } from 'lucide-react';
+import { Pill, Stethoscope, Ship, Car, CloudRain, Zap, Droplets, AlertTriangle, Sunset, Sunrise, Phone, MapPin, Fuel, ShieldAlert, Coffee, UtensilsCrossed, Film, ShoppingBag, Landmark } from 'lucide-react';
 import { useSmartFerry, formatTime, getTimeRemaining } from '@/hooks/useTransportSchedules';
 import { getParkingStatus } from '@/data/parkingData';
 import { useWeather, getWindType } from '@/hooks/useWeather';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { type SituationalMode } from '@/hooks/useSituationalMode';
 
 // ── Types ──
 
@@ -121,13 +122,51 @@ function useMeteoAlerts() {
   });
 }
 
+// ── Mode-aware priority boosts ──
+// Each mode has categories it prioritizes
+
+function getModePriorityBoost(mode: SituationalMode, cardType: string): number {
+  const boosts: Record<SituationalMode, Record<string, number>> = {
+    morning: {
+      transport: 30,
+      weatherAdvice: 25,
+      parking: 20,
+      bakery: 20,
+      cafe: 15,
+    },
+    day: {
+      shops: 20,
+      institutions: 20,
+      weatherAdvice: 15,
+      events: 15,
+      parking: 10,
+    },
+    evening: {
+      restaurants: 25,
+      cinema: 25,
+      lastTransport: 30,
+      parking: 20,
+      events: 15,
+    },
+    night: {
+      pharmacy: 30,
+      emergency: 30,
+      taxi: 25,
+      open247: 25,
+    },
+    bad_weather: {
+      weatherAlert: 40,
+      weatherAdvice: 35,
+      indoor: 20,
+      pharmacy: 15,
+      transport: 10,
+    },
+  };
+
+  return boosts[mode]?.[cardType] || 0;
+}
+
 // ── Priority Selection Algorithm ──
-// 1. Build all candidate cards with priority scores
-// 2. Night filter: discard priority < 70
-// 3. Sort desc by priority, actionable first on ties
-// 4. If >4, actionable cards displace informational
-// 5. If <4, fill with fallbacks (112, pharmacy, taxi, open-now)
-// 6. Always return exactly 4
 
 function selectTopCards(
   candidates: NowCard[],
@@ -159,7 +198,6 @@ function selectTopCards(
   if (pool.length < 4) {
     for (const fb of fallbacks) {
       if (pool.length >= 4) break;
-      // Don't duplicate same label
       if (!pool.some(c => c.label === fb.label)) {
         pool.push(fb);
       }
@@ -171,7 +209,11 @@ function selectTopCards(
 
 // ── Component ──
 
-export function NowInZadar() {
+interface NowInZadarProps {
+  mode?: SituationalMode;
+}
+
+export function NowInZadar({ mode = 'day' }: NowInZadarProps) {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const hour = new Date().getHours();
@@ -193,7 +235,7 @@ export function NowInZadar() {
 
   const candidates: NowCard[] = [];
 
-  // ── CRITICAL ALERTS (110+) ──
+  // ── CRITICAL ALERTS (110+) — always highest ──
 
   if (meteoAlerts && meteoAlerts.length > 0) {
     const top = meteoAlerts[0];
@@ -205,7 +247,7 @@ export function NowInZadar() {
       label: t('now.meteoAlert'),
       answer: `${levelEmoji} ${typeLabel}${meteoAlerts.length > 1 ? ` +${meteoAlerts.length - 1}` : ''}`,
       action: () => window.open('https://meteoalarm.org/en/live/', '_blank'),
-      priority: 115,
+      priority: 115 + getModePriorityBoost(mode, 'weatherAlert'),
       isActionable: true,
     });
   }
@@ -234,21 +276,19 @@ export function NowInZadar() {
     });
   }
 
-  // ── PRIORITY 100-110: Health / Safety ──
+  // ── Health / Safety ──
 
-  // Emergency 112 from DB (boosted at night to 110)
   if (emergencyContact) {
     candidates.push({
       icon: ShieldAlert, iconColor: 'text-destructive',
       label: t('now.emergencyMedical'),
       answer: `${emergencyContact.name} — ${emergencyContact.phone}`,
       action: () => navigate('/emergency'),
-      priority: isNightHour(hour) ? 110 : 50,
+      priority: 50 + getModePriorityBoost(mode, 'emergency'),
       isActionable: true,
     });
   }
 
-  // Duty pharmacy from DB
   if (dutyPharmacy) {
     const pharmacyLabel = `${dutyPharmacy.name}${dutyPharmacy.notes ? ` — ${dutyPharmacy.notes}` : ''}`;
     candidates.push({
@@ -259,26 +299,24 @@ export function NowInZadar() {
         if (dutyPharmacy.phone) window.open(`tel:${dutyPharmacy.phone}`);
         else navigate('/category/pharmacy?open=1');
       },
-      priority: isNightHour(hour) ? 105 : 100,
+      priority: (mode === 'night' ? 105 : 80) + getModePriorityBoost(mode, 'pharmacy'),
       isActionable: true,
     });
   }
 
-  // ── PRIORITY 90-95: Movement ──
+  // ── Movement ──
 
-  // Taxi from DB
   if (taxiContact) {
     candidates.push({
       icon: Phone, iconColor: 'text-accent',
       label: t('now.taxi'),
       answer: t('now.taxiGoogleSearch'),
       action: () => window.open('https://www.google.com/search?q=taxi+zadar', '_blank'),
-      priority: isEveningOrNight(hour) ? 95 : 45,
+      priority: (isEveningOrNight(hour) ? 75 : 40) + getModePriorityBoost(mode, 'taxi'),
       isActionable: true,
     });
   }
 
-  // Open 24/7 from DB
   if (open247Place) {
     candidates.push({
       icon: Fuel, iconColor: 'text-accent',
@@ -287,21 +325,23 @@ export function NowInZadar() {
       action: () => {
         if (open247Place.maps_url) window.open(open247Place.maps_url, '_blank');
       },
-      priority: isEveningOrNight(hour) ? 90 : 60,
+      priority: (isEveningOrNight(hour) ? 70 : 50) + getModePriorityBoost(mode, 'open247'),
       isActionable: true,
     });
   }
 
-  // Ferry — next today or first tomorrow
+  // ── Transport (mode-aware) ──
+
   if (!ferryLoading) {
     if (isToday && ferry) {
       const isLate = hour >= 18;
+      const cardType = isLate ? 'lastTransport' : 'transport';
       candidates.push({
         icon: Ship, iconColor: isLate ? 'text-orange-400' : 'text-accent',
         label: isLate ? t('now.lastFerry') : t('now.nextFerry'),
         answer: `${ferry.destination || ferry.route} — ${formatTime(ferry.departure_time)} (${getTimeRemaining(ferry.departure_time)})`,
         action: () => navigate('/transport'),
-        priority: isEveningOrNight(hour) ? 85 : 90,
+        priority: 70 + getModePriorityBoost(mode, cardType),
         isActionable: true,
       });
     } else if (firstFerry) {
@@ -310,13 +350,13 @@ export function NowInZadar() {
         label: t('now.firstFerry'),
         answer: `${firstFerry.destination || firstFerry.route} — ${formatTime(firstFerry.departure_time)}`,
         action: () => navigate('/transport'),
-        priority: isNightHour(hour) ? 85 : 70,
+        priority: 60 + getModePriorityBoost(mode, 'transport'),
         isActionable: true,
       });
     }
   }
 
-  // ── PRIORITY 70: City navigation ──
+  // ── City navigation ──
 
   candidates.push({
     icon: Car,
@@ -324,7 +364,7 @@ export function NowInZadar() {
     label: t('now.parking'),
     answer: parkingStatus === 'free' ? t('now.parkingFree') : t('now.parkingPaid'),
     action: () => navigate('/parking'),
-    priority: (hour >= 7 && hour < 20) ? 70 : 25,
+    priority: 50 + getModePriorityBoost(mode, 'parking'),
     isActionable: true,
   });
 
@@ -332,11 +372,77 @@ export function NowInZadar() {
   candidates.push({
     icon: MapPin, iconColor: 'text-[hsl(var(--status-open))]',
     label: t('now.oldTown'), answer: crowdLevel,
-    action: () => {}, priority: (hour >= 8 && hour < 20) ? 70 : 20,
+    action: () => {}, priority: (hour >= 8 && hour < 20) ? 50 : 20,
     isActionable: false,
   });
 
-  // ── PRIORITY 40: Informational ──
+  // ── Mode-specific contextual cards ──
+
+  // Morning: bakeries & cafes
+  if (mode === 'morning') {
+    candidates.push({
+      icon: Coffee, iconColor: 'text-orange-400',
+      label: t('mode.morningCafe'),
+      answer: t('mode.morningCafeAnswer'),
+      action: () => navigate('/category/cafes?open=1'),
+      priority: 75 + getModePriorityBoost(mode, 'cafe'),
+      isActionable: true,
+    });
+  }
+
+  // Day: shops & institutions
+  if (mode === 'day') {
+    candidates.push({
+      icon: ShoppingBag, iconColor: 'text-accent',
+      label: t('mode.shopsOpen'),
+      answer: t('mode.shopsOpenAnswer'),
+      action: () => navigate('/category/shops?open=1'),
+      priority: 55 + getModePriorityBoost(mode, 'shops'),
+      isActionable: true,
+    });
+    candidates.push({
+      icon: Landmark, iconColor: 'text-primary',
+      label: t('mode.institutions'),
+      answer: t('mode.institutionsAnswer'),
+      action: () => navigate('/public-services'),
+      priority: 50 + getModePriorityBoost(mode, 'institutions'),
+      isActionable: true,
+    });
+  }
+
+  // Evening: restaurants & cinema
+  if (mode === 'evening') {
+    candidates.push({
+      icon: UtensilsCrossed, iconColor: 'text-orange-400',
+      label: t('mode.restaurants'),
+      answer: t('mode.restaurantsAnswer'),
+      action: () => navigate('/category/restaurants?open=1'),
+      priority: 75 + getModePriorityBoost(mode, 'restaurants'),
+      isActionable: true,
+    });
+    candidates.push({
+      icon: Film, iconColor: 'text-accent',
+      label: t('mode.cinemaTonight'),
+      answer: t('mode.cinemaTonightAnswer'),
+      action: () => navigate('/cinema'),
+      priority: 70 + getModePriorityBoost(mode, 'cinema'),
+      isActionable: true,
+    });
+  }
+
+  // Bad weather: indoor recommendation
+  if (mode === 'bad_weather') {
+    candidates.push({
+      icon: Film, iconColor: 'text-accent',
+      label: t('mode.indoorActivity'),
+      answer: t('mode.indoorActivityAnswer'),
+      action: () => navigate('/cinema'),
+      priority: 80 + getModePriorityBoost(mode, 'indoor'),
+      isActionable: true,
+    });
+  }
+
+  // ── Informational ──
 
   if (weather) {
     candidates.push({
@@ -344,7 +450,9 @@ export function NowInZadar() {
       iconColor: 'text-accent',
       label: t('now.weatherAdvice'),
       answer: getWeatherAdvice(weather.weatherCode, weather.tempC, weather.windKmh, t),
-      action: () => {}, priority: 40, isActionable: false,
+      action: () => {}, 
+      priority: 30 + getModePriorityBoost(mode, 'weatherAdvice'),
+      isActionable: false,
     });
   }
 
@@ -352,13 +460,12 @@ export function NowInZadar() {
     candidates.push({
       icon: Sunset, iconColor: 'text-orange-400',
       label: t('now.sunset'), answer: `🌅 ${weather.sunset}`,
-      action: () => {}, priority: 40, isActionable: false,
+      action: () => {}, priority: 35, isActionable: false,
     });
   }
 
   // ── Fallbacks (guaranteed fill to 4) ──
   const fallbacks: NowCard[] = [
-    // 1) 112
     {
       icon: ShieldAlert, iconColor: 'text-destructive',
       label: t('now.emergencyMedical'),
@@ -366,7 +473,6 @@ export function NowInZadar() {
       action: () => navigate('/emergency'),
       priority: 110, isActionable: true,
     },
-    // 2) Pharmacy fallback
     {
       icon: Pill, iconColor: 'text-muted-foreground',
       label: t('now.pharmacy'),
@@ -374,7 +480,6 @@ export function NowInZadar() {
       action: () => navigate('/category/pharmacy?open=1'),
       priority: 100, isActionable: true,
     },
-    // 3) Taxi fallback
     {
       icon: Phone, iconColor: 'text-accent',
       label: t('now.taxi'),
@@ -382,7 +487,6 @@ export function NowInZadar() {
       action: () => window.open('https://www.google.com/search?q=taxi+zadar', '_blank'),
       priority: 90, isActionable: true,
     },
-    // 4) Open now fallback
     {
       icon: Fuel, iconColor: 'text-accent',
       label: t('now.open247'),
