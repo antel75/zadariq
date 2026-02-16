@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Shield, Plus, Pencil, LogOut, ArrowLeft, Trash2, Save } from 'lucide-react';
 import { PendingChangesTab } from '@/components/admin/PendingChangesTab';
+import { PendingPlacesTab } from '@/components/admin/PendingPlacesTab';
 
 type DutyService = {
   id: string;
@@ -168,9 +169,10 @@ const AdminPanel = () => {
       <main className="max-w-2xl mx-auto px-4 py-4">
         <Tabs defaultValue="duty">
           <TabsList className="w-full">
-            <TabsTrigger value="duty" className="flex-1">Duty</TabsTrigger>
-            <TabsTrigger value="transport" className="flex-1">Transport</TabsTrigger>
-            <TabsTrigger value="corrections" className="flex-1">Corrections</TabsTrigger>
+            <TabsTrigger value="duty" className="flex-1 text-xs">Duty</TabsTrigger>
+            <TabsTrigger value="transport" className="flex-1 text-xs">Transport</TabsTrigger>
+            <TabsTrigger value="cafes" className="flex-1 text-xs">Cafes</TabsTrigger>
+            <TabsTrigger value="corrections" className="flex-1 text-xs">Corrections</TabsTrigger>
           </TabsList>
 
           {/* DUTY SERVICES */}
@@ -403,6 +405,9 @@ const AdminPanel = () => {
               ))}
               {transports.length === 0 && <p className="text-sm text-muted-foreground text-center py-8">No transport schedules yet. Add one above.</p>}
             </div>
+          </TabsContent>
+          <TabsContent value="cafes">
+            <PendingPlacesTab />
           </TabsContent>
           <TabsContent value="corrections">
             <PendingChangesTab />

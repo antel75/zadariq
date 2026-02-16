@@ -415,6 +415,33 @@ const translations: Translations = {
   'pulse.rec.peakTonight': { hr: '🔥 Preporučeno večeras — grad je živ!', en: '🔥 Recommended tonight — city is alive!', de: '🔥 Heute Abend empfohlen — die Stadt lebt!', it: '🔥 Consigliato stasera — la città è viva!' },
   'pulse.rec.quietWalk': { hr: '🌿 Dobar trenutak za šetnju gradom', en: '🌿 Good time for a city walk', de: '🌿 Gute Zeit für einen Stadtspaziergang', it: '🌿 Buon momento per una passeggiata' },
   'pulse.rec.rainy': { hr: '☔ Kišovito — razmisli o zatvorenim aktivnostima', en: '☔ Rainy — consider indoor activities', de: '☔ Regnerisch — denken Sie an Innenaktivitäten', it: '☔ Pioggia — considera attività al chiuso' },
+  // Smoking status
+  'smoking.title': { hr: 'Pušenje', en: 'Smoking', de: 'Rauchen', it: 'Fumo' },
+  'smoking.allowed': { hr: 'Pušenje dozvoljeno', en: 'Smoking allowed', de: 'Rauchen erlaubt', it: 'Fumo consentito' },
+  'smoking.partial': { hr: 'Odvojeni dio', en: 'Separated area', de: 'Getrennter Bereich', it: 'Area separata' },
+  'smoking.notAllowed': { hr: 'Nepušački', en: 'Non-smoking', de: 'Nichtraucher', it: 'Non fumatori' },
+  'smoking.unconfirmed': { hr: 'Nije potvrđeno', en: 'Unconfirmed', de: 'Nicht bestätigt', it: 'Non confermato' },
+  'smoking.confirmed': { hr: 'Potvrđeno', en: 'Confirmed', de: 'Bestätigt', it: 'Confermato' },
+  'smoking.reportStatus': { hr: 'Prijavi status pušenja:', en: 'Report smoking status:', de: 'Raucherstatus melden:', it: 'Segnala stato fumo:' },
+  'smoking.thankYou': { hr: 'Hvala! Ažurirat ćemo kad bude dovoljno potvrda.', en: 'Thanks! We\'ll update when enough confirmations arrive.', de: 'Danke! Wir aktualisieren bei genügend Bestätigungen.', it: 'Grazie! Aggiorneremo con sufficienti conferme.' },
+  'smoking.cooldown': { hr: 'Već ste prijavili status za ovaj kafić. Pokušajte ponovno za 30 dana.', en: 'You already reported this cafe. Try again in 30 days.', de: 'Sie haben dieses Café bereits gemeldet. Versuchen Sie es in 30 Tagen erneut.', it: 'Hai già segnalato questo caffè. Riprova tra 30 giorni.' },
+  'smoking.disclaimer': { hr: 'Informativno – temelji se na prijavama korisnika. Ako se pravila promijene, prijavite ispravak.', en: 'Informational — based on user reports. If rules change, report a correction.', de: 'Informativ — basiert auf Nutzermeldungen. Bei Regeländerungen melden Sie eine Korrektur.', it: 'Informativo — basato su segnalazioni utenti. Se le regole cambiano, segnala una correzione.' },
+  // Add cafe
+  'addCafe.title': { hr: 'Dodaj novi kafić', en: 'Add new cafe', de: 'Neues Café hinzufügen', it: 'Aggiungi nuovo caffè' },
+  'addCafe.addButton': { hr: '➕ Dodaj kafić', en: '➕ Add cafe', de: '➕ Café hinzufügen', it: '➕ Aggiungi caffè' },
+  'addCafe.name': { hr: 'Naziv', en: 'Name', de: 'Name', it: 'Nome' },
+  'addCafe.namePlaceholder': { hr: 'npr. Caffe bar Sunset', en: 'e.g. Cafe Bar Sunset', de: 'z.B. Café Bar Sunset', it: 'es. Caffè Bar Sunset' },
+  'addCafe.address': { hr: 'Adresa', en: 'Address', de: 'Adresse', it: 'Indirizzo' },
+  'addCafe.addressPlaceholder': { hr: 'npr. Široka ulica 5, Zadar', en: 'e.g. Široka ulica 5, Zadar', de: 'z.B. Široka ulica 5, Zadar', it: 'es. Široka ulica 5, Zadar' },
+  'addCafe.phone': { hr: 'Telefon', en: 'Phone', de: 'Telefon', it: 'Telefono' },
+  'addCafe.website': { hr: 'Web stranica', en: 'Website', de: 'Webseite', it: 'Sito web' },
+  'addCafe.optional': { hr: 'opcionalno', en: 'optional', de: 'optional', it: 'opzionale' },
+  'addCafe.submit': { hr: 'Pošalji prijedlog', en: 'Submit suggestion', de: 'Vorschlag senden', it: 'Invia suggerimento' },
+  'addCafe.thankYou': { hr: 'Hvala! Vaš prijedlog je zaprimljen.', en: 'Thanks! Your suggestion has been received.', de: 'Danke! Ihr Vorschlag wurde empfangen.', it: 'Grazie! Il tuo suggerimento è stato ricevuto.' },
+  'addCafe.pendingReview': { hr: 'Prijedlog će biti pregledan i dodan ako bude odobren.', en: 'Your submission will be reviewed and added if approved.', de: 'Ihr Eintrag wird überprüft und bei Genehmigung hinzugefügt.', it: 'Il tuo invio sarà revisionato e aggiunto se approvato.' },
+  'addCafe.limitReached': { hr: 'Dosegnuli ste dnevni limit prijedloga. Pokušajte sutra.', en: 'You reached the daily suggestion limit. Try tomorrow.', de: 'Tageslimit erreicht. Versuchen Sie es morgen.', it: 'Limite giornaliero raggiunto. Riprova domani.' },
+  'addCafe.error': { hr: 'Greška pri slanju. Pokušajte ponovno.', en: 'Error submitting. Please try again.', de: 'Fehler beim Senden. Bitte versuchen Sie es erneut.', it: 'Errore nell\'invio. Riprova.' },
+  'addCafe.disclaimer': { hr: 'Svi prijedlozi prolaze moderaciju. Neprimjereni unosi bit će ignorirani.', en: 'All suggestions go through moderation. Inappropriate entries will be ignored.', de: 'Alle Vorschläge werden moderiert. Unangemessene Einträge werden ignoriert.', it: 'Tutti i suggerimenti passano per moderazione. Inserimenti inappropriati saranno ignorati.' },
 };
 
 interface LanguageContextType {

@@ -44,6 +44,33 @@ export type Database = {
         }
         Relationships: []
       }
+      cafe_smoking_reports: {
+        Row: {
+          business_id: string
+          created_at: string
+          fingerprint_hash: string
+          id: string
+          ip_hash: string | null
+          report_value: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          fingerprint_hash: string
+          id?: string
+          ip_hash?: string | null
+          report_value: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          fingerprint_hash?: string
+          id?: string
+          ip_hash?: string | null
+          report_value?: string
+        }
+        Relationships: []
+      }
       cinema_movies: {
         Row: {
           age_rating: string | null
@@ -474,6 +501,63 @@ export type Database = {
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
+        }
+        Relationships: []
+      }
+      pending_places: {
+        Row: {
+          category: string
+          created_at: string
+          fingerprint_hash: string
+          id: string
+          ip_hash: string | null
+          lat: number | null
+          lng: number | null
+          notes: string | null
+          phone: string | null
+          proposed_address: string
+          proposed_name: string
+          proposed_smoking_status: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          website: string | null
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          fingerprint_hash: string
+          id?: string
+          ip_hash?: string | null
+          lat?: number | null
+          lng?: number | null
+          notes?: string | null
+          phone?: string | null
+          proposed_address: string
+          proposed_name: string
+          proposed_smoking_status?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          website?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          fingerprint_hash?: string
+          id?: string
+          ip_hash?: string | null
+          lat?: number | null
+          lng?: number | null
+          notes?: string | null
+          phone?: string | null
+          proposed_address?: string
+          proposed_name?: string
+          proposed_smoking_status?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          website?: string | null
         }
         Relationships: []
       }
