@@ -157,6 +157,30 @@ export type Database = {
         }
         Relationships: []
       }
+      city_pulse_votes: {
+        Row: {
+          created_at: string
+          fingerprint_hash: string
+          id: string
+          vote_level: string
+          zone_id: string
+        }
+        Insert: {
+          created_at?: string
+          fingerprint_hash: string
+          id?: string
+          vote_level: string
+          zone_id: string
+        }
+        Update: {
+          created_at?: string
+          fingerprint_hash?: string
+          id?: string
+          vote_level?: string
+          zone_id?: string
+        }
+        Relationships: []
+      }
       duty_services: {
         Row: {
           address: string | null
