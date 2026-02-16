@@ -9,6 +9,7 @@ import { BusinessCard } from '@/components/BusinessCard';
 import { ReportModal } from '@/components/ReportModal';
 import { FieldReportButton } from '@/components/FieldReportButton';
 import { NowInZadar } from '@/components/dashboard/NowInZadar';
+import { ModeIndicator } from '@/components/dashboard/ModeIndicator';
 import { ZadarClock } from '@/components/dashboard/ZadarClock';
 import { TodayAlerts } from '@/components/dashboard/TodayAlerts';
 import { QuickActions } from '@/components/dashboard/QuickActions';
@@ -18,6 +19,7 @@ import { TodayCard } from '@/components/dashboard/TodayCard';
 import { FeaturedNearby } from '@/components/FeaturedNearby';
 import { ZadarIQLogo } from '@/components/ZadarIQLogo';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { useSituationalMode } from '@/hooks/useSituationalMode';
 import { businesses, isBusinessOpen } from '@/data/mockData';
 import { Business, CategoryId } from '@/data/types';
 import { Sparkles, MapPin, Siren, Briefcase } from 'lucide-react';
@@ -36,6 +38,8 @@ const Index = () => {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [reportTarget, setReportTarget] = useState<Business | null>(null);
+  const modeConfig = useSituationalMode();
+  const show = modeConfig.showSections;
 
   const handleSearch = () => {
     if (query.trim()) {
@@ -61,6 +65,8 @@ const Index = () => {
   const nearbyOpen = businesses
     .filter(b => isBusinessOpen(b))
     .slice(0, 4);
+
+  let sectionIndex = 0;
 
   return (
     <div className="min-h-screen gradient-bg gradient-mesh">
@@ -97,146 +103,177 @@ const Index = () => {
           <ZadarClock />
         </div>
 
-        {/* SADA U ZADRU — critical info first */}
+        {/* Mode Indicator */}
+        <motion.div
+          className="mb-2"
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          custom={sectionIndex++}
+        >
+          <ModeIndicator config={modeConfig} />
+        </motion.div>
+
+        {/* SADA U ZADRU — contextual smart cards */}
         <motion.section
           className="mb-4"
           variants={fadeUp}
           initial="hidden"
           animate="visible"
-          custom={0}
+          custom={sectionIndex++}
         >
-          <NowInZadar />
+          <NowInZadar mode={modeConfig.mode} />
         </motion.section>
 
         {/* Quick Actions */}
-        <motion.section
-          className="mb-4"
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          custom={1}
-        >
-          <QuickActions />
-        </motion.section>
+        {show.quickActions && (
+          <motion.section
+            className="mb-4"
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            custom={sectionIndex++}
+          >
+            <QuickActions />
+          </motion.section>
+        )}
 
         {/* Search */}
-        <motion.div
-          className="mb-4"
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          custom={2}
-        >
-          <SearchBar value={query} onChange={setQuery} onSubmit={handleSearch} />
-        </motion.div>
+        {show.search && (
+          <motion.div
+            className="mb-4"
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            custom={sectionIndex++}
+          >
+            <SearchBar value={query} onChange={setQuery} onSubmit={handleSearch} />
+          </motion.div>
+        )}
 
         {/* Alerts */}
-        <motion.section
-          className="mb-4"
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          custom={3}
-        >
-          <TodayAlerts />
-        </motion.section>
+        {show.alerts && (
+          <motion.section
+            className="mb-4"
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            custom={sectionIndex++}
+          >
+            <TodayAlerts />
+          </motion.section>
+        )}
 
         {/* Transport Widget */}
-        <motion.section
-          className="mb-4"
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          custom={4}
-        >
-          <TransportWidget />
-        </motion.section>
+        {show.transport && (
+          <motion.section
+            className="mb-4"
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            custom={sectionIndex++}
+          >
+            <TransportWidget />
+          </motion.section>
+        )}
 
-        {/* Weather & city metrics — demoted */}
-        <motion.section
-          className="mb-4"
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          custom={5}
-        >
-          <TodayCard />
-        </motion.section>
+        {/* Weather & city metrics */}
+        {show.todayCard && (
+          <motion.section
+            className="mb-4"
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            custom={sectionIndex++}
+          >
+            <TodayCard />
+          </motion.section>
+        )}
 
         {/* Categories */}
-        <motion.section
-          className="mb-6"
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          custom={6}
-        >
-          <CategoryScroll onSelect={handleCategory} />
-        </motion.section>
+        {show.categories && (
+          <motion.section
+            className="mb-6"
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            custom={sectionIndex++}
+          >
+            <CategoryScroll onSelect={handleCategory} />
+          </motion.section>
+        )}
 
         {/* Featured nearby */}
-        <motion.div
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          custom={6}
-        >
-          <FeaturedNearby />
-        </motion.div>
+        {show.featuredNearby && (
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            custom={sectionIndex++}
+          >
+            <FeaturedNearby />
+          </motion.div>
+        )}
 
         {/* For You Today */}
-        <motion.section
-          className="mb-6"
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          custom={7}
-        >
-          <ForYouSection onReport={setReportTarget} />
-        </motion.section>
+        {show.forYou && (
+          <motion.section
+            className="mb-6"
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            custom={sectionIndex++}
+          >
+            <ForYouSection onReport={setReportTarget} />
+          </motion.section>
+        )}
 
         {/* Trending */}
-        <motion.section
-          className="mb-6"
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          custom={8}
-        >
-          <div className="flex items-center gap-2 mb-3">
-            <Sparkles className="h-4 w-4 text-accent" />
-            <h2 className="text-sm font-semibold text-foreground">{t('home.trending')}</h2>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {trendingSearches.map((s) => (
-              <button
-                key={s.label}
-                onClick={() => navigate(s.path)}
-                className="px-3 py-1.5 rounded-full bg-secondary/80 text-secondary-foreground text-xs font-medium hover:bg-accent/15 hover:text-accent transition-all duration-200"
-              >
-                {s.label}
-              </button>
-            ))}
-          </div>
-        </motion.section>
+        {show.trending && (
+          <motion.section
+            className="mb-6"
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            custom={sectionIndex++}
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <Sparkles className="h-4 w-4 text-accent" />
+              <h2 className="text-sm font-semibold text-foreground">{t('home.trending')}</h2>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {trendingSearches.map((s) => (
+                <button
+                  key={s.label}
+                  onClick={() => navigate(s.path)}
+                  className="px-3 py-1.5 rounded-full bg-secondary/80 text-secondary-foreground text-xs font-medium hover:bg-accent/15 hover:text-accent transition-all duration-200"
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          </motion.section>
+        )}
 
         {/* Nearby open */}
-        <motion.section
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          custom={9}
-        >
-          <div className="flex items-center gap-2 mb-3">
-            <MapPin className="h-4 w-4 text-accent" />
-            <h2 className="text-sm font-semibold text-foreground">{t('home.nearby')}</h2>
-          </div>
-          <div className="flex flex-col gap-3">
-            {nearbyOpen.map((b) => (
-              <BusinessCard key={b.id} business={b} onReport={setReportTarget} />
-            ))}
-          </div>
-        </motion.section>
+        {show.nearbyOpen && (
+          <motion.section
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            custom={sectionIndex++}
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <MapPin className="h-4 w-4 text-accent" />
+              <h2 className="text-sm font-semibold text-foreground">{t('home.nearby')}</h2>
+            </div>
+            <div className="flex flex-col gap-3">
+              {nearbyOpen.map((b) => (
+                <BusinessCard key={b.id} business={b} onReport={setReportTarget} />
+              ))}
+            </div>
+          </motion.section>
+        )}
       </main>
 
       <ReportModal

@@ -336,6 +336,26 @@ const translations: Translations = {
   'today.sea.fresh': { hr: 'Svježe', en: 'Fresh', de: 'Frisch', it: 'Fresco' },
   'today.sea.pleasant': { hr: 'Ugodno', en: 'Pleasant', de: 'Angenehm', it: 'Piacevole' },
   'today.sea.warm': { hr: 'Toplo', en: 'Warm', de: 'Warm', it: 'Caldo' },
+  // Situational modes
+  'mode.morning': { hr: 'Jutarnji mod', en: 'Morning mode', de: 'Morgenmodus', it: 'Modalità mattina' },
+  'mode.day': { hr: 'Dnevni mod', en: 'Day mode', de: 'Tagesmodus', it: 'Modalità giorno' },
+  'mode.evening': { hr: 'Večernji mod', en: 'Evening mode', de: 'Abendmodus', it: 'Modalità sera' },
+  'mode.night': { hr: 'Noćni mod', en: 'Night mode', de: 'Nachtmodus', it: 'Modalità notte' },
+  'mode.bad_weather': { hr: 'Loše vrijeme', en: 'Bad weather', de: 'Schlechtwetter', it: 'Maltempo' },
+  'mode.badWeatherAlert': { hr: 'Upozorenje aktivno', en: 'Alert active', de: 'Warnung aktiv', it: 'Allerta attiva' },
+  // Mode-specific card labels
+  'mode.morningCafe': { hr: 'Kafić / Pekara', en: 'Cafe / Bakery', de: 'Café / Bäckerei', it: 'Caffè / Panificio' },
+  'mode.morningCafeAnswer': { hr: 'Otvoreni kafići u blizini ☕', en: 'Open cafes nearby ☕', de: 'Offene Cafés in der Nähe ☕', it: 'Caffè aperti vicino ☕' },
+  'mode.shopsOpen': { hr: 'Trgovine sada', en: 'Shops open', de: 'Geschäfte offen', it: 'Negozi aperti' },
+  'mode.shopsOpenAnswer': { hr: 'Otvorene trgovine u blizini 🛍️', en: 'Open shops nearby 🛍️', de: 'Offene Geschäfte in der Nähe 🛍️', it: 'Negozi aperti vicino 🛍️' },
+  'mode.institutions': { hr: 'Javne službe', en: 'Public services', de: 'Öffentliche Dienste', it: 'Servizi pubblici' },
+  'mode.institutionsAnswer': { hr: 'Pošta, banka, institucije 🏛️', en: 'Post, bank, services 🏛️', de: 'Post, Bank, Behörden 🏛️', it: 'Posta, banca, servizi 🏛️' },
+  'mode.restaurants': { hr: 'Restorani večeras', en: 'Restaurants tonight', de: 'Restaurants heute Abend', it: 'Ristoranti stasera' },
+  'mode.restaurantsAnswer': { hr: 'Otvoreni restorani u blizini 🍽️', en: 'Open restaurants nearby 🍽️', de: 'Offene Restaurants in der Nähe 🍽️', it: 'Ristoranti aperti vicino 🍽️' },
+  'mode.cinemaTonight': { hr: 'Kino večeras', en: 'Cinema tonight', de: 'Kino heute Abend', it: 'Cinema stasera' },
+  'mode.cinemaTonightAnswer': { hr: 'Projekcije večeras 🎬', en: 'Screenings tonight 🎬', de: 'Vorführungen heute Abend 🎬', it: 'Proiezioni stasera 🎬' },
+  'mode.indoorActivity': { hr: 'Zatvorene aktivnosti', en: 'Indoor activities', de: 'Indoor-Aktivitäten', it: 'Attività al chiuso' },
+  'mode.indoorActivityAnswer': { hr: 'Kino, muzej, shopping 🏠', en: 'Cinema, museum, shopping 🏠', de: 'Kino, Museum, Shopping 🏠', it: 'Cinema, museo, shopping 🏠' },
 };
 
 interface LanguageContextType {
