@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Pill, Stethoscope, Ship, Car, CloudRain, Zap, Droplets, AlertTriangle, Sunset, Sunrise, Phone, MapPin, Fuel, ShieldAlert, Coffee, UtensilsCrossed, Film, ShoppingBag, Landmark } from 'lucide-react';
@@ -226,7 +227,19 @@ export function NowInZadar({ mode = 'day' }: NowInZadarProps) {
   // Derived contacts from DB
   const taxiContact = cityContacts?.find(c => c.type === 'taxi');
   const emergencyContact = cityContacts?.find(c => c.type === 'emergency');
-  const open247Place = openNowPlaces?.find(p => p.open_247);
+  const all247Places = openNowPlaces?.filter(p => p.open_247) || [];
+
+  // Rotate through all 0-24 places every 10 seconds
+  const [open247Index, setOpen247Index] = useState(0);
+  useEffect(() => {
+    if (all247Places.length <= 1) return;
+    const interval = setInterval(() => {
+      setOpen247Index(prev => (prev + 1) % all247Places.length);
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [all247Places.length]);
+
+  const open247Place = all247Places.length > 0 ? all247Places[open247Index % all247Places.length] : undefined;
 
   const candidates: NowCard[] = [];
 
