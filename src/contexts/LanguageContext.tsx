@@ -511,6 +511,16 @@ const translations: Translations = {
   'happening.nothingMajor': { hr: 'Nema važnijih događanja', en: 'No major events', de: 'Keine größeren Ereignisse', it: 'Nessun evento importante' },
   'happening.crowdExpected': { hr: 'Očekuj promet', en: 'Expect traffic', de: 'Verkehr erwartet', it: 'Aspettati traffico' },
   'happening.at': { hr: 'u', en: 'at', de: 'um', it: 'alle' },
+  // App Mode (match states)
+  'appMode.preMatch': { hr: 'UTAKMICA USKORO', en: 'MATCH SOON', de: 'SPIEL BALD', it: 'PARTITA A BREVE' },
+  'appMode.liveMatch': { hr: 'UTAKMICA U TIJEKU', en: 'MATCH IN PROGRESS', de: 'SPIEL LÄUFT', it: 'PARTITA IN CORSO' },
+  'appMode.postMatch': { hr: 'ZAVRŠENO', en: 'FINISHED', de: 'BEENDET', it: 'FINITO' },
+  'appMode.expectCrowds': { hr: 'Očekuj gužvu oko stadiona i u kafićima', en: 'Expect crowds near stadium and in cafes', de: 'Erwarte Gedränge am Stadion und in Cafés', it: 'Aspettati folla vicino allo stadio e nei bar' },
+  'appMode.cityWatching': { hr: 'Grad prati utakmicu', en: 'City is watching the match', de: 'Die Stadt verfolgt das Spiel', it: 'La città segue la partita' },
+  'appMode.talkingAbout': { hr: 'Večeras se priča o ovome', en: 'Everyone is talking about this tonight', de: 'Darüber spricht man heute Abend', it: 'Stasera tutti ne parlano' },
+  'appMode.ctxParking': { hr: 'Očekuj popunjenost', en: 'Expect full parking', de: 'Parkplätze voll', it: 'Parcheggi pieni' },
+  'appMode.ctxCafes': { hr: 'Veća posjećenost', en: 'Higher cafe traffic', de: 'Mehr Cafébesucher', it: 'Più traffico nei bar' },
+  'appMode.ctxTraffic': { hr: 'Pojačan promet', en: 'Increased traffic', de: 'Erhöhter Verkehr', it: 'Traffico intenso' },
 };
 
 interface LanguageContextType {

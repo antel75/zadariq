@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { type AppMode } from '@/hooks/useAppMode';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Pill, Stethoscope, Ship, Car, CloudRain, Zap, Droplets, AlertTriangle, Sunset, Sunrise, Phone, MapPin, Fuel, ShieldAlert, Coffee, UtensilsCrossed, Film, ShoppingBag, Landmark, Trophy } from 'lucide-react';
@@ -236,9 +237,10 @@ function selectTopCards(
 
 interface NowInZadarProps {
   mode?: SituationalMode;
+  appMode?: AppMode;
 }
 
-export function NowInZadar({ mode = 'day' }: NowInZadarProps) {
+export function NowInZadar({ mode = 'day', appMode = 'normal' }: NowInZadarProps) {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const hour = getZadarHour();
@@ -583,9 +585,11 @@ export function NowInZadar({ mode = 'day' }: NowInZadarProps) {
 
   return (
     <div>
-      <h2 className="text-sm font-bold text-foreground mb-2 uppercase tracking-wide">
-        {t('now.title')}
-      </h2>
+      {appMode === 'normal' && (
+        <h2 className="text-sm font-bold text-foreground mb-2 uppercase tracking-wide">
+          {t('now.title')}
+        </h2>
+      )}
       <div className="grid grid-cols-2 gap-2">
         {topCards.map((card, i) => {
           const Icon = card.icon;
