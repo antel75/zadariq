@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.scrape-city-alerts]
 verify_jwt = false
+
+[functions.fetch-sports]
+verify_jwt = false

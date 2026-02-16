@@ -17,6 +17,7 @@ import { ForYouSection } from '@/components/dashboard/ForYouSection';
 import { TransportWidget } from '@/components/dashboard/TransportWidget';
 import { TodayCard } from '@/components/dashboard/TodayCard';
 import { CityPulseSection } from '@/components/dashboard/CityPulseSection';
+import { WhatIsHappeningToday } from '@/components/dashboard/WhatIsHappeningToday';
 import { FeaturedNearby } from '@/components/FeaturedNearby';
 import { ZadarIQLogo } from '@/components/ZadarIQLogo';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -287,6 +288,17 @@ const Index = () => {
             </div>
           </motion.section>
         )}
+
+        {/* ŠTO SE DOGAĐA DANAS — live city radar */}
+        <motion.section
+          className="mb-6 mt-2"
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          custom={sectionIndex++}
+        >
+          <WhatIsHappeningToday />
+        </motion.section>
       </main>
 
       <ReportModal

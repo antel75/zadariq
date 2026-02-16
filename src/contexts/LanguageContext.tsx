@@ -493,6 +493,23 @@ const translations: Translations = {
   'outdoor.reason.neutral': { hr: 'Umjereni uvjeti', en: 'Moderate conditions', de: 'Mäßige Bedingungen', it: 'Condizioni moderate' },
   'outdoor.reason.noData': { hr: 'Podaci se osvježavaju', en: 'Data refreshing', de: 'Daten werden aktualisiert', it: 'Aggiornamento dati' },
   'outdoor.updated': { hr: 'Ažurirano:', en: 'Updated:', de: 'Aktualisiert:', it: 'Aggiornato:' },
+  // What is happening today
+  'happening.sectionTitle': { hr: 'Što se događa danas', en: 'What\'s happening today', de: 'Was passiert heute', it: 'Cosa succede oggi' },
+  'happening.live': { hr: 'UŽIVO', en: 'LIVE', de: 'LIVE', it: 'DAL VIVO' },
+  'happening.liveBadge': { hr: 'UŽIVO', en: 'LIVE', de: 'LIVE', it: 'LIVE' },
+  'happening.tonight': { hr: 'Večeras igra', en: 'Playing tonight', de: 'Spielt heute Abend', it: 'Stasera gioca' },
+  'happening.soonBadge': { hr: 'USKORO', en: 'SOON', de: 'BALD', it: 'PRESTO' },
+  'happening.expectCrowds': { hr: 'Očekuj gužvu u kafićima', en: 'Expect crowds in cafes', de: 'Erwarte Gedränge in Cafés', it: 'Aspettati folla nei bar' },
+  'happening.finishedBadge': { hr: 'ZAVRŠENO', en: 'FINISHED', de: 'BEENDET', it: 'FINITO' },
+  'happening.matchEnded': { hr: 'Utakmica završila', en: 'Match ended', de: 'Spiel beendet', it: 'Partita finita' },
+  'happening.cityAlive': { hr: 'Grad živ večeras', en: 'City alive tonight', de: 'Stadt lebt heute Abend', it: 'Città viva stasera' },
+  'happening.today': { hr: 'Danas', en: 'Today', de: 'Heute', it: 'Oggi' },
+  'happening.calmDay': { hr: 'Miran dan u gradu', en: 'Calm day in the city', de: 'Ruhiger Tag in der Stadt', it: 'Giornata tranquilla in città' },
+  'happening.calmAfternoon': { hr: 'Mirno popodne u gradu', en: 'Quiet afternoon in the city', de: 'Ruhiger Nachmittag in der Stadt', it: 'Pomeriggio tranquillo in città' },
+  'happening.calmEvening': { hr: 'Mirna večer u gradu', en: 'Quiet evening in the city', de: 'Ruhiger Abend in der Stadt', it: 'Serata tranquilla in città' },
+  'happening.livelyWeekend': { hr: 'Živ vikend u centru', en: 'Lively weekend downtown', de: 'Lebhaftes Wochenende in der Innenstadt', it: 'Weekend vivace in centro' },
+  'happening.nothingMajor': { hr: 'Nema važnijih događanja', en: 'No major events', de: 'Keine größeren Ereignisse', it: 'Nessun evento importante' },
+  'happening.crowdExpected': { hr: 'Očekuj promet', en: 'Expect traffic', de: 'Verkehr erwartet', it: 'Aspettati traffico' },
 };
 
 interface LanguageContextType {
