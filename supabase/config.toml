@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.submit-correction]
 verify_jwt = false
+
+[functions.scrape-city-alerts]
+verify_jwt = false

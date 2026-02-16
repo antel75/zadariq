@@ -148,6 +148,51 @@ export type Database = {
           },
         ]
       }
+      city_alerts: {
+        Row: {
+          created_at: string
+          geo_relevance: string | null
+          hash: string
+          id: string
+          priority: number
+          source: string
+          source_url: string | null
+          summary: string
+          title: string
+          type: string
+          updated_at: string
+          valid_until: string
+        }
+        Insert: {
+          created_at?: string
+          geo_relevance?: string | null
+          hash: string
+          id?: string
+          priority?: number
+          source?: string
+          source_url?: string | null
+          summary: string
+          title: string
+          type?: string
+          updated_at?: string
+          valid_until: string
+        }
+        Update: {
+          created_at?: string
+          geo_relevance?: string | null
+          hash?: string
+          id?: string
+          priority?: number
+          source?: string
+          source_url?: string | null
+          summary?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          valid_until?: string
+        }
+        Relationships: []
+      }
       city_contacts: {
         Row: {
           created_at: string
