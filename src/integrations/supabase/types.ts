@@ -702,6 +702,30 @@ export type Database = {
         }
         Relationships: []
       }
+      sports_teams_cache: {
+        Row: {
+          api_team_id: number
+          fetched_at: string
+          id: string
+          name: string
+          sport: string
+        }
+        Insert: {
+          api_team_id: number
+          fetched_at?: string
+          id?: string
+          name: string
+          sport?: string
+        }
+        Update: {
+          api_team_id?: number
+          fetched_at?: string
+          id?: string
+          name?: string
+          sport?: string
+        }
+        Relationships: []
+      }
       transport_schedules: {
         Row: {
           carrier: string | null
