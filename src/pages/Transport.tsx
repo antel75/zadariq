@@ -7,6 +7,7 @@ import {
   Ship, Anchor, Bus, MapPin, Clock, ArrowLeft, Users,
   AlertTriangle, CheckCircle2, XCircle, Timer, Navigation, Loader2,
 } from 'lucide-react';
+import { Footer } from '@/components/Footer';
 import {
   useTransportSchedules,
   getBoardingStatus,
@@ -298,6 +299,7 @@ export default function Transport() {
           </TabsContent>
         </Tabs>
       </main>
+      <Footer />
     </div>
   );
 }

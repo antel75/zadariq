@@ -4,6 +4,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, Clock, Film, ExternalLink, Loader2, Play } from 'lucide-react';
+import { Footer } from '@/components/Footer';
 import { format, parseISO, isToday, isTomorrow, addDays } from 'date-fns';
 import { hr } from 'date-fns/locale';
 
@@ -216,6 +217,7 @@ export default function KinoZona() {
           {language === 'hr' ? 'Podaci se automatski ažuriraju s kino-zona.com' : 'Data is automatically updated from kino-zona.com'}
         </p>
       </div>
+      <Footer />
     </div>
   );
 }

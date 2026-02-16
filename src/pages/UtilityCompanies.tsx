@@ -3,6 +3,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { utilityCompanies } from '@/data/utilityCompaniesData';
 import { ArrowLeft, Phone, ExternalLink, Building2, Wrench, AlertTriangle, Mail, Clock, MapPin, MessageSquareWarning, Link } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Footer } from '@/components/Footer';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 12 },
@@ -169,6 +170,7 @@ export default function UtilityCompanies() {
           </motion.div>
         ))}
       </main>
+      <Footer />
     </div>
   );
 }

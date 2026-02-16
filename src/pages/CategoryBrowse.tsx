@@ -6,6 +6,7 @@ import { BusinessCard } from '@/components/BusinessCard';
 import { ReportModal } from '@/components/ReportModal';
 import { Business, CategoryId } from '@/data/types';
 import { ArrowLeft, Filter } from 'lucide-react';
+import { Footer } from '@/components/Footer';
 
 // Extract the meaningful sort key from a business name
 function getSortKey(name: string): string {
@@ -95,7 +96,7 @@ export default function CategoryBrowse() {
           )}
         </div>
       </main>
-
+      <Footer />
       <ReportModal business={reportTarget} open={!!reportTarget} onClose={() => setReportTarget(null)} />
     </div>
   );

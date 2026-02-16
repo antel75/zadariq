@@ -7,6 +7,7 @@ import { ReportModal } from '@/components/ReportModal';
 import { searchBusinesses, isBusinessOpen, categories } from '@/data/mockData';
 import { Business, CategoryId } from '@/data/types';
 import { ArrowLeft, Filter, X } from 'lucide-react';
+import { Footer } from '@/components/Footer';
 
 export default function SearchResults() {
   const { t } = useLanguage();
@@ -110,7 +111,7 @@ export default function SearchResults() {
           )}
         </div>
       </main>
-
+      <Footer />
       <ReportModal business={reportTarget} open={!!reportTarget} onClose={() => setReportTarget(null)} />
     </div>
   );

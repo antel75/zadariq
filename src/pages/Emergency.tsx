@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { Footer } from '@/components/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { emergencyContacts } from '@/data/mockData';
 import { ArrowLeft, Phone, Siren } from 'lucide-react';
@@ -43,6 +44,7 @@ export default function Emergency() {
           ))}
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

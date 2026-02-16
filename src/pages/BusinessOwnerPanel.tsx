@@ -8,6 +8,7 @@ import {
   ArrowLeft, Save, Eye, Phone, Navigation, Clock, Megaphone,
   Users, Tag, Activity, BarChart3, CheckCircle2,
 } from 'lucide-react';
+import { Footer } from '@/components/Footer';
 
 export default function BusinessOwnerPanel() {
   const { id } = useParams();
@@ -214,6 +215,7 @@ export default function BusinessOwnerPanel() {
           <p className="text-xs text-muted-foreground leading-relaxed">{t('biz.trustExplain.body')}</p>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

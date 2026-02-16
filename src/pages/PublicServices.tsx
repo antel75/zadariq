@@ -4,6 +4,7 @@ import { publicServiceOrgs } from '@/data/publicServicesData';
 import { ArrowLeft, Phone, ExternalLink, Building2, ChevronDown, ChevronRight, Mail, User } from 'lucide-react';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { Footer } from '@/components/Footer';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 12 },
@@ -200,6 +201,7 @@ export default function PublicServices() {
           </div>
         </motion.div>
       </main>
+      <Footer />
     </div>
   );
 }
