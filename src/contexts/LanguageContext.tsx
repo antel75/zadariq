@@ -511,6 +511,11 @@ const translations: Translations = {
   'happening.nothingMajor': { hr: 'Nema važnijih događanja', en: 'No major events', de: 'Keine größeren Ereignisse', it: 'Nessun evento importante' },
   'happening.crowdExpected': { hr: 'Očekuj promet', en: 'Expect traffic', de: 'Verkehr erwartet', it: 'Aspettati traffico' },
   'happening.at': { hr: 'u', en: 'at', de: 'um', it: 'alle' },
+  'happening.liveMatch': { hr: 'Utakmica u tijeku', en: 'Match in progress', de: 'Spiel läuft', it: 'Partita in corso' },
+  'happening.todayPlays': { hr: 'Danas igra Zadar', en: 'Zadar plays today', de: 'Zadar spielt heute', it: 'Zadar gioca oggi' },
+  'happening.nextMatch': { hr: 'Sljedeća utakmica', en: 'Next match', de: 'Nächstes Spiel', it: 'Prossima partita' },
+  'happening.lastResult': { hr: 'Zadnji rezultat', en: 'Last result', de: 'Letztes Ergebnis', it: 'Ultimo risultato' },
+  'happening.noSportsData': { hr: 'Nema dostupnih sportskih podataka', en: 'No sports data available', de: 'Keine Sportdaten verfügbar', it: 'Nessun dato sportivo disponibile' },
   // App Mode (match states)
   'appMode.preMatch': { hr: 'UTAKMICA USKORO', en: 'MATCH SOON', de: 'SPIEL BALD', it: 'PARTITA A BREVE' },
   'appMode.liveMatch': { hr: 'UTAKMICA U TIJEKU', en: 'MATCH IN PROGRESS', de: 'SPIEL LÄUFT', it: 'PARTITA IN CORSO' },

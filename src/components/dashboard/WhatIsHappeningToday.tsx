@@ -29,21 +29,49 @@ interface FeedCard {
 // ─── Hooks ───────────────────────────────────────────────
 function useSportsEvents() {
   return useQuery({
-    queryKey: ['sports-events-today'],
+    queryKey: ['sports-events-fallback'],
     queryFn: async () => {
-      const now = new Date();
-      const past24h = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
-      const next24h = new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
+      const now = new Date().toISOString();
 
-      const { data, error } = await supabase
+      // 1) Live matches
+      const { data: live } = await supabase
         .from('sports_events')
         .select('*')
-        .gte('start_time', past24h)
+        .eq('match_status', 'live')
+        .order('start_time', { ascending: true });
+      if (live && live.length > 0) return { events: live, tier: 'live' as const };
+
+      // 2) Today matches (next 24h)
+      const next24h = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+      const { data: today } = await supabase
+        .from('sports_events')
+        .select('*')
+        .eq('match_status', 'upcoming')
+        .gte('start_time', now)
         .lte('start_time', next24h)
         .order('start_time', { ascending: true });
+      if (today && today.length > 0) return { events: today, tier: 'today' as const };
 
-      if (error) throw error;
-      return data || [];
+      // 3) Next match (any future)
+      const { data: next } = await supabase
+        .from('sports_events')
+        .select('*')
+        .eq('match_status', 'upcoming')
+        .gte('start_time', now)
+        .order('start_time', { ascending: true })
+        .limit(1);
+      if (next && next.length > 0) return { events: next, tier: 'next' as const };
+
+      // 4) Last result
+      const { data: last } = await supabase
+        .from('sports_events')
+        .select('*')
+        .eq('match_status', 'finished')
+        .order('start_time', { ascending: false })
+        .limit(1);
+      if (last && last.length > 0) return { events: last, tier: 'last' as const };
+
+      return { events: [], tier: 'none' as const };
     },
     staleTime: 30 * 1000,
     refetchInterval: 60 * 1000,
@@ -110,7 +138,7 @@ function sportEmoji(tag?: string | null): string {
 // ─── Component ───────────────────────────────────────────
 export function WhatIsHappeningToday() {
   const { t } = useLanguage();
-  const { data: sports } = useSportsEvents();
+  const { data: sportsData } = useSportsEvents();
   const { data: cityAlerts } = useCityAlertsForFeed();
   const { data: outages } = useTodayOutagesForFeed();
   const hour = getZadarHour();
@@ -118,16 +146,13 @@ export function WhatIsHappeningToday() {
   const cards: FeedCard[] = useMemo(() => {
     const feed: FeedCard[] = [];
 
-    // ── Sports ────────────────────────────
-    if (sports) {
-      for (const ev of sports) {
-        const now = Date.now();
-        const startMs = new Date(ev.start_time).getTime();
-        const hoursUntil = (startMs - now) / (1000 * 60 * 60);
-        const hoursSince = (now - startMs) / (1000 * 60 * 60);
+    // ── Sports (always show at least one card) ────────────────
+    if (sportsData && sportsData.events.length > 0) {
+      const tier = sportsData.tier;
+      for (const ev of sportsData.events) {
         const emoji = sportEmoji(ev.team_tag);
 
-        if (ev.match_status === 'live') {
+        if (tier === 'live') {
           feed.push({
             id: ev.id,
             priority: 100,
@@ -135,13 +160,13 @@ export function WhatIsHappeningToday() {
             icon: Trophy,
             iconColor: 'text-destructive',
             accentClass: 'border-destructive/40 bg-destructive/5',
-            title: `${emoji} ${t('happening.live')}: ${ev.home_team} – ${ev.away_team}`,
+            title: `${emoji} ${t('happening.liveMatch')}: ${ev.home_team} – ${ev.away_team}`,
             subtitle: `${ev.home_score ?? 0}:${ev.away_score ?? 0}${ev.match_minute ? ` (${ev.match_minute}')` : ''}`,
             badge: t('happening.liveBadge'),
             badgeClass: 'bg-destructive text-white animate-pulse',
             pulsing: true,
           });
-        } else if (ev.match_status === 'upcoming' && hoursUntil > 0 && hoursUntil <= 3) {
+        } else if (tier === 'today') {
           feed.push({
             id: ev.id,
             priority: 90,
@@ -149,40 +174,51 @@ export function WhatIsHappeningToday() {
             icon: Trophy,
             iconColor: 'text-[hsl(var(--status-warning))]',
             accentClass: 'border-[hsl(var(--status-warning))]/30 bg-[hsl(var(--status-warning))]/5',
-            title: `${emoji} ${t('happening.tonight')}: ${ev.home_team} – ${ev.away_team}`,
-            subtitle: `${new Date(ev.start_time).toLocaleTimeString('hr-HR', { hour: '2-digit', minute: '2-digit' })} · ${t('happening.expectCrowds')}`,
+            title: `${emoji} ${t('happening.todayPlays')}: ${ev.home_team} – ${ev.away_team}`,
+            subtitle: `${new Date(ev.start_time).toLocaleTimeString('hr-HR', { hour: '2-digit', minute: '2-digit' })} · ${ev.league || ''}`,
             badge: t('happening.soonBadge'),
             badgeClass: 'bg-[hsl(var(--status-warning))] text-white',
           });
-        } else if (ev.match_status === 'finished' && hoursSince <= 2) {
-          const homeWon = (ev.home_score ?? 0) > (ev.away_score ?? 0);
-          const awayWon = (ev.away_score ?? 0) > (ev.home_score ?? 0);
-          const localWin = ev.is_local_team && (homeWon || awayWon);
+        } else if (tier === 'next') {
+          const date = new Date(ev.start_time);
+          const dayStr = date.toLocaleDateString('hr-HR', { weekday: 'short', day: 'numeric', month: 'short' });
+          const timeStr = date.toLocaleTimeString('hr-HR', { hour: '2-digit', minute: '2-digit' });
           feed.push({
             id: ev.id,
-            priority: 70,
-            type: 'finished_sport',
-            icon: Trophy,
-            iconColor: 'text-[hsl(var(--status-open))]',
-            accentClass: 'border-[hsl(var(--status-open))]/30 bg-[hsl(var(--status-open))]/5',
-            title: `${emoji} ${ev.home_team} ${ev.home_score ?? 0}:${ev.away_score ?? 0} ${ev.away_team}`,
-            subtitle: localWin ? t('happening.cityAlive') : t('happening.matchEnded'),
-            badge: t('happening.finishedBadge'),
-            badgeClass: 'bg-[hsl(var(--status-open))] text-white',
-          });
-        } else if (ev.match_status === 'upcoming' && hoursUntil > 3 && hoursUntil <= 12) {
-          feed.push({
-            id: ev.id,
-            priority: 50,
+            priority: 40,
             type: 'upcoming_sport',
             icon: Trophy,
             iconColor: 'text-muted-foreground',
             accentClass: 'border-border',
-            title: `${emoji} ${ev.home_team} – ${ev.away_team}`,
-            subtitle: `${t('happening.today')} ${new Date(ev.start_time).toLocaleTimeString('hr-HR', { hour: '2-digit', minute: '2-digit' })} · ${ev.league || ''}`,
+            title: `${emoji} ${t('happening.nextMatch')}: ${ev.home_team} – ${ev.away_team}`,
+            subtitle: `${dayStr} ${timeStr} · ${ev.league || ''}`,
+          });
+        } else if (tier === 'last') {
+          feed.push({
+            id: ev.id,
+            priority: 30,
+            type: 'finished_sport',
+            icon: Trophy,
+            iconColor: 'text-[hsl(var(--status-open))]',
+            accentClass: 'border-[hsl(var(--status-open))]/30 bg-[hsl(var(--status-open))]/5',
+            title: `${emoji} ${t('happening.lastResult')}: ${ev.home_team} ${ev.home_score ?? 0}:${ev.away_score ?? 0} ${ev.away_team}`,
+            subtitle: new Date(ev.start_time).toLocaleDateString('hr-HR', { weekday: 'short', day: 'numeric', month: 'short' }),
+            badge: t('happening.finishedBadge'),
+            badgeClass: 'bg-[hsl(var(--status-open))] text-white',
           });
         }
       }
+    } else if (sportsData && sportsData.tier === 'none') {
+      feed.push({
+        id: 'no-sports',
+        priority: 10,
+        type: 'fallback',
+        icon: Trophy,
+        iconColor: 'text-muted-foreground',
+        accentClass: 'border-border',
+        title: t('happening.noSportsData'),
+        subtitle: '',
+      });
     }
 
     // ── City alerts (traffic, events, etc.) ────────
@@ -271,7 +307,7 @@ export function WhatIsHappeningToday() {
     // Sort by priority descending
     feed.sort((a, b) => b.priority - a.priority);
     return feed;
-  }, [sports, cityAlerts, outages, hour, t]);
+  }, [sportsData, cityAlerts, outages, hour, t]);
 
   return (
     <section>
