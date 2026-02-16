@@ -472,6 +472,27 @@ const translations: Translations = {
   'detail.windTitle': { hr: 'Vjetar — detalji', en: 'Wind — Details', de: 'Wind — Details', it: 'Vento — Dettagli' },
   'detail.windType': { hr: 'Tip vjetra', en: 'Wind type', de: 'Windart', it: 'Tipo di vento' },
   'detail.windAdvice': { hr: 'Jak vjetar može utjecati na trajektne linije i cestovni promet, posebno na mostovima. Provjerite HAK za stanje na cestama.', en: 'Strong wind may affect ferry lines and road traffic, especially on bridges. Check HAK for road conditions.', de: 'Starker Wind kann Fährlinien und Straßenverkehr beeinträchtigen, besonders auf Brücken. Prüfen Sie HAK für Straßenverhältnisse.', it: 'Il vento forte può influenzare le linee traghetto e il traffico stradale, specialmente sui ponti. Controlla HAK per le condizioni stradali.' },
+  // Outdoor recommendation
+  'outdoor.label.good': { hr: 'Dobar trenutak za šetnju', en: 'Good time for a walk', de: 'Gute Zeit für einen Spaziergang', it: 'Buon momento per passeggiare' },
+  'outdoor.label.ok': { hr: 'Kratka šetnja – jakna', en: 'Short walk – bring jacket', de: 'Kurzer Spaziergang – Jacke', it: 'Breve passeggiata – giacca' },
+  'outdoor.label.bad': { hr: 'Ponesi kišobran / kratko i blizu', en: 'Bring umbrella / stay close', de: 'Schirm mitnehmen / in der Nähe', it: 'Porta ombrello / resta vicino' },
+  'outdoor.label.danger': { hr: 'Ne preporučuje se van', en: 'Not recommended to go out', de: 'Nicht empfohlen rauszugehen', it: 'Sconsigliato uscire' },
+  'outdoor.label.noData': { hr: 'Provjeri uvjete', en: 'Check conditions', de: 'Bedingungen prüfen', it: 'Controlla le condizioni' },
+  'outdoor.reason.stable': { hr: 'Stabilno — bez oborine, slab vjetar', en: 'Stable — no rain, light wind', de: 'Stabil — kein Regen, leichter Wind', it: 'Stabile — senza pioggia, vento leggero' },
+  'outdoor.reason.coolJacket': { hr: 'Hladno ali bez oborine — uzmi jaknu', en: 'Cool but dry — bring a jacket', de: 'Kühl aber trocken — Jacke mitnehmen', it: 'Fresco ma asciutto — porta giacca' },
+  'outdoor.reason.maybeRain': { hr: 'Moguća kiša — prati prognozu', en: 'Rain possible — watch forecast', de: 'Regen möglich — Prognose beachten', it: 'Pioggia possibile — segui previsioni' },
+  'outdoor.reason.rain': { hr: 'Kiša u tijeku', en: 'Rain ongoing', de: 'Regen aktiv', it: 'Pioggia in corso' },
+  'outdoor.reason.lightRain': { hr: 'Lagana kiša — kratko i blizu', en: 'Light rain — keep it short', de: 'Leichter Regen — kurz halten', it: 'Pioggia leggera — breve e vicino' },
+  'outdoor.reason.rainLikely': { hr: 'Velika šansa za kišu', en: 'High chance of rain', de: 'Hohe Regenwahrscheinlichkeit', it: 'Alta probabilità di pioggia' },
+  'outdoor.reason.strongWind': { hr: 'Jaki udari vjetra', en: 'Strong wind gusts', de: 'Starke Windböen', it: 'Forti raffiche di vento' },
+  'outdoor.reason.windy': { hr: 'Vjetrovito', en: 'Windy', de: 'Windig', it: 'Ventoso' },
+  'outdoor.reason.storm': { hr: 'Pljuskovi ili oluja', en: 'Heavy showers or storm', de: 'Starke Schauer oder Sturm', it: 'Forti acquazzoni o temporale' },
+  'outdoor.reason.veryCold': { hr: 'Jako hladno — ispod 3°C', en: 'Very cold — below 3°C', de: 'Sehr kalt — unter 3°C', it: 'Molto freddo — sotto 3°C' },
+  'outdoor.reason.meteoAlert': { hr: 'Upozorenje aktivno — oprez', en: 'Alert active — caution', de: 'Warnung aktiv — Vorsicht', it: 'Allerta attiva — cautela' },
+  'outdoor.reason.meteoYellow': { hr: 'Upozorenje (žuto) — prati situaciju', en: 'Alert (yellow) — monitor conditions', de: 'Warnung (gelb) — Lage beobachten', it: 'Allerta (gialla) — monitora condizioni' },
+  'outdoor.reason.neutral': { hr: 'Umjereni uvjeti', en: 'Moderate conditions', de: 'Mäßige Bedingungen', it: 'Condizioni moderate' },
+  'outdoor.reason.noData': { hr: 'Podaci se osvježavaju', en: 'Data refreshing', de: 'Daten werden aktualisiert', it: 'Aggiornamento dati' },
+  'outdoor.updated': { hr: 'Ažurirano:', en: 'Updated:', de: 'Aktualisiert:', it: 'Aggiornato:' },
 };
 
 interface LanguageContextType {
