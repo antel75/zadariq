@@ -6,7 +6,7 @@ import { getParkingStatus } from '@/data/parkingData';
 import { useWeather, getWindType } from '@/hooks/useWeather';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { type SituationalMode } from '@/hooks/useSituationalMode';
+import { type SituationalMode, getZadarHour } from '@/hooks/useSituationalMode';
 
 // ── Types ──
 
@@ -216,7 +216,7 @@ interface NowInZadarProps {
 export function NowInZadar({ mode = 'day' }: NowInZadarProps) {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const hour = new Date().getHours();
+  const hour = getZadarHour();
 
   // DB data
   const { data: dutyPharmacy } = useDutyPharmacy();
