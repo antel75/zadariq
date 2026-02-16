@@ -5,7 +5,7 @@ import { businesses, isBusinessOpen, categories } from '@/data/mockData';
 import { BusinessCard } from '@/components/BusinessCard';
 import { ReportModal } from '@/components/ReportModal';
 import { Business, CategoryId } from '@/data/types';
-import { ArrowLeft, Filter } from 'lucide-react';
+import { ArrowLeft, Filter, Plus } from 'lucide-react';
 import { Footer } from '@/components/Footer';
 
 // Extract the meaningful sort key from a business name
@@ -76,15 +76,26 @@ export default function CategoryBrowse() {
       <main className="max-w-lg mx-auto px-4 pb-8">
         <div className="flex items-center justify-between mt-4 mb-4">
           <span className="text-sm text-muted-foreground">{results.length} results</span>
-          <button
-            onClick={() => setOpenOnly(!openOnly)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-              openOnly ? 'bg-status-open text-status-open-foreground' : 'bg-secondary text-secondary-foreground'
-            }`}
-          >
-            <Filter className="h-3 w-3" />
-            {t('action.filter.openNow')}
-          </button>
+          <div className="flex items-center gap-2">
+            {categoryId === 'cafes' && (
+              <button
+                onClick={() => navigate('/add-cafe')}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+              >
+                <Plus className="h-3 w-3" />
+                {t('addCafe.addButton')}
+              </button>
+            )}
+            <button
+              onClick={() => setOpenOnly(!openOnly)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                openOnly ? 'bg-status-open text-status-open-foreground' : 'bg-secondary text-secondary-foreground'
+              }`}
+            >
+              <Filter className="h-3 w-3" />
+              {t('action.filter.openNow')}
+            </button>
+          </div>
         </div>
 
         <div className="flex flex-col gap-3">

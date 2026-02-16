@@ -23,6 +23,7 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminSignup from "./pages/AdminSignup";
 import AdminPanel from "./pages/AdminPanel";
 import PravneInformacije from "./pages/PravneInformacije";
+import AddCafe from "./pages/AddCafe";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -54,6 +55,7 @@ const App = () => (
               <Route path="/admin/signup" element={<AdminSignup />} />
               <Route path="/admin" element={<AdminPanel />} />
               <Route path="/pravne-informacije" element={<PravneInformacije />} />
+              <Route path="/add-cafe" element={<AddCafe />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

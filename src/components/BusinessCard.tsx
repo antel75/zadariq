@@ -3,6 +3,7 @@ import { isBusinessOpen, getTodayHours, getRelativeTime } from '@/data/mockData'
 import { useLanguage } from '@/contexts/LanguageContext';
 import { TrustBadge } from '@/components/TrustBadge';
 import { TrustScore } from '@/components/TrustScore';
+import { SmokingStatusInline } from '@/components/SmokingStatusInline';
 import { Phone, Navigation, AlertTriangle, ShieldCheck, Users, Bot, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -49,7 +50,10 @@ export function BusinessCard({ business, onReport }: BusinessCardProps) {
         </div>
       </div>
 
-      <p className="text-sm text-muted-foreground mb-2">{todayHours}</p>
+      <div className="flex items-center gap-2 mb-2">
+        <p className="text-sm text-muted-foreground">{todayHours}</p>
+        {business.category === 'cafes' && <SmokingStatusInline businessId={business.id} />}
+      </div>
 
       {/* Warning for 5+ reports */}
       {business.reportCount >= 5 && (

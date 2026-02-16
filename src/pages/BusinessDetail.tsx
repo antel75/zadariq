@@ -8,6 +8,7 @@ import { ClaimModal } from '@/components/ClaimModal';
 import { TrustBadge } from '@/components/TrustBadge';
 import { TrustScore } from '@/components/TrustScore';
 import { FollowButton } from '@/components/FollowButton';
+import { SmokingReportForm } from '@/components/SmokingReportForm';
 import {
   ArrowLeft, Phone, Navigation, BadgeCheck, AlertTriangle,
   UserCheck, Clock, ShieldCheck, Users, Bot, Activity, Tag, Megaphone, CalendarClock, Settings, Star,
@@ -194,6 +195,11 @@ export default function BusinessDetail() {
             </a>
           )}
         </div>
+
+        {/* Smoking status - only for cafes */}
+        {business.category === 'cafes' && (
+          <SmokingReportForm businessId={business.id} />
+        )}
 
         {/* Working hours */}
         <div className="mb-6 p-4 rounded-2xl bg-card border border-border">
