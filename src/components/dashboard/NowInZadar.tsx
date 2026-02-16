@@ -175,11 +175,6 @@ function selectTopCards(
 ): NowCard[] {
   let pool = [...candidates];
 
-  // Night rule: discard low-priority
-  if (isNightHour(hour)) {
-    pool = pool.filter(c => c.priority >= 70);
-  }
-
   // Sort: priority desc, actionable first on tie
   pool.sort((a, b) => {
     if (b.priority !== a.priority) return b.priority - a.priority;
