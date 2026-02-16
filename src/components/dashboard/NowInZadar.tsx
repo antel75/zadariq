@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Pill, Stethoscope, Ship, Car, CloudRain, Zap, Droplets, AlertTriangle, Sunset, Sunrise, Phone, MapPin, Fuel, ShieldAlert, Coffee, UtensilsCrossed, Film, ShoppingBag, Landmark } from 'lucide-react';
+import { Pill, Stethoscope, Ship, Car, CloudRain, Zap, Droplets, AlertTriangle, Sunset, Sunrise, Phone, MapPin, Fuel, ShieldAlert, Coffee, UtensilsCrossed, Film, ShoppingBag, Landmark, Trophy } from 'lucide-react';
 import { useSmartFerry, formatTime, getTimeRemaining } from '@/hooks/useTransportSchedules';
 import { getParkingStatus } from '@/data/parkingData';
 import { useWeather, getWindType } from '@/hooks/useWeather';
@@ -108,6 +108,26 @@ function useTodayOutages() {
     staleTime: 10 * 60 * 1000,
   });
   return { powerOutages: power.data || [], waterOutages: water.data || [] };
+}
+
+function useSportsForNow() {
+  return useQuery({
+    queryKey: ['sports-now-in-zadar'],
+    queryFn: async () => {
+      const now = new Date();
+      const past3h = new Date(now.getTime() - 3 * 60 * 60 * 1000).toISOString();
+      const next12h = new Date(now.getTime() + 12 * 60 * 60 * 1000).toISOString();
+      const { data } = await supabase
+        .from('sports_events')
+        .select('*')
+        .gte('start_time', past3h)
+        .lte('start_time', next12h)
+        .order('start_time', { ascending: true });
+      return data || [];
+    },
+    staleTime: 30 * 1000,
+    refetchInterval: 60 * 1000,
+  });
 }
 
 function useMeteoAlerts() {
@@ -222,6 +242,7 @@ export function NowInZadar({ mode = 'day' }: NowInZadarProps) {
   const { data: weather } = useWeather();
   const { powerOutages, waterOutages } = useTodayOutages();
   const { data: meteoAlerts } = useMeteoAlerts();
+  const { data: sportsEvents } = useSportsForNow();
   const parkingStatus = getParkingStatus();
 
   // Derived contacts from DB
@@ -282,6 +303,50 @@ export function NowInZadar({ mode = 'day' }: NowInZadarProps) {
       action: () => navigate('/utility-companies'),
       priority: 112, isActionable: true,
     });
+  }
+
+  // ── SPORT CARDS (highest priority when live) ──
+
+  if (sportsEvents && sportsEvents.length > 0) {
+    for (const ev of sportsEvents) {
+      const now = Date.now();
+      const startMs = new Date(ev.start_time).getTime();
+      const hoursUntil = (startMs - now) / (1000 * 60 * 60);
+      const hoursSince = (now - startMs) / (1000 * 60 * 60);
+      const emoji = ev.team_tag?.includes('basketball') || ev.team_tag === 'kk_zadar' ? '🏀' : '⚽';
+
+      if (ev.match_status === 'live') {
+        candidates.push({
+          icon: Trophy,
+          iconColor: 'text-destructive',
+          label: `${emoji} ${t('happening.liveBadge')}`,
+          answer: `${ev.home_team} ${ev.home_score ?? 0}:${ev.away_score ?? 0} ${ev.away_team}${ev.match_minute ? ` (${ev.match_minute}')` : ''}`,
+          action: () => {},
+          priority: 120, // Above meteo alerts
+          isActionable: false,
+        });
+      } else if (ev.match_status === 'upcoming' && hoursUntil > 0 && hoursUntil <= 3) {
+        candidates.push({
+          icon: Trophy,
+          iconColor: 'text-[hsl(var(--status-warning))]',
+          label: `${emoji} ${t('happening.tonight')}`,
+          answer: `${ev.home_team} – ${ev.away_team} ${t('happening.at')} ${new Date(ev.start_time).toLocaleTimeString('hr-HR', { hour: '2-digit', minute: '2-digit' })}`,
+          action: () => {},
+          priority: 116, // Above meteo but below live
+          isActionable: false,
+        });
+      } else if (ev.match_status === 'finished' && hoursSince >= 0 && hoursSince <= 2) {
+        candidates.push({
+          icon: Trophy,
+          iconColor: 'text-[hsl(var(--status-open))]',
+          label: `${emoji} ${t('happening.finishedBadge')}`,
+          answer: `${ev.home_team} ${ev.home_score ?? 0}:${ev.away_score ?? 0} ${ev.away_team}`,
+          action: () => {},
+          priority: 105,
+          isActionable: false,
+        });
+      }
+    }
   }
 
   // ── Health / Safety ──

@@ -510,6 +510,7 @@ const translations: Translations = {
   'happening.livelyWeekend': { hr: 'Živ vikend u centru', en: 'Lively weekend downtown', de: 'Lebhaftes Wochenende in der Innenstadt', it: 'Weekend vivace in centro' },
   'happening.nothingMajor': { hr: 'Nema važnijih događanja', en: 'No major events', de: 'Keine größeren Ereignisse', it: 'Nessun evento importante' },
   'happening.crowdExpected': { hr: 'Očekuj promet', en: 'Expect traffic', de: 'Verkehr erwartet', it: 'Aspettati traffico' },
+  'happening.at': { hr: 'u', en: 'at', de: 'um', it: 'alle' },
 };
 
 interface LanguageContextType {
