@@ -19,6 +19,7 @@ import { TodayCard } from '@/components/dashboard/TodayCard';
 import { FeaturedNearby } from '@/components/FeaturedNearby';
 import { ZadarIQLogo } from '@/components/ZadarIQLogo';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { Footer } from '@/components/Footer';
 import { useSituationalMode } from '@/hooks/useSituationalMode';
 import { businesses, isBusinessOpen } from '@/data/mockData';
 import { Business, CategoryId } from '@/data/types';
@@ -282,6 +283,7 @@ const Index = () => {
         onClose={() => setReportTarget(null)}
       />
       <FieldReportButton />
+      <Footer />
     </div>
   );
 };
