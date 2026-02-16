@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { businesses, isBusinessOpen, getTodayHours, getRelativeTime } from '@/data/mockData';
 import { ReportModal } from '@/components/ReportModal';
+import { CorrectionPopup } from '@/components/CorrectionPopup';
 import { ClaimModal } from '@/components/ClaimModal';
 import { TrustBadge } from '@/components/TrustBadge';
 import { TrustScore } from '@/components/TrustScore';
@@ -36,7 +37,9 @@ export default function BusinessDetail() {
           <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-xl hover:bg-muted transition-colors">
             <ArrowLeft className="h-5 w-5 text-foreground" />
           </button>
-          <h1 className="text-base font-semibold text-foreground truncate">{business.name}</h1>
+          <CorrectionPopup entityType="business" entityId={business.id} fieldName="name" currentValue={business.name}>
+            <h1 className="text-base font-semibold text-foreground truncate cursor-pointer hover:text-accent transition-colors">{business.name}</h1>
+          </CorrectionPopup>
         </div>
       </header>
 
@@ -55,7 +58,9 @@ export default function BusinessDetail() {
             </span>
           )}
           <TrustBadge status={business.verificationStatus} size="md" />
-          <span className="text-sm text-muted-foreground">{getTodayHours(business)}</span>
+          <CorrectionPopup entityType="business" entityId={business.id} fieldName="workingHours" currentValue={getTodayHours(business)}>
+            <span className="text-sm text-muted-foreground cursor-pointer hover:text-accent transition-colors">{getTodayHours(business)}</span>
+          </CorrectionPopup>
           <div className="ml-auto">
             <FollowButton businessId={business.id} businessName={business.name} />
           </div>
@@ -156,7 +161,9 @@ export default function BusinessDetail() {
 
         {/* Address + Actions */}
         <div className="mb-6 p-4 rounded-2xl bg-card border border-border">
-          <p className="text-sm text-foreground mb-3">{business.address}</p>
+          <CorrectionPopup entityType="business" entityId={business.id} fieldName="address" currentValue={business.address}>
+            <p className="text-sm text-foreground mb-3 cursor-pointer hover:text-accent transition-colors">{business.address}</p>
+          </CorrectionPopup>
           <div className="flex gap-2">
             <a
               href={`tel:${business.phone}`}
