@@ -5,6 +5,7 @@ import { useCityPulse, type ZonePulse, type ZoneId } from '@/hooks/useCityPulse'
 import { CityPulseCard } from './CityPulseCard';
 import { CityPulseDetail } from './CityPulseDetail';
 import { CityPulseVote } from './CityPulseVote';
+import { OutdoorAdviceBanner } from './OutdoorAdviceBanner';
 import { Activity, Info } from 'lucide-react';
 import {
   Tooltip,
@@ -14,7 +15,7 @@ import {
 
 export function CityPulseSection() {
   const { t } = useLanguage();
-  const { zones, loading, recommendationKey } = useCityPulse();
+  const { zones, loading } = useCityPulse();
   const [selectedZone, setSelectedZone] = useState<ZoneId | null>(null);
 
   if (loading) {
@@ -54,16 +55,8 @@ export function CityPulseSection() {
 
       <p className="text-[11px] text-muted-foreground -mt-1">{t('pulse.subtitle')}</p>
 
-      {/* Recommendation banner */}
-      {recommendationKey && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          className="px-3 py-2 rounded-xl bg-accent/10 border border-accent/20"
-        >
-          <p className="text-xs font-medium text-accent">{t(recommendationKey)}</p>
-        </motion.div>
-      )}
+      {/* Outdoor Advice Banner (replaces old recommendation) */}
+      <OutdoorAdviceBanner />
 
       {/* Zone grid */}
       <div className="grid grid-cols-2 gap-2">

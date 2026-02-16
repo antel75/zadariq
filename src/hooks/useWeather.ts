@@ -8,10 +8,13 @@ interface WeatherData {
   windGustKmh: number;
   windDirection: number;
   humidity: number;
+  precipitationMm: number;
+  precipitationProbability: number;
   sunset: string;
   sunrise: string;
   sunsetISO: string;
   sunriseNextISO: string;
+  fetchedAt: number; // timestamp ms
 }
 
 const ZADAR_LAT = 44.12;
@@ -23,36 +26,61 @@ export function useWeather() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${ZADAR_LAT}&longitude=${ZADAR_LON}&current=temperature_2m,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m,is_day,relative_humidity_2m&daily=sunset,sunrise&timezone=Europe%2FZagreb&forecast_days=2`;
+    const fetchWeather = () => {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${ZADAR_LAT}&longitude=${ZADAR_LON}&current=temperature_2m,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m,is_day,relative_humidity_2m,precipitation,rain&hourly=precipitation_probability&daily=sunset,sunrise&timezone=Europe%2FZagreb&forecast_days=2&forecast_hours=2`;
 
-    fetch(url)
-      .then(res => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
-      .then(json => {
-        const sunsetRaw = json.daily?.sunset?.[0] ?? '';
-        const sunsetTime = sunsetRaw ? sunsetRaw.split('T')[1]?.slice(0, 5) : '--:--';
-        const sunriseRaw = json.daily?.sunrise?.[0] ?? '';
-        const sunriseTime = sunriseRaw ? sunriseRaw.split('T')[1]?.slice(0, 5) : '--:--';
-        const sunriseNextRaw = json.daily?.sunrise?.[1] ?? sunriseRaw;
+      fetch(url)
+        .then(res => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json();
+        })
+        .then(json => {
+          const sunsetRaw = json.daily?.sunset?.[0] ?? '';
+          const sunsetTime = sunsetRaw ? sunsetRaw.split('T')[1]?.slice(0, 5) : '--:--';
+          const sunriseRaw = json.daily?.sunrise?.[0] ?? '';
+          const sunriseTime = sunriseRaw ? sunriseRaw.split('T')[1]?.slice(0, 5) : '--:--';
+          const sunriseNextRaw = json.daily?.sunrise?.[1] ?? sunriseRaw;
 
-        setData({
-          tempC: Math.round(json.current.temperature_2m),
-          isDay: json.current.is_day === 1,
-          weatherCode: json.current.weather_code,
-          windKmh: Math.round(json.current.wind_speed_10m),
-          windGustKmh: Math.round(json.current.wind_gusts_10m ?? 0),
-          windDirection: Math.round(json.current.wind_direction_10m ?? 0),
-          humidity: Math.round(json.current.relative_humidity_2m ?? 50),
-          sunset: sunsetTime,
-          sunrise: sunriseTime,
-          sunsetISO: sunsetRaw,
-          sunriseNextISO: sunriseNextRaw,
-        });
-      })
-      .catch(err => setError(err.message))
-      .finally(() => setLoading(false));
+          // Get precipitation probability for current/next hour
+          const precipProbs = json.hourly?.precipitation_probability ?? [];
+          const precipProb = precipProbs.length > 0 ? Math.max(precipProbs[0] ?? 0, precipProbs[1] ?? 0) : 0;
+
+          setData({
+            tempC: Math.round(json.current.temperature_2m),
+            isDay: json.current.is_day === 1,
+            weatherCode: json.current.weather_code,
+            windKmh: Math.round(json.current.wind_speed_10m),
+            windGustKmh: Math.round(json.current.wind_gusts_10m ?? 0),
+            windDirection: Math.round(json.current.wind_direction_10m ?? 0),
+            humidity: Math.round(json.current.relative_humidity_2m ?? 50),
+            precipitationMm: json.current.precipitation ?? json.current.rain ?? 0,
+            precipitationProbability: precipProb,
+            sunset: sunsetTime,
+            sunrise: sunriseTime,
+            sunsetISO: sunsetRaw,
+            sunriseNextISO: sunriseNextRaw,
+            fetchedAt: Date.now(),
+          });
+        })
+        .catch(err => setError(err.message))
+        .finally(() => setLoading(false));
+    };
+    fetchWeather();
+
+    // Auto-refresh every 10 minutes
+    const interval = setInterval(fetchWeather, 10 * 60 * 1000);
+
+    // Refresh on focus/reconnect
+    const onFocus = () => fetchWeather();
+    const onOnline = () => fetchWeather();
+    window.addEventListener('focus', onFocus);
+    window.addEventListener('online', onOnline);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', onFocus);
+      window.removeEventListener('online', onOnline);
+    };
   }, []);
 
   return { data, loading, error };
