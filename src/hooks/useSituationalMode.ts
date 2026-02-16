@@ -111,9 +111,18 @@ const modeEmoji: Record<SituationalMode, string> = {
   bad_weather: '⛈️',
 };
 
+export function getZadarHour(): number {
+  const zadarTime = new Date().toLocaleString('en-US', {
+    timeZone: 'Europe/Zagreb',
+    hour: 'numeric',
+    hour12: false,
+  });
+  return parseInt(zadarTime, 10);
+}
+
 export function useSituationalMode(): ModeConfig {
   const { data: weather } = useWeather();
-  const hour = new Date().getHours();
+  const hour = getZadarHour();
   
   const baseMode = getBaseMode(hour);
   const badWeather = weather 
