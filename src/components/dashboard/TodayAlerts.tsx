@@ -1,16 +1,51 @@
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { AlertTriangle, Pill, Construction, PartyPopper, Wind, Zap, Droplets } from 'lucide-react';
+import { AlertTriangle, Pill, Construction, PartyPopper, Wind, Zap, Droplets, Car, Trophy, Megaphone, ExternalLink } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { formatDistanceToNow } from 'date-fns';
+import { hr } from 'date-fns/locale';
 
-interface Alert {
+interface AlertCard {
   id: string;
   icon: LucideIcon;
   iconColor: string;
   title: string;
   desc: string;
   link?: string;
+  updatedAt?: string;
+  priority: number;
+}
+
+const typeIconMap: Record<string, { icon: LucideIcon; color: string }> = {
+  traffic: { icon: Car, color: 'text-[hsl(var(--status-warning))]' },
+  roads: { icon: Construction, color: 'text-[hsl(var(--status-warning))]' },
+  sport: { icon: Trophy, color: 'text-accent' },
+  power: { icon: Zap, color: 'text-destructive' },
+  water: { icon: Droplets, color: 'text-blue-500' },
+  weather: { icon: Wind, color: 'text-[hsl(var(--status-warning))]' },
+  event: { icon: PartyPopper, color: 'text-accent' },
+  general: { icon: Megaphone, color: 'text-primary' },
+};
+
+function useCityAlerts() {
+  return useQuery({
+    queryKey: ['city-alerts-active'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('city_alerts')
+        .select('*')
+        .gt('valid_until', new Date().toISOString())
+        .order('priority', { ascending: false })
+        .order('created_at', { ascending: false })
+        .limit(10);
+      if (error) throw error;
+      return data || [];
+    },
+    staleTime: 2 * 60 * 1000,
+    refetchInterval: 5 * 60 * 1000,
+  });
 }
 
 function useTodayOutages() {
@@ -46,14 +81,35 @@ function useTodayWaterOutages() {
 }
 
 export function TodayAlerts() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { data: cityAlerts } = useCityAlerts();
   const { data: outages } = useTodayOutages();
   const { data: waterOutages } = useTodayWaterOutages();
-  
-  const alerts: Alert[] = [];
-  const hour = new Date().getHours();
 
-  // Duty pharmacy - always shown
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [isPaused, setIsPaused] = useState(false);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const alerts: AlertCard[] = [];
+
+  // Add city_alerts from DB
+  if (cityAlerts) {
+    for (const ca of cityAlerts) {
+      const typeInfo = typeIconMap[ca.type] || typeIconMap.general;
+      alerts.push({
+        id: `ca-${ca.id}`,
+        icon: typeInfo.icon,
+        iconColor: typeInfo.color,
+        title: ca.title,
+        desc: ca.summary,
+        link: ca.source_url || undefined,
+        updatedAt: ca.created_at,
+        priority: ca.priority,
+      });
+    }
+  }
+
+  // Duty pharmacy - always
   alerts.push({
     id: 'duty-pharmacy',
     icon: Pill,
@@ -61,92 +117,70 @@ export function TodayAlerts() {
     title: t('alert.dutyPharmacy'),
     desc: t('alert.dutyPharmacyDesc'),
     link: 'https://maps.app.goo.gl/MzSeHLC1RCqsJ45b6?g_st=ic',
+    priority: 50,
   });
 
-  // Power outages from DB
+  // Power outages
   if (outages && outages.length > 0) {
-    if (outages.length === 1) {
-      const o = outages[0];
-      const timeStr = o.time_from && o.time_until ? `${o.time_from} - ${o.time_until}` : '';
-      alerts.push({
-        id: 'power-outage',
-        icon: Zap,
-        iconColor: 'text-destructive',
-        title: t('alert.powerOutage'),
-        desc: timeStr ? `${o.area} — ${timeStr}` : o.area,
-        link: 'https://www.hep.hr/ods/bez-struje/19?dp=zadar',
-      });
-    } else {
-      alerts.push({
-        id: 'power-outage',
-        icon: Zap,
-        iconColor: 'text-destructive',
-        title: t('alert.powerOutage'),
-        desc: t('alert.powerOutageMultiple').replace('{count}', String(outages.length)),
-        link: 'https://www.hep.hr/ods/bez-struje/19?dp=zadar',
-      });
-    }
+    const desc = outages.length === 1
+      ? (outages[0].time_from && outages[0].time_until ? `${outages[0].area} — ${outages[0].time_from} - ${outages[0].time_until}` : outages[0].area)
+      : t('alert.powerOutageMultiple').replace('{count}', String(outages.length));
+    alerts.push({
+      id: 'power-outage',
+      icon: Zap,
+      iconColor: 'text-destructive',
+      title: t('alert.powerOutage'),
+      desc,
+      link: 'https://www.hep.hr/ods/bez-struje/19?dp=zadar',
+      priority: 90,
+    });
   }
 
-  // Water outages from DB
+  // Water outages
   if (waterOutages && waterOutages.length > 0) {
-    if (waterOutages.length === 1) {
-      const w = waterOutages[0];
-      const timeStr = w.time_from && w.time_until ? `${w.time_from} - ${w.time_until}` : '';
-      alerts.push({
-        id: 'water-outage',
-        icon: Droplets,
-        iconColor: 'text-blue-500',
-        title: t('alert.waterOutage'),
-        desc: timeStr ? `${w.area} — ${timeStr}` : w.area,
-        link: 'https://www.vodovod-zadar.hr/obavijesti',
-      });
+    const desc = waterOutages.length === 1
+      ? (waterOutages[0].time_from && waterOutages[0].time_until ? `${waterOutages[0].area} — ${waterOutages[0].time_from} - ${waterOutages[0].time_until}` : waterOutages[0].area)
+      : t('alert.waterOutageMultiple').replace('{count}', String(waterOutages.length));
+    alerts.push({
+      id: 'water-outage',
+      icon: Droplets,
+      iconColor: 'text-blue-500',
+      title: t('alert.waterOutage'),
+      desc,
+      link: 'https://www.vodovod-zadar.hr/obavijesti',
+      priority: 85,
+    });
+  }
+
+  // Sort by priority desc
+  alerts.sort((a, b) => b.priority - a.priority);
+
+  // Auto-scroll logic
+  const scrollNext = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const cardWidth = 220; // w-[210px] + gap
+    const maxScroll = el.scrollWidth - el.clientWidth;
+    if (el.scrollLeft >= maxScroll - 10) {
+      el.scrollTo({ left: 0, behavior: 'smooth' });
     } else {
-      alerts.push({
-        id: 'water-outage',
-        icon: Droplets,
-        iconColor: 'text-blue-500',
-        title: t('alert.waterOutage'),
-        desc: t('alert.waterOutageMultiple').replace('{count}', String(waterOutages.length)),
-        link: 'https://www.vodovod-zadar.hr/obavijesti',
-      });
+      el.scrollBy({ left: cardWidth, behavior: 'smooth' });
     }
-  }
+  }, []);
 
-  // Road closed (daytime mock)
-  if (hour >= 8 && hour <= 18) {
-    alerts.push({
-      id: 'road-closed',
-      icon: Construction,
-      iconColor: 'text-[hsl(var(--status-warning))]',
-      title: t('alert.roadClosed'),
-      desc: t('alert.roadClosedDesc'),
-    });
-  }
-
-  // Event tonight
-  if (hour >= 14) {
-    alerts.push({
-      id: 'event',
-      icon: PartyPopper,
-      iconColor: 'text-accent',
-      title: t('alert.eventTonight'),
-      desc: t('alert.eventTonightDesc'),
-    });
-  }
-
-  // Strong wind
-  if (hour >= 12) {
-    alerts.push({
-      id: 'wind',
-      icon: Wind,
-      iconColor: 'text-[hsl(var(--status-warning))]',
-      title: t('alert.strongWind'),
-      desc: t('alert.strongWindDesc'),
-    });
-  }
+  useEffect(() => {
+    if (alerts.length <= 1) return;
+    if (!isPaused) {
+      intervalRef.current = setInterval(scrollNext, 6000);
+    }
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [isPaused, scrollNext, alerts.length]);
 
   if (alerts.length === 0) return null;
+
+  const locale = language === 'hr' ? hr : undefined;
 
   return (
     <div>
@@ -154,20 +188,33 @@ export function TodayAlerts() {
         <AlertTriangle className="h-4 w-4 text-[hsl(var(--status-warning))]" />
         {t('dashboard.alerts')}
       </h2>
-      <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+      <div
+        ref={scrollRef}
+        className="flex gap-2.5 overflow-x-auto scrollbar-hide pb-1 snap-x snap-mandatory"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+        onTouchStart={() => setIsPaused(true)}
+        onTouchEnd={() => setTimeout(() => setIsPaused(false), 3000)}
+      >
         {alerts.map((alert) => {
           const Icon = alert.icon;
           return (
             <div
               key={alert.id}
-              className={`flex-shrink-0 w-52 rounded-xl bg-card border border-border p-3 flex items-start gap-2.5 ${alert.link ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}`}
+              className={`flex-shrink-0 w-[210px] snap-start rounded-xl bg-card border border-border p-3 flex flex-col gap-1.5 ${alert.link ? 'cursor-pointer hover:shadow-md hover:border-primary/30 transition-all' : ''}`}
               onClick={() => alert.link && window.open(alert.link, '_blank', 'noopener,noreferrer')}
             >
-              <Icon className={`h-4 w-4 mt-0.5 flex-shrink-0 ${alert.iconColor}`} />
-              <div className="min-w-0">
-                <p className="text-xs font-semibold text-foreground truncate">{alert.title}</p>
-                <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-2">{alert.desc}</p>
+              <div className="flex items-center gap-2">
+                <Icon className={`h-4 w-4 flex-shrink-0 ${alert.iconColor}`} />
+                <p className="text-xs font-semibold text-foreground truncate flex-1">{alert.title}</p>
+                {alert.link && <ExternalLink className="h-3 w-3 text-muted-foreground flex-shrink-0" />}
               </div>
+              <p className="text-[10px] text-muted-foreground line-clamp-2 leading-relaxed">{alert.desc}</p>
+              {alert.updatedAt && (
+                <p className="text-[9px] text-muted-foreground/60 mt-auto">
+                  {formatDistanceToNow(new Date(alert.updatedAt), { addSuffix: true, locale })}
+                </p>
+              )}
             </div>
           );
         })}
