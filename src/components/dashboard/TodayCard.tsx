@@ -1,7 +1,18 @@
+import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useNavigate } from 'react-router-dom';
 import { Thermometer, Cloud, Shirt, Users, Car, Waves, Loader2 } from 'lucide-react';
-import { useWeather } from '@/hooks/useWeather';
-import { getParkingStatus } from '@/data/parkingData';
+import { useWeather, getWindName } from '@/hooks/useWeather';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { Badge } from '@/components/ui/badge';
+import {
+  WeatherDetailModal,
+  CrowdDetailModal,
+  SeaDetailModal,
+  MeteoAlertModal,
+  WindDetailModal,
+} from './TodayDetailModals';
 
 // ── Semantic Logic ──
 
@@ -71,7 +82,7 @@ function getSeaKey(seaTempC: number): string {
   return 'warm';
 }
 
-// ── Semantic color helpers ──
+// ── Color helpers ──
 
 function getFeelColor(key: string): string {
   if (key.startsWith('veryCold') || key.startsWith('cold')) return 'text-blue-400';
@@ -94,8 +105,7 @@ function getCrowdColor(key: string): string {
 }
 
 function getParkingColor(key: string): string {
-  if (key === 'free') return 'text-[hsl(var(--status-open))]';
-  if (key === 'available') return 'text-[hsl(var(--status-open))]';
+  if (key === 'free' || key === 'available') return 'text-[hsl(var(--status-open))]';
   if (key === 'hardToFind') return 'text-[hsl(var(--status-warning))]';
   return 'text-[hsl(var(--status-closed))]';
 }
@@ -106,11 +116,31 @@ function getSeaColor(key: string): string {
   return 'text-[hsl(var(--status-open))]';
 }
 
+// ── Meteo hook (reused from NowInZadar) ──
+
+function useMeteoAlerts() {
+  return useQuery({
+    queryKey: ['meteoalarm-zadar'],
+    queryFn: async () => {
+      const res = await supabase.functions.invoke('meteoalarm');
+      if (res.error) throw res.error;
+      return (res.data?.alerts || []) as Array<{ title: string; level: string; levelNum: number; type: string; description: string }>;
+    },
+    staleTime: 30 * 60 * 1000,
+    retry: 1,
+  });
+}
+
 // ── Component ──
+
+type ModalType = 'weather' | 'crowd' | 'sea' | 'meteo' | 'wind' | null;
 
 export function TodayCard() {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const { data: weather, loading } = useWeather();
+  const { data: meteoAlerts } = useMeteoAlerts();
+  const [activeModal, setActiveModal] = useState<ModalType>(null);
   const hour = new Date().getHours();
   const seaTempC = 15; // mock
 
@@ -127,9 +157,13 @@ export function TodayCard() {
 
   const tempC = weather?.tempC ?? 15;
   const windKmh = weather?.windKmh ?? 0;
+  const windGustKmh = weather?.windGustKmh ?? 0;
+  const windDirection = weather?.windDirection ?? 0;
   const humidity = weather?.humidity ?? 50;
   const isDay = weather?.isDay ?? true;
   const weatherCode = weather?.weatherCode ?? 0;
+  const sunrise = weather?.sunrise ?? '--:--';
+  const sunset = weather?.sunset ?? '--:--';
 
   const feelKey = getFeelKey(tempC, windKmh, humidity, isDay);
   const weatherAdviceKey = getWeatherAdviceKey(weatherCode);
@@ -137,9 +171,36 @@ export function TodayCard() {
   const crowdKey = getCrowdKey(hour);
   const parkingKey = getParkingSemanticKey(hour);
   const seaKey = getSeaKey(seaTempC);
+  const windName = getWindName(windDirection);
 
-  const cards = [
+  // Smart badges
+  const hasMeteoAlert = meteoAlerts && meteoAlerts.length > 0;
+  const hasStrongWind = windKmh >= 35 || windGustKmh >= 55;
+  const windLabel = windName === 'jugo' ? t('badge.jugoStrong') : t('badge.buraStrong');
+
+  const meteoLevelColor = hasMeteoAlert
+    ? meteoAlerts[0].levelNum >= 3 ? 'bg-destructive/15 text-destructive border-destructive/30'
+      : meteoAlerts[0].levelNum >= 2 ? 'bg-orange-500/15 text-orange-600 border-orange-500/30'
+      : 'bg-yellow-500/15 text-yellow-700 border-yellow-500/30'
+    : '';
+
+  // Card click handlers
+  type CardType = 'feel' | 'weather' | 'clothing' | 'crowd' | 'parking' | 'sea';
+  const handleCardClick = (type: CardType) => {
+    if (type === 'feel' || type === 'weather' || type === 'clothing') {
+      setActiveModal('weather');
+    } else if (type === 'crowd') {
+      setActiveModal('crowd');
+    } else if (type === 'parking') {
+      navigate('/parking');
+    } else if (type === 'sea') {
+      setActiveModal('sea');
+    }
+  };
+
+  const cards: Array<{ type: CardType; icon: typeof Thermometer; label: string; value: string; sub: string; color: string; iconColor: string }> = [
     {
+      type: 'feel',
       icon: Thermometer,
       label: t('today.feelLabel'),
       value: t(`today.feel.${feelKey}`),
@@ -148,14 +209,16 @@ export function TodayCard() {
       iconColor: 'text-orange-400',
     },
     {
+      type: 'weather',
       icon: Cloud,
       label: t('today.weatherLabel'),
       value: t(`today.weather.${weatherAdviceKey}`),
-      sub: t(`weather.${weather ? (weatherCode === 0 ? (isDay ? 'sunny' : 'clear_night') : weatherCode <= 3 ? 'partly_cloudy' : weatherCode <= 48 ? 'foggy' : weatherCode <= 67 ? 'rainy' : 'stormy') : 'sunny'}`),
+      sub: t(`weather.${weatherCode === 0 ? (isDay ? 'sunny' : 'clear_night') : weatherCode <= 3 ? 'partly_cloudy' : weatherCode <= 48 ? 'foggy' : weatherCode <= 67 ? 'rainy' : 'stormy'}`),
       color: getWeatherColor(weatherAdviceKey),
       iconColor: 'text-blue-400',
     },
     {
+      type: 'clothing',
       icon: Shirt,
       label: t('today.clothingLabel'),
       value: t(`today.clothing.${clothingKey}`),
@@ -164,6 +227,7 @@ export function TodayCard() {
       iconColor: 'text-accent',
     },
     {
+      type: 'crowd',
       icon: Users,
       label: t('today.crowdLabel'),
       value: t(`today.crowd.${crowdKey}`),
@@ -172,6 +236,7 @@ export function TodayCard() {
       iconColor: 'text-muted-foreground',
     },
     {
+      type: 'parking',
       icon: Car,
       label: t('today.parkingLabel'),
       value: t(`today.parking.${parkingKey}`),
@@ -180,6 +245,7 @@ export function TodayCard() {
       iconColor: 'text-muted-foreground',
     },
     {
+      type: 'sea',
       icon: Waves,
       label: t('today.seaLabel'),
       value: t(`today.sea.${seaKey}`),
@@ -190,20 +256,95 @@ export function TodayCard() {
   ];
 
   return (
-    <div className="rounded-2xl bg-gradient-to-br from-primary/10 via-accent/5 to-card border border-border p-4">
-      <h2 className="text-sm font-semibold text-foreground mb-3">{t('dashboard.today')}</h2>
-      <div className="grid grid-cols-3 gap-3">
-        {cards.map((card, i) => {
-          const Icon = card.icon;
-          return (
-            <div key={i} className="flex flex-col items-center gap-1 text-center">
-              <Icon className={`h-5 w-5 ${card.iconColor}`} />
-              <span className={`text-sm font-bold leading-tight ${card.color}`}>{card.value}</span>
-              <span className="text-[10px] text-muted-foreground">{card.sub}</span>
-            </div>
-          );
-        })}
+    <>
+      <div className="rounded-2xl bg-gradient-to-br from-primary/10 via-accent/5 to-card border border-border p-4">
+        <h2 className="text-sm font-semibold text-foreground mb-2">{t('dashboard.today')}</h2>
+
+        {/* Smart Badges */}
+        <div className="flex flex-wrap gap-1.5 mb-3">
+          {hasMeteoAlert && (
+            <button
+              onClick={() => setActiveModal('meteo')}
+              className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold transition-colors hover:opacity-80 ${meteoLevelColor}`}
+            >
+              ⚠️ {t('badge.meteoalarm')}: {meteoAlerts[0].level}
+            </button>
+          )}
+          {hasStrongWind && (
+            <button
+              onClick={() => setActiveModal('wind')}
+              className="inline-flex items-center gap-1 rounded-full border border-blue-400/30 bg-blue-500/10 text-blue-600 dark:text-blue-400 px-2 py-0.5 text-[10px] font-semibold transition-colors hover:opacity-80"
+            >
+              💨 {windLabel}
+            </button>
+          )}
+          <button
+            onClick={() => setActiveModal('weather')}
+            className="inline-flex items-center gap-1 rounded-full border border-border bg-secondary/50 text-muted-foreground px-2 py-0.5 text-[10px] font-medium transition-colors hover:bg-secondary"
+          >
+            🌅 {sunrise} &nbsp; 🌇 {sunset}
+          </button>
+        </div>
+
+        {/* 6 Indicators Grid */}
+        <div className="grid grid-cols-3 gap-3">
+          {cards.map((card) => {
+            const Icon = card.icon;
+            return (
+              <button
+                key={card.type}
+                onClick={() => handleCardClick(card.type)}
+                className="flex flex-col items-center gap-1 text-center rounded-xl p-1.5 transition-colors hover:bg-accent/10 active:bg-accent/20 cursor-pointer"
+              >
+                <Icon className={`h-5 w-5 ${card.iconColor}`} />
+                <span className={`text-sm font-bold leading-tight ${card.color}`}>{card.value}</span>
+                <span className="text-[10px] text-muted-foreground">{card.sub}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
-    </div>
+
+      {/* Modals */}
+      <WeatherDetailModal
+        open={activeModal === 'weather'}
+        onClose={() => setActiveModal(null)}
+        tempC={tempC}
+        humidity={humidity}
+        windKmh={windKmh}
+        windGustKmh={windGustKmh}
+        windDirection={windDirection}
+        weatherCode={weatherCode}
+        sunrise={sunrise}
+        sunset={sunset}
+      />
+      <CrowdDetailModal
+        open={activeModal === 'crowd'}
+        onClose={() => setActiveModal(null)}
+        crowdKey={crowdKey}
+        hour={hour}
+      />
+      <SeaDetailModal
+        open={activeModal === 'sea'}
+        onClose={() => setActiveModal(null)}
+        seaTempC={seaTempC}
+        seaKey={seaKey}
+      />
+      {hasMeteoAlert && (
+        <MeteoAlertModal
+          open={activeModal === 'meteo'}
+          onClose={() => setActiveModal(null)}
+          alerts={meteoAlerts}
+        />
+      )}
+      <WindDetailModal
+        open={activeModal === 'wind'}
+        onClose={() => setActiveModal(null)}
+        windKmh={windKmh}
+        windGustKmh={windGustKmh}
+        windDirection={windDirection}
+        windName={windName}
+      />
+    </>
   );
 }

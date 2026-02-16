@@ -5,6 +5,8 @@ interface WeatherData {
   isDay: boolean;
   weatherCode: number;
   windKmh: number;
+  windGustKmh: number;
+  windDirection: number;
   humidity: number;
   sunset: string;
   sunrise: string;
@@ -21,7 +23,7 @@ export function useWeather() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${ZADAR_LAT}&longitude=${ZADAR_LON}&current=temperature_2m,weather_code,wind_speed_10m,is_day,relative_humidity_2m&daily=sunset,sunrise&timezone=Europe%2FZagreb&forecast_days=2`;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${ZADAR_LAT}&longitude=${ZADAR_LON}&current=temperature_2m,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m,is_day,relative_humidity_2m&daily=sunset,sunrise&timezone=Europe%2FZagreb&forecast_days=2`;
 
     fetch(url)
       .then(res => {
@@ -40,6 +42,8 @@ export function useWeather() {
           isDay: json.current.is_day === 1,
           weatherCode: json.current.weather_code,
           windKmh: Math.round(json.current.wind_speed_10m),
+          windGustKmh: Math.round(json.current.wind_gusts_10m ?? 0),
+          windDirection: Math.round(json.current.wind_direction_10m ?? 0),
           humidity: Math.round(json.current.relative_humidity_2m ?? 50),
           sunset: sunsetTime,
           sunrise: sunriseTime,
@@ -71,4 +75,17 @@ export function getWindType(kmh: number): string {
   if (kmh < 15) return 'calm';
   if (kmh < 40) return 'moderate';
   return 'bura';
+}
+
+/** Determine wind name based on direction (Adriatic) */
+export function getWindName(direction: number): 'bura' | 'jugo' | 'maestral' | 'tramontana' | 'other' {
+  // Bura: NE (20-80°)
+  if (direction >= 20 && direction <= 80) return 'bura';
+  // Jugo: SE (100-170°)
+  if (direction >= 100 && direction <= 170) return 'jugo';
+  // Maestral: NW (280-340°)
+  if (direction >= 280 && direction <= 340) return 'maestral';
+  // Tramontana: N (340-360 or 0-20)
+  if (direction >= 340 || direction <= 20) return 'tramontana';
+  return 'other';
 }
