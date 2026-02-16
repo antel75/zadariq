@@ -231,7 +231,7 @@ export default function BusinessDetail() {
       </main>
 
       <ReportModal business={showReport ? business : null} open={showReport} onClose={() => setShowReport(false)} />
-      <ClaimModal businessName={business.name} open={showClaim} onClose={() => setShowClaim(false)} />
+      <ClaimModal businessId={business.id} businessName={business.name} open={showClaim} onClose={() => setShowClaim(false)} />
     </div>
   );
 }

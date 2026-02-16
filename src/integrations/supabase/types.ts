@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      business_ownership: {
+        Row: {
+          business_id: string
+          created_at: string | null
+          id: string
+          owner_user_id: string | null
+          updated_at: string | null
+          verified: boolean | null
+          verified_at: string | null
+        }
+        Insert: {
+          business_id: string
+          created_at?: string | null
+          id?: string
+          owner_user_id?: string | null
+          updated_at?: string | null
+          verified?: boolean | null
+          verified_at?: string | null
+        }
+        Update: {
+          business_id?: string
+          created_at?: string | null
+          id?: string
+          owner_user_id?: string | null
+          updated_at?: string | null
+          verified?: boolean | null
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       cinema_movies: {
         Row: {
           age_rating: string | null
@@ -291,6 +321,87 @@ export type Database = {
           open_until?: string | null
           phone?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      ownership_audit_log: {
+        Row: {
+          action: string
+          actor_user_id: string | null
+          business_id: string | null
+          created_at: string | null
+          details: Json | null
+          email: string | null
+          id: string
+          ip: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          actor_user_id?: string | null
+          business_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          email?: string | null
+          id?: string
+          ip?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          actor_user_id?: string | null
+          business_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          email?: string | null
+          id?: string
+          ip?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      ownership_claim_requests: {
+        Row: {
+          attempts: number | null
+          business_id: string
+          code_hash: string
+          created_at: string | null
+          email: string
+          expires_at: string
+          id: string
+          ip: string | null
+          last_attempt_at: string | null
+          requester_user_id: string | null
+          status: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          attempts?: number | null
+          business_id: string
+          code_hash: string
+          created_at?: string | null
+          email: string
+          expires_at: string
+          id?: string
+          ip?: string | null
+          last_attempt_at?: string | null
+          requester_user_id?: string | null
+          status?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          attempts?: number | null
+          business_id?: string
+          code_hash?: string
+          created_at?: string | null
+          email?: string
+          expires_at?: string
+          id?: string
+          ip?: string | null
+          last_attempt_at?: string | null
+          requester_user_id?: string | null
+          status?: string | null
+          user_agent?: string | null
         }
         Relationships: []
       }

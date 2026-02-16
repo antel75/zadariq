@@ -1,1 +1,7 @@
 project_id = "yxfaovaigwdbziewnppx"
+
+[functions.send-ownership-code]
+verify_jwt = false
+
+[functions.verify-ownership-code]
+verify_jwt = false
