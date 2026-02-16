@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ArrowLeft, Landmark, Building2, Wrench } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Footer } from '@/components/Footer';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 12 },
@@ -58,6 +59,7 @@ export default function PublicServicesMenu() {
           })}
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import {
   ArrowLeft, ShieldCheck, BarChart3, Megaphone, Users,
   TrendingUp, Star, Eye, CheckCircle2, ArrowRight,
 } from 'lucide-react';
+import { Footer } from '@/components/Footer';
 
 const benefits = [
   { icon: ShieldCheck, titleKey: 'forbiz.benefit1.title', descKey: 'forbiz.benefit1.desc', color: 'text-status-open' },
@@ -81,6 +82,7 @@ export default function ForBusiness() {
 
         <p className="text-center text-xs text-muted-foreground mt-3">{t('forbiz.free')}</p>
       </main>
+      <Footer />
     </div>
   );
 }

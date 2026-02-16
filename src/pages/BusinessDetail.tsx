@@ -11,6 +11,7 @@ import {
   ArrowLeft, Phone, Navigation, BadgeCheck, AlertTriangle,
   UserCheck, Clock, ShieldCheck, Users, Bot, Activity, Tag, Megaphone, CalendarClock, Settings, Star,
 } from 'lucide-react';
+import { Footer } from '@/components/Footer';
 
 const dayKeys = ['days.mon', 'days.tue', 'days.wed', 'days.thu', 'days.fri', 'days.sat', 'days.sun'] as const;
 const hourKeys = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
@@ -229,7 +230,7 @@ export default function BusinessDetail() {
           )}
         </div>
       </main>
-
+      <Footer />
       <ReportModal business={showReport ? business : null} open={showReport} onClose={() => setShowReport(false)} />
       <ClaimModal businessId={business.id} businessName={business.name} open={showClaim} onClose={() => setShowClaim(false)} />
     </div>

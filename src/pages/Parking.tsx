@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { ArrowLeft, Car, MessageSquare, AlertTriangle, ExternalLink } from 'lucide-react';
+import { Footer } from '@/components/Footer';
 import {
   parkingZones,
   getCurrentRegime,
@@ -166,6 +167,7 @@ const Parking = () => {
           </div>
         </section>
       </main>
+      <Footer />
     </div>
   );
 };

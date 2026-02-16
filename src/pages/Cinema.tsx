@@ -4,6 +4,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, Clock, MapPin, Film, Calendar, ExternalLink, Loader2 } from 'lucide-react';
+import { Footer } from '@/components/Footer';
 import { format, parseISO, isToday, isTomorrow, addDays } from 'date-fns';
 import { hr } from 'date-fns/locale';
 
@@ -275,6 +276,7 @@ export default function Cinema() {
             : 'Data is automatically updated from cinestarcinemas.hr'}
         </p>
       </div>
+      <Footer />
     </div>
   );
 }
