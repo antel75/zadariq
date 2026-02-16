@@ -642,6 +642,66 @@ export type Database = {
         }
         Relationships: []
       }
+      sports_events: {
+        Row: {
+          api_match_id: string | null
+          away_score: number | null
+          away_team: string
+          created_at: string
+          home_score: number | null
+          home_team: string
+          id: string
+          is_local_team: boolean
+          league: string | null
+          match_minute: string | null
+          match_status: string
+          source_url: string | null
+          sport: string
+          start_time: string
+          team_tag: string | null
+          updated_at: string
+          venue: string | null
+        }
+        Insert: {
+          api_match_id?: string | null
+          away_score?: number | null
+          away_team: string
+          created_at?: string
+          home_score?: number | null
+          home_team: string
+          id?: string
+          is_local_team?: boolean
+          league?: string | null
+          match_minute?: string | null
+          match_status?: string
+          source_url?: string | null
+          sport?: string
+          start_time: string
+          team_tag?: string | null
+          updated_at?: string
+          venue?: string | null
+        }
+        Update: {
+          api_match_id?: string | null
+          away_score?: number | null
+          away_team?: string
+          created_at?: string
+          home_score?: number | null
+          home_team?: string
+          id?: string
+          is_local_team?: boolean
+          league?: string | null
+          match_minute?: string | null
+          match_status?: string
+          source_url?: string | null
+          sport?: string
+          start_time?: string
+          team_tag?: string | null
+          updated_at?: string
+          venue?: string | null
+        }
+        Relationships: []
+      }
       transport_schedules: {
         Row: {
           carrier: string | null
