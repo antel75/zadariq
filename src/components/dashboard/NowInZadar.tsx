@@ -322,8 +322,8 @@ export function NowInZadar({ mode = 'day' }: NowInZadarProps) {
           label: `${emoji} ${t('happening.liveBadge')}`,
           answer: `${ev.home_team} ${ev.home_score ?? 0}:${ev.away_score ?? 0} ${ev.away_team}${ev.match_minute ? ` (${ev.match_minute}')` : ''}`,
           action: () => {},
-          priority: 120, // Above meteo alerts
-          isActionable: false,
+          priority: 120,
+          isActionable: true, // Must be true to survive selectTopCards filter
         });
       } else if (ev.match_status === 'upcoming' && hoursUntil > 0 && hoursUntil <= 3) {
         candidates.push({
@@ -332,8 +332,8 @@ export function NowInZadar({ mode = 'day' }: NowInZadarProps) {
           label: `${emoji} ${t('happening.tonight')}`,
           answer: `${ev.home_team} – ${ev.away_team} ${t('happening.at')} ${new Date(ev.start_time).toLocaleTimeString('hr-HR', { hour: '2-digit', minute: '2-digit' })}`,
           action: () => {},
-          priority: 116, // Above meteo but below live
-          isActionable: false,
+          priority: 116,
+          isActionable: true,
         });
       } else if (ev.match_status === 'finished' && hoursSince >= 0 && hoursSince <= 2) {
         candidates.push({
@@ -343,7 +343,7 @@ export function NowInZadar({ mode = 'day' }: NowInZadarProps) {
           answer: `${ev.home_team} ${ev.home_score ?? 0}:${ev.away_score ?? 0} ${ev.away_team}`,
           action: () => {},
           priority: 105,
-          isActionable: false,
+          isActionable: true,
         });
       }
     }
