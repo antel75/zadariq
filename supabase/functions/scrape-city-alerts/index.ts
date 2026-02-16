@@ -156,7 +156,7 @@ async function parseHAK(): Promise<AlertInput[]> {
         title,
         summary,
         source: "hak",
-        source_url: "https://www.hak.hr/info/stanje-na-cestama/",
+        source_url: "https://m.hak.hr/stanje.asp?id=1",
         priority,
         valid_until: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // 2h
         type: "roads",
