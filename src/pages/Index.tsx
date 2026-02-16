@@ -9,6 +9,7 @@ import { BusinessCard } from '@/components/BusinessCard';
 import { ReportModal } from '@/components/ReportModal';
 import { FieldReportButton } from '@/components/FieldReportButton';
 import { NowInZadar } from '@/components/dashboard/NowInZadar';
+import { MatchModeHeader } from '@/components/dashboard/MatchModeHeader';
 import { ModeIndicator } from '@/components/dashboard/ModeIndicator';
 import { ZadarClock } from '@/components/dashboard/ZadarClock';
 import { TodayAlerts } from '@/components/dashboard/TodayAlerts';
@@ -23,6 +24,7 @@ import { ZadarIQLogo } from '@/components/ZadarIQLogo';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Footer } from '@/components/Footer';
 import { useSituationalMode } from '@/hooks/useSituationalMode';
+import { useAppMode } from '@/hooks/useAppMode';
 import { businesses, isBusinessOpen } from '@/data/mockData';
 import { Business, CategoryId } from '@/data/types';
 import { Sparkles, MapPin, Siren, Briefcase } from 'lucide-react';
@@ -42,7 +44,9 @@ const Index = () => {
   const [query, setQuery] = useState('');
   const [reportTarget, setReportTarget] = useState<Business | null>(null);
   const modeConfig = useSituationalMode();
+  const appMode = useAppMode();
   const show = modeConfig.showSections;
+  const isMatchActive = appMode.mode !== 'normal';
 
   const handleSearch = () => {
     if (query.trim()) {
@@ -117,7 +121,7 @@ const Index = () => {
           <ModeIndicator config={modeConfig} />
         </motion.div>
 
-        {/* SADA U ZADRU — contextual smart cards */}
+        {/* Match Mode Header OR normal SADA U ZADRU */}
         <motion.section
           className="mb-4"
           variants={fadeUp}
@@ -125,7 +129,10 @@ const Index = () => {
           animate="visible"
           custom={sectionIndex++}
         >
-          <NowInZadar mode={modeConfig.mode} />
+          {isMatchActive && appMode.match ? (
+            <MatchModeHeader mode={appMode.mode} match={appMode.match} />
+          ) : null}
+          <NowInZadar mode={modeConfig.mode} appMode={appMode.mode} />
         </motion.section>
 
         {/* Quick Actions */}
