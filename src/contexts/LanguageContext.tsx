@@ -539,6 +539,10 @@ const translations: Translations = {
   'appMode.ctxParking': { hr: 'Očekuj popunjenost', en: 'Expect full parking', de: 'Parkplätze voll', it: 'Parcheggi pieni' },
   'appMode.ctxCafes': { hr: 'Veća posjećenost', en: 'Higher cafe traffic', de: 'Mehr Cafébesucher', it: 'Più traffico nei bar' },
   'appMode.ctxTraffic': { hr: 'Pojačan promet', en: 'Increased traffic', de: 'Erhöhter Verkehr', it: 'Traffico intenso' },
+  // Sports freshness
+  'sports.noFreshData': { hr: 'Nema svježih sportskih podataka', en: 'No fresh sports data available', de: 'Keine aktuellen Sportdaten verfügbar', it: 'Nessun dato sportivo aggiornato' },
+  'sports.sourceUpdated': { hr: 'Izvor: {source} · Ažurirano: {time}', en: 'Source: {source} · Updated: {time}', de: 'Quelle: {source} · Aktualisiert: {time}', it: 'Fonte: {source} · Aggiornato: {time}' },
+  'sports.openExternal': { hr: 'Otvori SofaScore / Flashscore', en: 'Open SofaScore / Flashscore', de: 'SofaScore / Flashscore öffnen', it: 'Apri SofaScore / Flashscore' },
 };
 
 interface LanguageContextType {

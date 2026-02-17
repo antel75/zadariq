@@ -647,11 +647,14 @@ export type Database = {
           api_match_id: string | null
           away_score: number | null
           away_team: string
+          confidence: number | null
           created_at: string
+          fetched_at: string | null
           home_score: number | null
           home_team: string
           id: string
           is_local_team: boolean
+          is_stale: boolean | null
           league: string | null
           link_url: string | null
           manual_expires_at: string | null
@@ -670,11 +673,14 @@ export type Database = {
           api_match_id?: string | null
           away_score?: number | null
           away_team: string
+          confidence?: number | null
           created_at?: string
+          fetched_at?: string | null
           home_score?: number | null
           home_team: string
           id?: string
           is_local_team?: boolean
+          is_stale?: boolean | null
           league?: string | null
           link_url?: string | null
           manual_expires_at?: string | null
@@ -693,11 +699,14 @@ export type Database = {
           api_match_id?: string | null
           away_score?: number | null
           away_team?: string
+          confidence?: number | null
           created_at?: string
+          fetched_at?: string | null
           home_score?: number | null
           home_team?: string
           id?: string
           is_local_team?: boolean
+          is_stale?: boolean | null
           league?: string | null
           link_url?: string | null
           manual_expires_at?: string | null

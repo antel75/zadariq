@@ -8,6 +8,10 @@ const corsHeaders = {
 
 const ERGAST_BASE = "https://api.jolpi.ca/ergast/f1";
 
+// Freshness windows
+const MAX_RESULT_AGE_DAYS = 7;
+const MAX_UPCOMING_DAYS = 30;
+
 interface ErgastRace {
   season: string;
   round: string;
@@ -22,6 +26,21 @@ interface ErgastRace {
     Constructor: { name: string };
     Time?: { time: string };
   }>;
+}
+
+function isStaleRace(race: ErgastRace, status: string): boolean {
+  const now = Date.now();
+  const raceDate = new Date(race.time ? `${race.date}T${race.time}` : `${race.date}T14:00:00Z`).getTime();
+
+  if (status === "finished") {
+    const ageDays = (now - raceDate) / (1000 * 60 * 60 * 24);
+    return ageDays > MAX_RESULT_AGE_DAYS;
+  }
+  if (status === "upcoming") {
+    const daysAhead = (raceDate - now) / (1000 * 60 * 60 * 24);
+    return daysAhead > MAX_UPCOMING_DAYS;
+  }
+  return false;
 }
 
 function raceToRow(race: ErgastRace, status: string, subtitle?: string) {
@@ -46,6 +65,9 @@ function raceToRow(race: ErgastRace, status: string, subtitle?: string) {
     source: "api",
     link_url: race.url || null,
     match_minute: subtitle || null,
+    fetched_at: new Date().toISOString(),
+    confidence: 90,
+    is_stale: isStaleRace(race, status),
   };
 }
 
@@ -117,7 +139,6 @@ serve(async (req) => {
     for (const race of pastRaces) {
       const row = raceToRow(race, "finished");
       if (!allRows.some(r => r.api_match_id === row.api_match_id)) {
-        // Try to get results for this race
         const raceResultData = await fetchJSON(`${ERGAST_BASE}/${race.season}/${race.round}/results.json`);
         const raceResults = raceResultData?.MRData?.RaceTable?.Races?.[0]?.Results || [];
         if (raceResults.length >= 3) {
@@ -127,15 +148,29 @@ serve(async (req) => {
       }
     }
 
-    // ── Upsert ──
-    if (allRows.length > 0) {
+    // ── Filter stale ──
+    const freshRows = allRows.filter(r => !r.is_stale);
+    const staleRows = allRows.filter(r => r.is_stale);
+    console.log(`[F1 FRESHNESS] ${freshRows.length} fresh, ${staleRows.length} stale`);
+
+    // ── Upsert fresh ──
+    if (freshRows.length > 0) {
       const { error } = await supabase
         .from("sports_events")
-        .upsert(allRows, { onConflict: "api_match_id" });
+        .upsert(freshRows, { onConflict: "api_match_id" });
       if (error) {
         console.error("F1 upsert error:", error);
         throw error;
       }
+    }
+
+    // ── Mark stale ──
+    if (staleRows.length > 0) {
+      const staleIds = staleRows.map(r => r.api_match_id);
+      await supabase
+        .from("sports_events")
+        .update({ is_stale: true })
+        .in("api_match_id", staleIds);
     }
 
     // ── Cleanup: keep last 3 finished F1 ──
@@ -145,6 +180,7 @@ serve(async (req) => {
       .eq("match_status", "finished")
       .eq("team_tag", "f1")
       .eq("source", "api")
+      .eq("is_stale", false)
       .order("start_time", { ascending: false });
 
     if (finishedF1 && finishedF1.length > 3) {
@@ -161,10 +197,10 @@ serve(async (req) => {
       updated_at: new Date().toISOString(),
     });
 
-    console.log(`[F1 DONE] Upserted ${allRows.length} events`);
+    console.log(`[F1 DONE] Upserted ${freshRows.length} fresh events`);
 
     return new Response(
-      JSON.stringify({ success: true, fetched: allRows.length }),
+      JSON.stringify({ success: true, fetched: freshRows.length, stale: staleRows.length }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {

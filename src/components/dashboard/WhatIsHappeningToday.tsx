@@ -24,6 +24,8 @@ interface FeedCard {
   badgeClass?: string;
   link?: string;
   pulsing?: boolean;
+  debugInfo?: string;
+  sourceMeta?: string;
 }
 
 // ─── Hooks ───────────────────────────────────────────────
@@ -33,37 +35,40 @@ function useSportsEvents() {
     queryFn: async () => {
       const now = new Date().toISOString();
 
-      // 1) Live matches
+      // 1) Live matches (never stale)
       const { data: live } = await supabase
         .from('sports_events')
         .select('*')
         .eq('match_status', 'live')
         .order('start_time', { ascending: true });
       
-      // 2) Today matches (next 24h)
+      // 2) Today matches (next 24h, non-stale)
       const next24h = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
       const { data: today } = await supabase
         .from('sports_events')
         .select('*')
         .eq('match_status', 'upcoming')
+        .eq('is_stale', false)
         .gte('start_time', now)
         .lte('start_time', next24h)
         .order('start_time', { ascending: true });
 
-      // 3) Next 3 upcoming (any future)
+      // 3) Next upcoming (non-stale)
       const { data: upcoming } = await supabase
         .from('sports_events')
         .select('*')
         .eq('match_status', 'upcoming')
+        .eq('is_stale', false)
         .gte('start_time', now)
         .order('start_time', { ascending: true })
         .limit(6);
 
-      // 4) Last 3 results
+      // 4) Last results (non-stale, within 7 days)
       const { data: last } = await supabase
         .from('sports_events')
         .select('*')
         .eq('match_status', 'finished')
+        .eq('is_stale', false)
         .order('start_time', { ascending: false })
         .limit(3);
 
@@ -177,6 +182,7 @@ export function WhatIsHappeningToday() {
   const { data: sourcesHealth } = useSportsSourcesHealth();
   const hour = getZadarHour();
   const apiDown = fetchStatus && fetchStatus.ok === false;
+  const isDebug = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('debug');
 
   const cards: FeedCard[] = useMemo(() => {
     const feed: FeedCard[] = [];
@@ -190,6 +196,7 @@ export function WhatIsHappeningToday() {
       // LIVE
       for (const ev of live) {
         const emoji = sportEmoji(ev.team_tag);
+        const fetchedTime = ev.fetched_at ? new Date(ev.fetched_at).toLocaleTimeString('hr-HR', { hour: '2-digit', minute: '2-digit' }) : '';
         feed.push({
           id: ev.id,
           priority: 120,
@@ -203,6 +210,8 @@ export function WhatIsHappeningToday() {
           badgeClass: 'bg-destructive text-white animate-pulse',
           pulsing: true,
           link: ev.link_url || ev.source_url || undefined,
+          sourceMeta: fetchedTime ? `${ev.source === 'api' ? 'TheSportsDB' : ev.source} · ${fetchedTime}` : undefined,
+          debugInfo: `id:${ev.id} api:${ev.api_match_id} tag:${ev.team_tag} status:${ev.match_status} stale:${ev.is_stale} conf:${ev.confidence}`,
         });
       }
 
@@ -212,9 +221,9 @@ export function WhatIsHappeningToday() {
         const emoji = sportEmoji(ev.team_tag);
         const isF1 = ev.team_tag === 'f1';
         const label = isF1 ? t('happening.nextRace') : t('happening.todayPlays');
-        // Priority: F1 in next 72h = high, match today = high
         const hoursUntil = (new Date(ev.start_time).getTime() - now) / 3600000;
         const priority = hoursUntil < 3 ? 100 : 90;
+        const fetchedTime = ev.fetched_at ? new Date(ev.fetched_at).toLocaleTimeString('hr-HR', { hour: '2-digit', minute: '2-digit' }) : '';
         
         feed.push({
           id: ev.id,
@@ -228,6 +237,8 @@ export function WhatIsHappeningToday() {
           badge: t('happening.soonBadge'),
           badgeClass: 'bg-[hsl(var(--status-warning))] text-white',
           link: ev.link_url || ev.source_url || undefined,
+          sourceMeta: fetchedTime ? `${ev.source === 'api' ? 'TheSportsDB' : ev.source} · ${fetchedTime}` : undefined,
+          debugInfo: `id:${ev.id} api:${ev.api_match_id} tag:${ev.team_tag} start:${ev.start_time} stale:${ev.is_stale}`,
         });
       }
 
@@ -254,6 +265,7 @@ export function WhatIsHappeningToday() {
           title: `${emoji} ${label}: ${isF1 ? ev.away_team : `${ev.home_team} – ${ev.away_team}`}`,
           subtitle: `${dayStr} ${timeStr} · ${ev.league || ''}`,
           link: ev.link_url || ev.source_url || undefined,
+          debugInfo: `id:${ev.id} api:${ev.api_match_id} tag:${ev.team_tag} start:${ev.start_time}`,
         });
       }
 
@@ -264,6 +276,7 @@ export function WhatIsHappeningToday() {
         const emoji = sportEmoji(ev.team_tag);
         const isF1 = ev.team_tag === 'f1';
         const label = isF1 ? t('happening.lastRace') : t('happening.lastResult');
+        const fetchedTime = ev.fetched_at ? new Date(ev.fetched_at).toLocaleTimeString('hr-HR', { hour: '2-digit', minute: '2-digit' }) : '';
 
         feed.push({
           id: ev.id,
@@ -279,6 +292,8 @@ export function WhatIsHappeningToday() {
           badge: t('happening.finishedBadge'),
           badgeClass: 'bg-[hsl(var(--status-open))] text-white',
           link: ev.link_url || ev.source_url || undefined,
+          sourceMeta: fetchedTime ? `${ev.source === 'api' ? 'TheSportsDB' : ev.source} · ${fetchedTime}` : undefined,
+          debugInfo: `id:${ev.id} api:${ev.api_match_id} tag:${ev.team_tag} date:${ev.start_time} stale:${ev.is_stale} conf:${ev.confidence}`,
         });
       }
 
@@ -292,8 +307,9 @@ export function WhatIsHappeningToday() {
             icon: WifiOff,
             iconColor: 'text-muted-foreground',
             accentClass: 'border-[hsl(var(--status-warning))]/20 bg-[hsl(var(--status-warning))]/5',
-            title: `⚽ ${t('happening.autoUpdateDown')}`,
-            subtitle: t('happening.apiUnavailable'),
+            title: `⚽ ${t('sports.noFreshData')}`,
+            subtitle: t('sports.openExternal'),
+            link: 'https://www.sofascore.com/',
           });
         } else {
           feed.push({
@@ -303,8 +319,9 @@ export function WhatIsHappeningToday() {
             icon: Trophy,
             iconColor: 'text-muted-foreground',
             accentClass: 'border-border',
-            title: t('happening.noUpcoming'),
-            subtitle: '',
+            title: t('sports.noFreshData'),
+            subtitle: t('sports.openExternal'),
+            link: 'https://www.sofascore.com/',
           });
         }
       }
@@ -467,6 +484,12 @@ export function WhatIsHappeningToday() {
                     <p className="text-[11px] text-muted-foreground leading-relaxed">
                       {typeof card.subtitle === 'string' ? highlightText(card.subtitle) : card.subtitle}
                     </p>
+                    {card.sourceMeta && (
+                      <p className="text-[9px] text-muted-foreground/60 mt-0.5">{card.sourceMeta}</p>
+                    )}
+                    {isDebug && card.debugInfo && (
+                      <p className="text-[8px] text-muted-foreground/40 mt-0.5 font-mono break-all">{card.debugInfo}</p>
+                    )}
                   </div>
                 </div>
               </motion.div>
