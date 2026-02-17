@@ -253,6 +253,33 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_poll: {
+        Row: {
+          context_key: string
+          context_type: string
+          created_at: string
+          expires_at: string
+          id: string
+          question_text: string
+        }
+        Insert: {
+          context_key?: string
+          context_type?: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          question_text: string
+        }
+        Update: {
+          context_key?: string
+          context_type?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          question_text?: string
+        }
+        Relationships: []
+      }
       duty_services: {
         Row: {
           address: string | null
@@ -605,6 +632,74 @@ export type Database = {
           website?: string | null
         }
         Relationships: []
+      }
+      poll_options: {
+        Row: {
+          id: string
+          option_text: string
+          poll_id: string
+          votes_count: number
+        }
+        Insert: {
+          id?: string
+          option_text: string
+          poll_id: string
+          votes_count?: number
+        }
+        Update: {
+          id?: string
+          option_text?: string
+          poll_id?: string
+          votes_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "poll_options_poll_id_fkey"
+            columns: ["poll_id"]
+            isOneToOne: false
+            referencedRelation: "daily_poll"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      poll_votes: {
+        Row: {
+          created_at: string
+          fingerprint_hash: string
+          id: string
+          option_id: string
+          poll_id: string
+        }
+        Insert: {
+          created_at?: string
+          fingerprint_hash: string
+          id?: string
+          option_id: string
+          poll_id: string
+        }
+        Update: {
+          created_at?: string
+          fingerprint_hash?: string
+          id?: string
+          option_id?: string
+          poll_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "poll_votes_option_id_fkey"
+            columns: ["option_id"]
+            isOneToOne: false
+            referencedRelation: "poll_options"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "poll_votes_poll_id_fkey"
+            columns: ["poll_id"]
+            isOneToOne: false
+            referencedRelation: "daily_poll"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       power_outages: {
         Row: {
@@ -972,6 +1067,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_poll_vote: { Args: { p_option_id: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
