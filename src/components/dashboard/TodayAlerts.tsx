@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { AlertTriangle, Pill, Construction, PartyPopper, Wind, Zap, Droplets, Car, Trophy, Megaphone, ExternalLink } from 'lucide-react';
+import { AlertTriangle, Pill, Construction, PartyPopper, Wind, Zap, Droplets, Car, Trophy, Megaphone, ExternalLink, Activity } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -80,11 +80,42 @@ function useTodayWaterOutages() {
   });
 }
 
+function useEarthquakes() {
+  return useQuery({
+    queryKey: ['earthquakes-nearby'],
+    queryFn: async () => {
+      // EMSC FDSN API — earthquakes within ~300km of Zadar (44.12, 15.23)
+      // maxradius in degrees: 300km ≈ 2.7°
+      const now = new Date();
+      const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      const url = `https://www.seismicportal.eu/fdsnws/event/1/query?format=json&lat=44.12&lon=15.23&maxradius=2.7&minmag=2.0&limit=5&orderby=time&start=${yesterday.toISOString()}`;
+      const res = await fetch(url);
+      if (!res.ok) return [];
+      const data = await res.json();
+      return (data?.features || []) as Array<{
+        id: string;
+        properties: {
+          time: string;
+          mag: number;
+          flynn_region: string;
+          lat: number;
+          lon: number;
+          depth: number;
+          unid: string;
+        };
+      }>;
+    },
+    staleTime: 5 * 60 * 1000,
+    refetchInterval: 5 * 60 * 1000,
+  });
+}
+
 export function TodayAlerts() {
   const { t, language } = useLanguage();
   const { data: cityAlerts } = useCityAlerts();
   const { data: outages } = useTodayOutages();
   const { data: waterOutages } = useTodayWaterOutages();
+  const { data: earthquakes } = useEarthquakes();
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
@@ -150,6 +181,31 @@ export function TodayAlerts() {
       link: 'https://www.vodovod-zadar.hr/obavijesti',
       priority: 85,
     });
+  }
+
+  // Earthquakes from EMSC
+  if (earthquakes && earthquakes.length > 0) {
+    for (const eq of earthquakes) {
+      const mag = eq.properties.mag;
+      const region = eq.properties.flynn_region;
+      const depth = eq.properties.depth;
+      const timeStr = eq.properties.time;
+      const emscUrl = `https://www.seismicportal.eu/eventdetails.html?unid=${eq.properties.unid}`;
+      
+      // Priority based on magnitude
+      const eqPriority = mag >= 5 ? 100 : mag >= 4 ? 95 : mag >= 3 ? 80 : 60;
+      
+      alerts.push({
+        id: `eq-${eq.id}`,
+        icon: Activity,
+        iconColor: mag >= 4 ? 'text-destructive' : 'text-[hsl(var(--status-warning))]',
+        title: `${language === 'hr' ? 'Potres' : 'Earthquake'} M${mag.toFixed(1)}`,
+        desc: `${region}${depth ? ` — ${language === 'hr' ? 'dubina' : 'depth'} ${Math.round(depth)} km` : ''}`,
+        link: emscUrl,
+        updatedAt: timeStr,
+        priority: eqPriority,
+      });
+    }
   }
 
   // Sort by priority desc
