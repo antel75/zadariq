@@ -255,6 +255,7 @@ export type Database = {
       }
       daily_poll: {
         Row: {
+          context_hash: string | null
           context_key: string
           context_type: string
           created_at: string
@@ -263,6 +264,7 @@ export type Database = {
           question_text: string
         }
         Insert: {
+          context_hash?: string | null
           context_key?: string
           context_type?: string
           created_at?: string
@@ -271,6 +273,7 @@ export type Database = {
           question_text: string
         }
         Update: {
+          context_hash?: string | null
           context_key?: string
           context_type?: string
           created_at?: string
@@ -630,6 +633,45 @@ export type Database = {
           reviewed_by?: string | null
           status?: string
           website?: string | null
+        }
+        Relationships: []
+      }
+      poll_history: {
+        Row: {
+          context_hash: string | null
+          context_key: string
+          context_type: string
+          created_at: string
+          expire_reason: string
+          expired_at: string
+          id: string
+          original_poll_id: string
+          question_text: string
+          total_votes: number
+        }
+        Insert: {
+          context_hash?: string | null
+          context_key?: string
+          context_type?: string
+          created_at?: string
+          expire_reason?: string
+          expired_at?: string
+          id?: string
+          original_poll_id: string
+          question_text: string
+          total_votes?: number
+        }
+        Update: {
+          context_hash?: string | null
+          context_key?: string
+          context_type?: string
+          created_at?: string
+          expire_reason?: string
+          expired_at?: string
+          id?: string
+          original_poll_id?: string
+          question_text?: string
+          total_votes?: number
         }
         Relationships: []
       }
