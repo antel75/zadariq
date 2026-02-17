@@ -322,8 +322,8 @@ export function getTodayHours(business: Business): string {
   return business.workingHours[dayKeys[dayIndex]];
 }
 
-export function searchBusinesses(query: string, categoryFilter?: CategoryId): Business[] {
-  let results = businesses;
+export function searchBusinesses(query: string, categoryFilter?: CategoryId, extraBusinesses?: Business[]): Business[] {
+  let results = [...businesses, ...(extraBusinesses || [])];
 
   if (categoryFilter) {
     // 'doctor' shows both dentist and medicine subcategories
