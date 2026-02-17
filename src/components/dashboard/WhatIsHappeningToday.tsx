@@ -6,7 +6,7 @@ import { getZadarHour } from '@/hooks/useSituationalMode';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Trophy, AlertTriangle, Car, Construction, Ship, Megaphone,
-  Coffee, ExternalLink, Zap, Droplets, Wind, WifiOff
+  Coffee, ExternalLink, Zap, Droplets, Wind, WifiOff, Flag
 } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 
@@ -17,7 +17,7 @@ interface FeedCard {
   type: 'live_sport' | 'upcoming_sport' | 'finished_sport' | 'weather_warning' | 'traffic' | 'city_event' | 'fallback';
   icon: LucideIcon;
   iconColor: string;
-  accentClass: string; // border/bg accent
+  accentClass: string;
   title: string;
   subtitle: string;
   badge?: string;
@@ -29,7 +29,7 @@ interface FeedCard {
 // ─── Hooks ───────────────────────────────────────────────
 function useSportsEvents() {
   return useQuery({
-    queryKey: ['sports-events-fallback'],
+    queryKey: ['sports-events-feed'],
     queryFn: async () => {
       const now = new Date().toISOString();
 
@@ -39,8 +39,7 @@ function useSportsEvents() {
         .select('*')
         .eq('match_status', 'live')
         .order('start_time', { ascending: true });
-      if (live && live.length > 0) return { events: live, tier: 'live' as const };
-
+      
       // 2) Today matches (next 24h)
       const next24h = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
       const { data: today } = await supabase
@@ -50,28 +49,30 @@ function useSportsEvents() {
         .gte('start_time', now)
         .lte('start_time', next24h)
         .order('start_time', { ascending: true });
-      if (today && today.length > 0) return { events: today, tier: 'today' as const };
 
-      // 3) Next match (any future)
-      const { data: next } = await supabase
+      // 3) Next 3 upcoming (any future)
+      const { data: upcoming } = await supabase
         .from('sports_events')
         .select('*')
         .eq('match_status', 'upcoming')
         .gte('start_time', now)
         .order('start_time', { ascending: true })
-        .limit(1);
-      if (next && next.length > 0) return { events: next, tier: 'next' as const };
+        .limit(3);
 
-      // 4) Last result
+      // 4) Last 3 results
       const { data: last } = await supabase
         .from('sports_events')
         .select('*')
         .eq('match_status', 'finished')
         .order('start_time', { ascending: false })
-        .limit(1);
-      if (last && last.length > 0) return { events: last, tier: 'last' as const };
+        .limit(3);
 
-      return { events: [], tier: 'none' as const };
+      return {
+        live: live || [],
+        today: today || [],
+        upcoming: upcoming || [],
+        last: last || [],
+      };
     },
     staleTime: 30 * 1000,
     refetchInterval: 60 * 1000,
@@ -129,6 +130,19 @@ function useSportsFetchStatus() {
   });
 }
 
+function useSportsSourcesHealth() {
+  return useQuery({
+    queryKey: ['sports-sources-health'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('sports_sources_health')
+        .select('*');
+      return data || [];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
 // ─── Highlight keywords ──────────────────────────────────
 const HIGHLIGHT_WORDS = ['zatvoreno', 'bura', 'zabrana', 'radovi', 'posebna regulacija', 'closed', 'gesperrt', 'chiuso'];
 
@@ -145,8 +159,11 @@ function highlightText(text: string): React.ReactNode {
 // ─── Sport emoji by tag ──────────────────────────────────
 function sportEmoji(tag?: string | null): string {
   if (!tag) return '⚽';
+  if (tag === 'f1') return '🏎️';
   if (tag.includes('basketball') || tag === 'kk_zadar') return '🏀';
   if (tag.includes('handball')) return '🤾';
+  if (tag === 'ucl') return '⚽🏆';
+  if (tag === 'croatia_nt') return '🇭🇷⚽';
   return '⚽';
 }
 
@@ -157,103 +174,144 @@ export function WhatIsHappeningToday() {
   const { data: cityAlerts } = useCityAlertsForFeed();
   const { data: outages } = useTodayOutagesForFeed();
   const { data: fetchStatus } = useSportsFetchStatus();
+  const { data: sourcesHealth } = useSportsSourcesHealth();
   const hour = getZadarHour();
   const apiDown = fetchStatus && fetchStatus.ok === false;
 
   const cards: FeedCard[] = useMemo(() => {
     const feed: FeedCard[] = [];
+    const now = Date.now();
 
-    // ── Sports (always show at least one card) ────────────────
-    if (sportsData && sportsData.events.length > 0) {
-      const tier = sportsData.tier;
-      for (const ev of sportsData.events) {
+    // ── Sports: always show something ────────────────
+    if (sportsData) {
+      const { live, today, upcoming, last } = sportsData;
+      const hasAnySport = live.length > 0 || today.length > 0 || upcoming.length > 0 || last.length > 0;
+
+      // LIVE
+      for (const ev of live) {
         const emoji = sportEmoji(ev.team_tag);
+        feed.push({
+          id: ev.id,
+          priority: 120,
+          type: 'live_sport',
+          icon: Trophy,
+          iconColor: 'text-destructive',
+          accentClass: 'border-destructive/40 bg-destructive/5',
+          title: `${emoji} ${t('happening.liveMatch')}: ${ev.home_team} – ${ev.away_team}`,
+          subtitle: `${ev.home_score ?? 0}:${ev.away_score ?? 0}${ev.match_minute ? ` (${ev.match_minute})` : ''}`,
+          badge: t('happening.liveBadge'),
+          badgeClass: 'bg-destructive text-white animate-pulse',
+          pulsing: true,
+          link: ev.link_url || ev.source_url || undefined,
+        });
+      }
 
-        if (tier === 'live') {
+      // TODAY (within 24h)
+      for (const ev of today) {
+        if (live.some((l: any) => l.id === ev.id)) continue;
+        const emoji = sportEmoji(ev.team_tag);
+        const isF1 = ev.team_tag === 'f1';
+        const label = isF1 ? t('happening.nextRace') : t('happening.todayPlays');
+        // Priority: F1 in next 72h = high, match today = high
+        const hoursUntil = (new Date(ev.start_time).getTime() - now) / 3600000;
+        const priority = hoursUntil < 3 ? 100 : 90;
+        
+        feed.push({
+          id: ev.id,
+          priority,
+          type: 'upcoming_sport',
+          icon: isF1 ? Flag : Trophy,
+          iconColor: 'text-[hsl(var(--status-warning))]',
+          accentClass: 'border-[hsl(var(--status-warning))]/30 bg-[hsl(var(--status-warning))]/5',
+          title: `${emoji} ${label}: ${isF1 ? ev.away_team : `${ev.home_team} – ${ev.away_team}`}`,
+          subtitle: `${new Date(ev.start_time).toLocaleTimeString('hr-HR', { hour: '2-digit', minute: '2-digit' })} · ${ev.league || ''}${ev.venue ? ` · ${ev.venue}` : ''}`,
+          badge: t('happening.soonBadge'),
+          badgeClass: 'bg-[hsl(var(--status-warning))] text-white',
+          link: ev.link_url || ev.source_url || undefined,
+        });
+      }
+
+      // UPCOMING (not today but next ones)
+      for (const ev of upcoming) {
+        if (today.some((td: any) => td.id === ev.id)) continue;
+        if (feed.some(f => f.id === ev.id)) continue;
+        const emoji = sportEmoji(ev.team_tag);
+        const isF1 = ev.team_tag === 'f1';
+        const date = new Date(ev.start_time);
+        const dayStr = date.toLocaleDateString('hr-HR', { weekday: 'short', day: 'numeric', month: 'short' });
+        const timeStr = date.toLocaleTimeString('hr-HR', { hour: '2-digit', minute: '2-digit' });
+        const label = isF1 ? t('happening.nextRace') : t('happening.nextMatch');
+        const hoursUntil = (date.getTime() - now) / 3600000;
+        const priority = isF1 && hoursUntil < 72 ? 85 : 40;
+
+        feed.push({
+          id: ev.id,
+          priority,
+          type: 'upcoming_sport',
+          icon: isF1 ? Flag : Trophy,
+          iconColor: 'text-muted-foreground',
+          accentClass: 'border-border',
+          title: `${emoji} ${label}: ${isF1 ? ev.away_team : `${ev.home_team} – ${ev.away_team}`}`,
+          subtitle: `${dayStr} ${timeStr} · ${ev.league || ''}`,
+          link: ev.link_url || ev.source_url || undefined,
+        });
+      }
+
+      // LAST RESULTS (show at least 1)
+      const shownSportIds = new Set(feed.map(f => f.id));
+      for (const ev of last) {
+        if (shownSportIds.has(ev.id)) continue;
+        const emoji = sportEmoji(ev.team_tag);
+        const isF1 = ev.team_tag === 'f1';
+        const label = isF1 ? t('happening.lastRace') : t('happening.lastResult');
+
+        feed.push({
+          id: ev.id,
+          priority: 30,
+          type: 'finished_sport',
+          icon: isF1 ? Flag : Trophy,
+          iconColor: 'text-[hsl(var(--status-open))]',
+          accentClass: 'border-[hsl(var(--status-open))]/30 bg-[hsl(var(--status-open))]/5',
+          title: `${emoji} ${label}: ${isF1 ? ev.away_team : `${ev.home_team} ${ev.home_score ?? 0}:${ev.away_score ?? 0} ${ev.away_team}`}`,
+          subtitle: isF1 && ev.match_minute
+            ? ev.match_minute
+            : new Date(ev.start_time).toLocaleDateString('hr-HR', { weekday: 'short', day: 'numeric', month: 'short' }),
+          badge: t('happening.finishedBadge'),
+          badgeClass: 'bg-[hsl(var(--status-open))] text-white',
+          link: ev.link_url || ev.source_url || undefined,
+        });
+      }
+
+      // If absolutely no sports data
+      if (!hasAnySport) {
+        if (apiDown) {
           feed.push({
-            id: ev.id,
-            priority: 100,
-            type: 'live_sport',
-            icon: Trophy,
-            iconColor: 'text-destructive',
-            accentClass: 'border-destructive/40 bg-destructive/5',
-            title: `${emoji} ${t('happening.liveMatch')}: ${ev.home_team} – ${ev.away_team}`,
-            subtitle: `${ev.home_score ?? 0}:${ev.away_score ?? 0}${ev.match_minute ? ` (${ev.match_minute}')` : ''}`,
-            badge: t('happening.liveBadge'),
-            badgeClass: 'bg-destructive text-white animate-pulse',
-            pulsing: true,
+            id: 'api-down',
+            priority: 15,
+            type: 'fallback',
+            icon: WifiOff,
+            iconColor: 'text-muted-foreground',
+            accentClass: 'border-[hsl(var(--status-warning))]/20 bg-[hsl(var(--status-warning))]/5',
+            title: `⚽ ${t('happening.autoUpdateDown')}`,
+            subtitle: t('happening.apiUnavailable'),
           });
-        } else if (tier === 'today') {
+        } else {
           feed.push({
-            id: ev.id,
-            priority: 90,
-            type: 'upcoming_sport',
-            icon: Trophy,
-            iconColor: 'text-[hsl(var(--status-warning))]',
-            accentClass: 'border-[hsl(var(--status-warning))]/30 bg-[hsl(var(--status-warning))]/5',
-            title: `${emoji} ${t('happening.todayPlays')}: ${ev.home_team} – ${ev.away_team}`,
-            subtitle: `${new Date(ev.start_time).toLocaleTimeString('hr-HR', { hour: '2-digit', minute: '2-digit' })} · ${ev.league || ''}`,
-            badge: t('happening.soonBadge'),
-            badgeClass: 'bg-[hsl(var(--status-warning))] text-white',
-          });
-        } else if (tier === 'next') {
-          const date = new Date(ev.start_time);
-          const dayStr = date.toLocaleDateString('hr-HR', { weekday: 'short', day: 'numeric', month: 'short' });
-          const timeStr = date.toLocaleTimeString('hr-HR', { hour: '2-digit', minute: '2-digit' });
-          feed.push({
-            id: ev.id,
-            priority: 40,
-            type: 'upcoming_sport',
+            id: 'no-sports',
+            priority: 10,
+            type: 'fallback',
             icon: Trophy,
             iconColor: 'text-muted-foreground',
             accentClass: 'border-border',
-            title: `${emoji} ${t('happening.nextMatch')}: ${ev.home_team} – ${ev.away_team}`,
-            subtitle: `${dayStr} ${timeStr} · ${ev.league || ''}`,
-          });
-        } else if (tier === 'last') {
-          feed.push({
-            id: ev.id,
-            priority: 30,
-            type: 'finished_sport',
-            icon: Trophy,
-            iconColor: 'text-[hsl(var(--status-open))]',
-            accentClass: 'border-[hsl(var(--status-open))]/30 bg-[hsl(var(--status-open))]/5',
-            title: `${emoji} ${t('happening.lastResult')}: ${ev.home_team} ${ev.home_score ?? 0}:${ev.away_score ?? 0} ${ev.away_team}`,
-            subtitle: new Date(ev.start_time).toLocaleDateString('hr-HR', { weekday: 'short', day: 'numeric', month: 'short' }),
-            badge: t('happening.finishedBadge'),
-            badgeClass: 'bg-[hsl(var(--status-open))] text-white',
+            title: t('happening.noUpcoming'),
+            subtitle: '',
           });
         }
       }
-    } else if (sportsData && sportsData.tier === 'none') {
-      // API down with no data
-      if (apiDown) {
-        feed.push({
-          id: 'api-down',
-          priority: 15,
-          type: 'fallback',
-          icon: WifiOff,
-          iconColor: 'text-muted-foreground',
-          accentClass: 'border-[hsl(var(--status-warning))]/20 bg-[hsl(var(--status-warning))]/5',
-          title: `⚽ ${t('happening.autoUpdateDown')}`,
-          subtitle: t('happening.apiUnavailable'),
-        });
-      } else {
-        feed.push({
-          id: 'no-sports',
-          priority: 10,
-          type: 'fallback',
-          icon: Trophy,
-          iconColor: 'text-muted-foreground',
-          accentClass: 'border-border',
-          title: t('happening.noUpcoming'),
-          subtitle: '',
-        });
-      }
     }
 
-    // Show API status warning banner if down but we have some data
-    if (apiDown && sportsData && sportsData.tier !== 'none') {
+    // API warning banner
+    if (apiDown && sportsData && (sportsData.live.length > 0 || sportsData.today.length > 0 || sportsData.upcoming.length > 0 || sportsData.last.length > 0)) {
       feed.push({
         id: 'api-status-warning',
         priority: 5,
@@ -266,7 +324,7 @@ export function WhatIsHappeningToday() {
       });
     }
 
-    // ── City alerts (traffic, events, etc.) ────────
+    // ── City alerts ────────
     if (cityAlerts) {
       for (const alert of cityAlerts) {
         const typeMap: Record<string, { icon: LucideIcon; color: string }> = {
@@ -349,16 +407,30 @@ export function WhatIsHappeningToday() {
       });
     }
 
-    // Sort by priority descending
     feed.sort((a, b) => b.priority - a.priority);
     return feed;
-  }, [sportsData, cityAlerts, outages, hour, t]);
+  }, [sportsData, cityAlerts, outages, hour, t, apiDown]);
+
+  // Get last update time from sources health
+  const lastUpdate = useMemo(() => {
+    if (!sourcesHealth || sourcesHealth.length === 0) return null;
+    const latest = sourcesHealth
+      .filter((s: any) => s.last_success_at)
+      .sort((a: any, b: any) => new Date(b.last_success_at).getTime() - new Date(a.last_success_at).getTime());
+    if (latest.length === 0) return null;
+    return new Date(latest[0].last_success_at).toLocaleTimeString('hr-HR', { hour: '2-digit', minute: '2-digit' });
+  }, [sourcesHealth]);
 
   return (
     <section>
       <div className="flex items-center gap-2 mb-3">
         <AlertTriangle className="h-4 w-4 text-accent" />
         <h2 className="text-sm font-semibold text-foreground">{t('happening.sectionTitle')}</h2>
+        {lastUpdate && (
+          <span className="text-[10px] text-muted-foreground ml-auto">
+            {t('happening.updated')}: {lastUpdate}
+          </span>
+        )}
       </div>
 
       <div className="flex flex-col gap-2.5">

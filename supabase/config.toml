@@ -14,3 +14,12 @@ verify_jwt = false
 
 [functions.fetch-sports]
 verify_jwt = false
+
+[functions.fetch-sports-football]
+verify_jwt = false
+
+[functions.fetch-sports-f1]
+verify_jwt = false
+
+[functions.seed-sports]
+verify_jwt = false

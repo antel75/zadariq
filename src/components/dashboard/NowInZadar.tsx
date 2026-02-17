@@ -355,7 +355,8 @@ export function NowInZadar({ mode = 'day', appMode = 'normal' }: NowInZadarProps
   if (sportsEvents && sportsEvents.events.length > 0) {
     const tier = sportsEvents.tier;
     for (const ev of sportsEvents.events) {
-      const emoji = ev.team_tag?.includes('basketball') || ev.team_tag === 'kk_zadar' ? '🏀' : '⚽';
+      const emoji = ev.team_tag === 'f1' ? '🏎️' : ev.team_tag?.includes('basketball') || ev.team_tag === 'kk_zadar' ? '🏀' : ev.team_tag === 'ucl' ? '⚽🏆' : ev.team_tag === 'croatia_nt' ? '🇭🇷⚽' : '⚽';
+      const isF1 = ev.team_tag === 'f1';
 
       if (tier === 'live') {
         candidates.push({
