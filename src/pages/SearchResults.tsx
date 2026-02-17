@@ -8,6 +8,7 @@ import { searchBusinesses, isBusinessOpen, categories } from '@/data/mockData';
 import { Business, CategoryId } from '@/data/types';
 import { ArrowLeft, Filter, X } from 'lucide-react';
 import { Footer } from '@/components/Footer';
+import { useApprovedPlaces } from '@/hooks/useApprovedPlaces';
 
 export default function SearchResults() {
   const { t } = useLanguage();
@@ -18,12 +19,13 @@ export default function SearchResults() {
   const [openOnly, setOpenOnly] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<CategoryId | null>(null);
   const [reportTarget, setReportTarget] = useState<Business | null>(null);
+  const { data: approvedPlaces } = useApprovedPlaces();
 
   const results = useMemo(() => {
-    let r = searchBusinesses(query, selectedCategory ?? undefined);
+    let r = searchBusinesses(query, selectedCategory ?? undefined, approvedPlaces);
     if (openOnly) r = r.filter(isBusinessOpen);
     return r;
-  }, [query, openOnly, selectedCategory]);
+  }, [query, openOnly, selectedCategory, approvedPlaces]);
 
   const openCount = useMemo(() => results.filter(isBusinessOpen).length, [results]);
 

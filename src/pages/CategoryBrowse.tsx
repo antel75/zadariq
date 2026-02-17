@@ -7,6 +7,7 @@ import { ReportModal } from '@/components/ReportModal';
 import { Business, CategoryId } from '@/data/types';
 import { ArrowLeft, Filter, Plus } from 'lucide-react';
 import { Footer } from '@/components/Footer';
+import { useApprovedPlaces } from '@/hooks/useApprovedPlaces';
 
 // Extract the meaningful sort key from a business name
 function getSortKey(name: string): string {
@@ -44,11 +45,13 @@ export default function CategoryBrowse() {
   const [searchParams] = useSearchParams();
   const [openOnly, setOpenOnly] = useState(searchParams.get('open') === '1');
   const [reportTarget, setReportTarget] = useState<Business | null>(null);
+  const { data: approvedPlaces } = useApprovedPlaces();
 
   const category = categories.find(c => c.id === categoryId);
 
   const results = useMemo(() => {
-    let r = businesses.filter(b => {
+    const allBusinesses = [...businesses, ...(approvedPlaces || [])];
+    let r = allBusinesses.filter(b => {
       if (categoryId === 'doctor') {
         return b.category === 'doctor' || b.category === 'dentist' || b.category === 'medicine';
       }
@@ -58,7 +61,7 @@ export default function CategoryBrowse() {
     // Sort alphabetically by meaningful sort key
     r.sort((a, b) => getSortKey(a.name).localeCompare(getSortKey(b.name), 'hr'));
     return r;
-  }, [categoryId, openOnly]);
+  }, [categoryId, openOnly, approvedPlaces]);
 
   return (
     <div className="min-h-screen bg-background">
