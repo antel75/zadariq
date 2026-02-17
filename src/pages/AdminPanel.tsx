@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Shield, Plus, Pencil, LogOut, ArrowLeft, Trash2, Save } from 'lucide-react';
 import { PendingChangesTab } from '@/components/admin/PendingChangesTab';
-import { PendingPlacesTab } from '@/components/admin/PendingPlacesTab';
+import { ApprovedPlacesTab } from '@/components/admin/ApprovedPlacesTab';
 import { CityAlertsTab } from '@/components/admin/CityAlertsTab';
 import { SportsEventsTab } from '@/components/admin/SportsEventsTab';
 
@@ -417,7 +417,7 @@ const AdminPanel = () => {
             <CityAlertsTab />
           </TabsContent>
           <TabsContent value="cafes">
-            <PendingPlacesTab />
+            <ApprovedPlacesTab />
           </TabsContent>
           <TabsContent value="corrections">
             <PendingChangesTab />
