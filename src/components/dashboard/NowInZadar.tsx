@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { type AppMode } from '@/hooks/useAppMode';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Pill, Stethoscope, Ship, Car, CloudRain, Zap, Droplets, AlertTriangle, Sunset, Sunrise, Phone, MapPin, Fuel, ShieldAlert, Coffee, UtensilsCrossed, Film, ShoppingBag, Landmark, Trophy } from 'lucide-react';
+import { Pill, Stethoscope, Ship, Car, CloudRain, Zap, Droplets, AlertTriangle, Sunset, Sunrise, Phone, MapPin, Fuel, ShieldAlert, Coffee, UtensilsCrossed, Film, ShoppingBag, Landmark, Trophy, WifiOff } from 'lucide-react';
 import { useSmartFerry, formatTime, getTimeRemaining } from '@/hooks/useTransportSchedules';
 import { getParkingStatus } from '@/data/parkingData';
 import { useWeather, getWindType } from '@/hooks/useWeather';
@@ -149,6 +149,21 @@ function useSportsForNow() {
   });
 }
 
+function useSportsFetchStatus() {
+  return useQuery({
+    queryKey: ['sports-fetch-status'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('sports_fetch_status')
+        .select('*')
+        .eq('id', 'fetch-sports')
+        .maybeSingle();
+      return data;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
 function useMeteoAlerts() {
   return useQuery({
     queryKey: ['meteoalarm-zadar'],
@@ -271,7 +286,9 @@ export function NowInZadar({ mode = 'day', appMode = 'normal' }: NowInZadarProps
   const { powerOutages, waterOutages } = useTodayOutages();
   const { data: meteoAlerts } = useMeteoAlerts();
   const { data: sportsEvents } = useSportsForNow();
+  const { data: fetchStatus } = useSportsFetchStatus();
   const parkingStatus = getParkingStatus();
+  const apiDown = fetchStatus && fetchStatus.ok === false;
 
   // Derived contacts from DB
   const taxiContact = cityContacts?.find(c => c.type === 'taxi');
@@ -386,9 +403,19 @@ export function NowInZadar({ mode = 'day', appMode = 'normal' }: NowInZadarProps
         });
       }
     }
+  } else if (apiDown) {
+    // API is down, no sport data at all
+    candidates.push({
+      icon: WifiOff,
+      iconColor: 'text-muted-foreground',
+      label: `⚽ ${t('happening.autoUpdateDown')}`,
+      answer: t('happening.apiUnavailable'),
+      action: () => {},
+      priority: 15,
+      isActionable: false,
+    });
   }
 
-  // ── Health / Safety ──
 
   if (emergencyContact) {
     candidates.push({

@@ -516,6 +516,9 @@ const translations: Translations = {
   'happening.nextMatch': { hr: 'Sljedeća utakmica', en: 'Next match', de: 'Nächstes Spiel', it: 'Prossima partita' },
   'happening.lastResult': { hr: 'Zadnji rezultat', en: 'Last result', de: 'Letztes Ergebnis', it: 'Ultimo risultato' },
   'happening.noSportsData': { hr: 'Nema dostupnih sportskih podataka', en: 'No sports data available', de: 'Keine Sportdaten verfügbar', it: 'Nessun dato sportivo disponibile' },
+  'happening.apiUnavailable': { hr: 'Privremeni problem s izvorom rezultata. Prikazujemo zadnje poznate informacije.', en: 'Temporary issue with results source. Showing last known data.', de: 'Vorübergehendes Problem mit der Ergebnisquelle. Letzte bekannte Daten werden angezeigt.', it: 'Problema temporaneo con la fonte dei risultati. Mostriamo gli ultimi dati noti.' },
+  'happening.noUpcoming': { hr: 'Trenutno nema utakmica u sljedećih 30 dana za praćene timove.', en: 'No matches in the next 30 days for tracked teams.', de: 'Keine Spiele in den nächsten 30 Tagen für verfolgte Teams.', it: 'Nessuna partita nei prossimi 30 giorni per le squadre seguite.' },
+  'happening.autoUpdateDown': { hr: 'Automatsko ažuriranje privremeno nedostupno', en: 'Auto-update temporarily unavailable', de: 'Auto-Update vorübergehend nicht verfügbar', it: 'Aggiornamento automatico temporaneamente non disponibile' },
   // App Mode (match states)
   'appMode.preMatch': { hr: 'UTAKMICA USKORO', en: 'MATCH SOON', de: 'SPIEL BALD', it: 'PARTITA A BREVE' },
   'appMode.liveMatch': { hr: 'UTAKMICA U TIJEKU', en: 'MATCH IN PROGRESS', de: 'SPIEL LÄUFT', it: 'PARTITA IN CORSO' },
