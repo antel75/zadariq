@@ -653,9 +653,11 @@ export type Database = {
           id: string
           is_local_team: boolean
           league: string | null
+          link_url: string | null
           manual_expires_at: string | null
           match_minute: string | null
           match_status: string
+          round: string | null
           source: string
           source_url: string | null
           sport: string
@@ -674,9 +676,11 @@ export type Database = {
           id?: string
           is_local_team?: boolean
           league?: string | null
+          link_url?: string | null
           manual_expires_at?: string | null
           match_minute?: string | null
           match_status?: string
+          round?: string | null
           source?: string
           source_url?: string | null
           sport?: string
@@ -695,9 +699,11 @@ export type Database = {
           id?: string
           is_local_team?: boolean
           league?: string | null
+          link_url?: string | null
           manual_expires_at?: string | null
           match_minute?: string | null
           match_status?: string
+          round?: string | null
           source?: string
           source_url?: string | null
           sport?: string
@@ -734,6 +740,78 @@ export type Database = {
           last_run_at?: string
           message?: string | null
           ok?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sports_manual_submissions: {
+        Row: {
+          away_team: string
+          competition: string | null
+          created_at: string
+          home_team: string
+          id: string
+          link_url: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          sport: string
+          start_time: string
+          status: string
+          submitted_by_fingerprint: string
+          team_tag: string
+          venue: string | null
+        }
+        Insert: {
+          away_team: string
+          competition?: string | null
+          created_at?: string
+          home_team: string
+          id?: string
+          link_url?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sport?: string
+          start_time: string
+          status?: string
+          submitted_by_fingerprint: string
+          team_tag?: string
+          venue?: string | null
+        }
+        Update: {
+          away_team?: string
+          competition?: string | null
+          created_at?: string
+          home_team?: string
+          id?: string
+          link_url?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sport?: string
+          start_time?: string
+          status?: string
+          submitted_by_fingerprint?: string
+          team_tag?: string
+          venue?: string | null
+        }
+        Relationships: []
+      }
+      sports_sources_health: {
+        Row: {
+          last_error: string | null
+          last_success_at: string | null
+          source: string
+          updated_at: string
+        }
+        Insert: {
+          last_error?: string | null
+          last_success_at?: string | null
+          source: string
+          updated_at?: string
+        }
+        Update: {
+          last_error?: string | null
+          last_success_at?: string | null
+          source?: string
           updated_at?: string
         }
         Relationships: []
