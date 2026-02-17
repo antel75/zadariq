@@ -653,8 +653,10 @@ export type Database = {
           id: string
           is_local_team: boolean
           league: string | null
+          manual_expires_at: string | null
           match_minute: string | null
           match_status: string
+          source: string
           source_url: string | null
           sport: string
           start_time: string
@@ -672,8 +674,10 @@ export type Database = {
           id?: string
           is_local_team?: boolean
           league?: string | null
+          manual_expires_at?: string | null
           match_minute?: string | null
           match_status?: string
+          source?: string
           source_url?: string | null
           sport?: string
           start_time: string
@@ -691,14 +695,46 @@ export type Database = {
           id?: string
           is_local_team?: boolean
           league?: string | null
+          manual_expires_at?: string | null
           match_minute?: string | null
           match_status?: string
+          source?: string
           source_url?: string | null
           sport?: string
           start_time?: string
           team_tag?: string | null
           updated_at?: string
           venue?: string | null
+        }
+        Relationships: []
+      }
+      sports_fetch_status: {
+        Row: {
+          consecutive_failures: number
+          fetched_count: number
+          id: string
+          last_run_at: string
+          message: string | null
+          ok: boolean
+          updated_at: string
+        }
+        Insert: {
+          consecutive_failures?: number
+          fetched_count?: number
+          id?: string
+          last_run_at?: string
+          message?: string | null
+          ok?: boolean
+          updated_at?: string
+        }
+        Update: {
+          consecutive_failures?: number
+          fetched_count?: number
+          id?: string
+          last_run_at?: string
+          message?: string | null
+          ok?: boolean
+          updated_at?: string
         }
         Relationships: []
       }

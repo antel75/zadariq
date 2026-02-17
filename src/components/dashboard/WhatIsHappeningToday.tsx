@@ -6,7 +6,7 @@ import { getZadarHour } from '@/hooks/useSituationalMode';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Trophy, AlertTriangle, Car, Construction, Ship, Megaphone,
-  Coffee, ExternalLink, Zap, Droplets, Wind
+  Coffee, ExternalLink, Zap, Droplets, Wind, WifiOff
 } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 
@@ -114,6 +114,21 @@ function useTodayOutagesForFeed() {
   });
 }
 
+function useSportsFetchStatus() {
+  return useQuery({
+    queryKey: ['sports-fetch-status'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('sports_fetch_status')
+        .select('*')
+        .eq('id', 'fetch-sports')
+        .maybeSingle();
+      return data;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
 // ─── Highlight keywords ──────────────────────────────────
 const HIGHLIGHT_WORDS = ['zatvoreno', 'bura', 'zabrana', 'radovi', 'posebna regulacija', 'closed', 'gesperrt', 'chiuso'];
 
@@ -141,7 +156,9 @@ export function WhatIsHappeningToday() {
   const { data: sportsData } = useSportsEvents();
   const { data: cityAlerts } = useCityAlertsForFeed();
   const { data: outages } = useTodayOutagesForFeed();
+  const { data: fetchStatus } = useSportsFetchStatus();
   const hour = getZadarHour();
+  const apiDown = fetchStatus && fetchStatus.ok === false;
 
   const cards: FeedCard[] = useMemo(() => {
     const feed: FeedCard[] = [];
@@ -209,15 +226,43 @@ export function WhatIsHappeningToday() {
         }
       }
     } else if (sportsData && sportsData.tier === 'none') {
+      // API down with no data
+      if (apiDown) {
+        feed.push({
+          id: 'api-down',
+          priority: 15,
+          type: 'fallback',
+          icon: WifiOff,
+          iconColor: 'text-muted-foreground',
+          accentClass: 'border-[hsl(var(--status-warning))]/20 bg-[hsl(var(--status-warning))]/5',
+          title: `⚽ ${t('happening.autoUpdateDown')}`,
+          subtitle: t('happening.apiUnavailable'),
+        });
+      } else {
+        feed.push({
+          id: 'no-sports',
+          priority: 10,
+          type: 'fallback',
+          icon: Trophy,
+          iconColor: 'text-muted-foreground',
+          accentClass: 'border-border',
+          title: t('happening.noUpcoming'),
+          subtitle: '',
+        });
+      }
+    }
+
+    // Show API status warning banner if down but we have some data
+    if (apiDown && sportsData && sportsData.tier !== 'none') {
       feed.push({
-        id: 'no-sports',
-        priority: 10,
+        id: 'api-status-warning',
+        priority: 5,
         type: 'fallback',
-        icon: Trophy,
+        icon: WifiOff,
         iconColor: 'text-muted-foreground',
-        accentClass: 'border-border',
-        title: t('happening.noSportsData'),
-        subtitle: '',
+        accentClass: 'border-[hsl(var(--status-warning))]/20 bg-[hsl(var(--status-warning))]/5',
+        title: t('happening.autoUpdateDown'),
+        subtitle: t('happening.apiUnavailable'),
       });
     }
 
