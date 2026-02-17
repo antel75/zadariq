@@ -12,16 +12,39 @@ interface PollTemplate {
   context_key: string
 }
 
+interface ContextSignals {
+  rain: boolean
+  strongWind: boolean
+  tempBand: 'cold' | 'mild' | 'hot' | 'extreme'
+  nightDay: 'day' | 'night'
+  liveMatch: boolean
+  matchSoon: boolean
+  weekendEvening: boolean
+}
+
+function getZagrebDate(): Date {
+  return new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Zagreb' }))
+}
+
 function getZagrebHour(): number {
-  const now = new Date()
-  const zagreb = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Zagreb' }))
-  return zagreb.getHours()
+  return getZagrebDate().getHours()
 }
 
 function getZagrebDay(): number {
-  const now = new Date()
-  const zagreb = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Zagreb' }))
-  return zagreb.getDay() // 0=Sun, 5=Fri, 6=Sat
+  return getZagrebDate().getDay()
+}
+
+// Compute a stable hash string from context signals
+function computeContextHash(signals: ContextSignals): string {
+  return [
+    signals.rain ? '1' : '0',
+    signals.strongWind ? '1' : '0',
+    signals.tempBand,
+    signals.nightDay,
+    signals.liveMatch ? '1' : '0',
+    signals.matchSoon ? '1' : '0',
+    signals.weekendEvening ? '1' : '0',
+  ].join('|')
 }
 
 async function getWeatherData(): Promise<{ temp: number; windGust: number; precipProb: number; precipMm: number }> {
@@ -68,6 +91,30 @@ async function getLiveLocalMatch(supabase: any): Promise<{ live: boolean; upcomi
     }
   } catch {
     return { live: false, upcoming3h: false }
+  }
+}
+
+function buildContextSignals(
+  weather: { temp: number; windGust: number; precipProb: number; precipMm: number },
+  sport: { live: boolean; upcoming3h: boolean },
+  hour: number,
+  dayOfWeek: number
+): ContextSignals {
+  // Temperature band
+  let tempBand: ContextSignals['tempBand'] = 'mild'
+  if (weather.temp >= 34) tempBand = 'extreme'
+  else if (weather.temp >= 30) tempBand = 'hot'
+  else if (weather.temp <= 0) tempBand = 'cold'
+  else if (weather.temp <= 5) tempBand = 'cold'
+
+  return {
+    rain: weather.precipProb >= 60 || weather.precipMm >= 0.3,
+    strongWind: weather.windGust >= 45,
+    tempBand,
+    nightDay: (hour >= 6 && hour < 20) ? 'day' : 'night',
+    liveMatch: sport.live,
+    matchSoon: sport.upcoming3h,
+    weekendEvening: (dayOfWeek === 5 || dayOfWeek === 6) && hour >= 20,
   }
 }
 
@@ -182,6 +229,78 @@ function determinePoll(
   }
 }
 
+function computeExpiresAt(): string {
+  const now = new Date()
+  const zagreb = getZagrebDate()
+  const tomorrow3am = new Date(zagreb)
+  tomorrow3am.setDate(tomorrow3am.getDate() + 1)
+  tomorrow3am.setHours(3, 0, 0, 0)
+  const expiresAt = new Date(now.getTime() + (tomorrow3am.getTime() - zagreb.getTime()))
+  return expiresAt.toISOString()
+}
+
+async function archivePoll(supabase: any, poll: any): Promise<void> {
+  // Sum up votes from options
+  const { data: options } = await supabase
+    .from('poll_options')
+    .select('votes_count')
+    .eq('poll_id', poll.id)
+
+  const totalVotes = (options || []).reduce((sum: number, o: any) => sum + o.votes_count, 0)
+
+  await supabase.from('poll_history').insert({
+    original_poll_id: poll.id,
+    question_text: poll.question_text,
+    context_type: poll.context_type,
+    context_key: poll.context_key,
+    context_hash: poll.context_hash,
+    created_at: poll.created_at,
+    expired_at: new Date().toISOString(),
+    expire_reason: 'context_change',
+    total_votes: totalVotes,
+  })
+}
+
+async function expireCurrentPoll(supabase: any, poll: any): Promise<void> {
+  // Archive first (votes stay in poll_votes table untouched)
+  await archivePoll(supabase, poll)
+
+  // Set expires_at to now so it's no longer active
+  await supabase
+    .from('daily_poll')
+    .update({ expires_at: new Date().toISOString() })
+    .eq('id', poll.id)
+}
+
+async function createNewPoll(supabase: any, poll: PollTemplate, contextHash: string): Promise<any> {
+  const { data: newPoll, error: pollError } = await supabase
+    .from('daily_poll')
+    .insert({
+      question_text: poll.question,
+      context_type: poll.context_type,
+      context_key: poll.context_key,
+      context_hash: contextHash,
+      expires_at: computeExpiresAt(),
+    })
+    .select('id')
+    .single()
+
+  if (pollError) throw pollError
+
+  const optionRows = poll.options.map(text => ({
+    poll_id: newPoll.id,
+    option_text: text,
+  }))
+
+  const { error: optError } = await supabase
+    .from('poll_options')
+    .insert(optionRows)
+
+  if (optError) throw optError
+
+  return newPoll
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
@@ -193,21 +312,7 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     )
 
-    // Check if active poll exists
-    const { data: activePoll } = await supabase
-      .from('daily_poll')
-      .select('id')
-      .gt('expires_at', new Date().toISOString())
-      .limit(1)
-
-    if (activePoll && activePoll.length > 0) {
-      return new Response(
-        JSON.stringify({ status: 'exists', poll_id: activePoll[0].id }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
-
-    // Gather data
+    // Gather live data
     const [weather, sport] = await Promise.all([
       getWeatherData(),
       getLiveLocalMatch(supabase),
@@ -215,45 +320,46 @@ Deno.serve(async (req) => {
 
     const hour = getZagrebHour()
     const day = getZagrebDay()
-    const poll = determinePoll(weather, sport, hour, day)
 
-    // Expires at 03:00 next day Zagreb time
-    const now = new Date()
-    const zagreb = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Zagreb' }))
-    const tomorrow3am = new Date(zagreb)
-    tomorrow3am.setDate(tomorrow3am.getDate() + 1)
-    tomorrow3am.setHours(3, 0, 0, 0)
-    // Convert back to UTC approximately
-    const expiresAt = new Date(now.getTime() + (tomorrow3am.getTime() - zagreb.getTime()))
+    // Compute current context hash
+    const signals = buildContextSignals(weather, sport, hour, day)
+    const currentHash = computeContextHash(signals)
 
-    // Insert poll
-    const { data: newPoll, error: pollError } = await supabase
+    // Check for active poll
+    const { data: activePoll } = await supabase
       .from('daily_poll')
-      .insert({
-        question_text: poll.question,
-        context_type: poll.context_type,
-        context_key: poll.context_key,
-        expires_at: expiresAt.toISOString(),
-      })
-      .select('id')
+      .select('id, question_text, context_type, context_key, context_hash, created_at, expires_at')
+      .gt('expires_at', new Date().toISOString())
+      .order('created_at', { ascending: false })
+      .limit(1)
       .single()
 
-    if (pollError) throw pollError
+    if (activePoll) {
+      // Compare context hash
+      if (activePoll.context_hash === currentHash) {
+        return new Response(
+          JSON.stringify({ status: 'exists', poll_id: activePoll.id, context_hash: currentHash }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
 
-    // Insert options
-    const optionRows = poll.options.map(text => ({
-      poll_id: newPoll.id,
-      option_text: text,
-    }))
+      // Context changed — archive old poll and create new one
+      console.log(`Context changed: ${activePoll.context_hash} → ${currentHash}`)
+      await expireCurrentPoll(supabase, activePoll)
+    }
 
-    const { error: optError } = await supabase
-      .from('poll_options')
-      .insert(optionRows)
-
-    if (optError) throw optError
+    // Create new poll
+    const poll = determinePoll(weather, sport, hour, day)
+    const newPoll = await createNewPoll(supabase, poll, currentHash)
 
     return new Response(
-      JSON.stringify({ status: 'created', poll_id: newPoll.id, question: poll.question }),
+      JSON.stringify({
+        status: activePoll ? 'regenerated' : 'created',
+        poll_id: newPoll.id,
+        question: poll.question,
+        context_hash: currentHash,
+        previous_poll_id: activePoll?.id || null,
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (err) {
