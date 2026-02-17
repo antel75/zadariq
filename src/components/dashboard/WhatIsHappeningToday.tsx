@@ -57,7 +57,7 @@ function useSportsEvents() {
         .eq('match_status', 'upcoming')
         .gte('start_time', now)
         .order('start_time', { ascending: true })
-        .limit(3);
+        .limit(6);
 
       // 4) Last 3 results
       const { data: last } = await supabase
