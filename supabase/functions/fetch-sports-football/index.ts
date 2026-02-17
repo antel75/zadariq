@@ -8,13 +8,16 @@ const corsHeaders = {
 
 const TSDB_BASE = "https://www.thesportsdb.com/api/v1/json";
 
-// Known IDs (cached; will be resolved dynamically if missing)
 const KNOWN_TEAMS: Record<string, { searchName: string; tag: string; isLocal: boolean }> = {
   hajduk: { searchName: "Hajduk Split", tag: "hajduk", isLocal: false },
   croatia: { searchName: "Croatia", tag: "croatia_nt", isLocal: false },
 };
 
 const UCL_LEAGUE_NAME = "UEFA Champions League";
+
+// Freshness windows
+const MAX_RESULT_AGE_DAYS = 7;
+const MAX_UPCOMING_DAYS = 30;
 
 interface TSDBEvent {
   idEvent: string;
@@ -43,11 +46,26 @@ function mapStatus(ev: TSDBEvent): string {
   const status = (ev.strStatus || "").toLowerCase();
   if (status.includes("live") || status === "1h" || status === "2h" || status === "ht" || status === "et") return "live";
   if (parseScore(ev.intHomeScore) !== null && parseScore(ev.intAwayScore) !== null) {
-    // Has scores — check if it's really finished
     if (status === "" || status === "match finished" || status === "ft" || status === "aet" || status === "pen" || status === "finished") return "finished";
     return "finished";
   }
   return "upcoming";
+}
+
+function isStaleEvent(ev: TSDBEvent): boolean {
+  const now = Date.now();
+  const eventDate = new Date(ev.strTimestamp || `${ev.dateEvent}T${ev.strTime || "00:00:00"}Z`).getTime();
+  const status = mapStatus(ev);
+
+  if (status === "finished") {
+    const ageDays = (now - eventDate) / (1000 * 60 * 60 * 24);
+    return ageDays > MAX_RESULT_AGE_DAYS;
+  }
+  if (status === "upcoming") {
+    const daysAhead = (eventDate - now) / (1000 * 60 * 60 * 24);
+    return daysAhead > MAX_UPCOMING_DAYS;
+  }
+  return false; // live events are never stale
 }
 
 function eventToRow(ev: TSDBEvent, tag: string, isLocal: boolean, competition: string) {
@@ -72,6 +90,9 @@ function eventToRow(ev: TSDBEvent, tag: string, isLocal: boolean, competition: s
     source: "api",
     link_url: null,
     match_minute: null,
+    fetched_at: new Date().toISOString(),
+    confidence: 80,
+    is_stale: isStaleEvent(ev),
   };
 }
 
@@ -102,7 +123,6 @@ serve(async (req) => {
 
     // ── Fetch team events (Hajduk, Croatia NT) ──
     for (const [key, team] of Object.entries(KNOWN_TEAMS)) {
-      // Resolve team ID via search
       const searchData = await fetchJSON(`${base}/searchteams.php?t=${encodeURIComponent(team.searchName)}`);
       const teams = searchData?.teams || [];
       if (teams.length === 0) {
@@ -110,9 +130,16 @@ serve(async (req) => {
         continue;
       }
       const teamId = teams[0].idTeam;
-      console.log(`[TEAM] ${team.searchName} -> ID ${teamId}`);
+      console.log(`[TEAM] ${team.searchName} -> ID ${teamId} (${teams[0].strLeague})`);
 
-      // Next events
+      // Cache team ID
+      await supabase.from("sports_teams_cache").upsert({
+        name: team.searchName,
+        api_team_id: parseInt(teamId),
+        sport: "football",
+        fetched_at: new Date().toISOString(),
+      }, { onConflict: "name" }).then(() => {});
+
       const nextData = await fetchJSON(`${base}/eventsnext.php?id=${teamId}`);
       const nextEvents = (nextData?.events || []) as TSDBEvent[];
       console.log(`[NEXT] ${team.searchName}: ${nextEvents.length} events`);
@@ -120,7 +147,6 @@ serve(async (req) => {
         allRows.push(eventToRow(ev, team.tag, team.isLocal, ev.strLeague));
       }
 
-      // Last events
       const lastData = await fetchJSON(`${base}/eventslast.php?id=${teamId}`);
       const lastEvents = (lastData?.events || []) as TSDBEvent[];
       console.log(`[LAST] ${team.searchName}: ${lastEvents.length} events`);
@@ -131,7 +157,6 @@ serve(async (req) => {
 
     // ── UCL (Champions League) ──
     try {
-      // Search for UCL league
       const leagueSearch = await fetchJSON(`${base}/search_all_leagues.php?s=Soccer`);
       const leagues = (leagueSearch?.countrys || leagueSearch?.leagues || []) as any[];
       const ucl = leagues.find((l: any) =>
@@ -143,7 +168,6 @@ serve(async (req) => {
         const leagueId = ucl.idLeague;
         console.log(`[UCL] League ID: ${leagueId}`);
 
-        // Next UCL events
         const uclNext = await fetchJSON(`${base}/eventsnextleague.php?id=${leagueId}`);
         const uclNextEvents = (uclNext?.events || []) as TSDBEvent[];
         console.log(`[UCL NEXT] ${uclNextEvents.length} events`);
@@ -151,7 +175,6 @@ serve(async (req) => {
           allRows.push(eventToRow(ev, "ucl", false, UCL_LEAGUE_NAME));
         }
 
-        // Past UCL events
         const uclPast = await fetchJSON(`${base}/eventspastleague.php?id=${leagueId}`);
         const uclPastEvents = (uclPast?.events || []) as TSDBEvent[];
         console.log(`[UCL PAST] ${uclPastEvents.length} events`);
@@ -173,16 +196,26 @@ serve(async (req) => {
         const kkId = kkTeams[0].idTeam;
         console.log(`[KK ZADAR] Team ID: ${kkId}`);
 
+        // Cache team ID
+        await supabase.from("sports_teams_cache").upsert({
+          name: "KK Zadar",
+          api_team_id: parseInt(kkId),
+          sport: "basketball",
+          fetched_at: new Date().toISOString(),
+        }, { onConflict: "name" }).then(() => {});
+
         const kkNext = await fetchJSON(`${base}/eventsnext.php?id=${kkId}`);
         for (const ev of ((kkNext?.events || []) as TSDBEvent[]).slice(0, 5)) {
-          allRows.push(eventToRow(ev, "kk_zadar", true, ev.strLeague));
-          allRows[allRows.length - 1].sport = "basketball";
+          const row = eventToRow(ev, "kk_zadar", true, ev.strLeague);
+          row.sport = "basketball";
+          allRows.push(row);
         }
 
         const kkLast = await fetchJSON(`${base}/eventslast.php?id=${kkId}`);
         for (const ev of ((kkLast?.events || []) as TSDBEvent[]).slice(0, 2)) {
-          allRows.push(eventToRow(ev, "kk_zadar", true, ev.strLeague));
-          allRows[allRows.length - 1].sport = "basketball";
+          const row = eventToRow(ev, "kk_zadar", true, ev.strLeague);
+          row.sport = "basketball";
+          allRows.push(row);
         }
       } else {
         console.warn("[KK ZADAR] Team not found — relying on manual submissions");
@@ -191,19 +224,33 @@ serve(async (req) => {
       console.error("[KK ZADAR] Error:", e);
     }
 
-    // ── Upsert ──
-    if (allRows.length > 0) {
+    // ── Filter out stale before upsert (don't display them) ──
+    const freshRows = allRows.filter(r => !r.is_stale);
+    const staleRows = allRows.filter(r => r.is_stale);
+    console.log(`[FRESHNESS] ${freshRows.length} fresh, ${staleRows.length} stale (excluded)`);
+
+    // ── Upsert only fresh ──
+    if (freshRows.length > 0) {
       const { error } = await supabase
         .from("sports_events")
-        .upsert(allRows, { onConflict: "api_match_id" });
+        .upsert(freshRows, { onConflict: "api_match_id" });
       if (error) {
         console.error("Upsert error:", error);
         throw error;
       }
     }
 
+    // ── Mark existing stale events ──
+    if (staleRows.length > 0) {
+      const staleIds = staleRows.map(r => r.api_match_id);
+      await supabase
+        .from("sports_events")
+        .update({ is_stale: true })
+        .in("api_match_id", staleIds);
+    }
+
     // ── Cleanup: keep last 5 finished per tag, delete >30 days old ──
-    const tags = [...new Set(allRows.map(r => r.team_tag))];
+    const tags = [...new Set(freshRows.map(r => r.team_tag))];
     for (const tag of tags) {
       const { data: finished } = await supabase
         .from("sports_events")
@@ -211,6 +258,7 @@ serve(async (req) => {
         .eq("match_status", "finished")
         .eq("team_tag", tag)
         .eq("source", "api")
+        .eq("is_stale", false)
         .order("start_time", { ascending: false });
 
       if (finished && finished.length > 5) {
@@ -220,7 +268,6 @@ serve(async (req) => {
       }
     }
 
-    // Delete very old finished (>30 days)
     const cutoff30 = new Date(Date.now() - 30 * 86400000).toISOString();
     await supabase
       .from("sports_events")
@@ -237,21 +284,20 @@ serve(async (req) => {
       updated_at: new Date().toISOString(),
     });
 
-    // Also update sports_fetch_status for backward compat
     await supabase.from("sports_fetch_status").upsert({
       id: "fetch-sports",
       last_run_at: new Date().toISOString(),
       ok: true,
-      message: `TheSportsDB: ${allRows.length} events`,
-      fetched_count: allRows.length,
+      message: `TheSportsDB: ${freshRows.length} fresh, ${staleRows.length} stale`,
+      fetched_count: freshRows.length,
       consecutive_failures: 0,
       updated_at: new Date().toISOString(),
     });
 
-    console.log(`[DONE] Upserted ${allRows.length} events`);
+    console.log(`[DONE] Upserted ${freshRows.length} fresh events`);
 
     return new Response(
-      JSON.stringify({ success: true, fetched: allRows.length }),
+      JSON.stringify({ success: true, fetched: freshRows.length, stale: staleRows.length }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
