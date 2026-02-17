@@ -15,6 +15,7 @@ import { Shield, Plus, Pencil, LogOut, ArrowLeft, Trash2, Save } from 'lucide-re
 import { PendingChangesTab } from '@/components/admin/PendingChangesTab';
 import { PendingPlacesTab } from '@/components/admin/PendingPlacesTab';
 import { CityAlertsTab } from '@/components/admin/CityAlertsTab';
+import { SportsEventsTab } from '@/components/admin/SportsEventsTab';
 
 type DutyService = {
   id: string;
@@ -172,6 +173,7 @@ const AdminPanel = () => {
           <TabsList className="w-full">
             <TabsTrigger value="duty" className="flex-1 text-xs">Duty</TabsTrigger>
             <TabsTrigger value="transport" className="flex-1 text-xs">Transport</TabsTrigger>
+            <TabsTrigger value="sports" className="flex-1 text-xs">Sport</TabsTrigger>
             <TabsTrigger value="alerts" className="flex-1 text-xs">Alerts</TabsTrigger>
             <TabsTrigger value="cafes" className="flex-1 text-xs">Cafes</TabsTrigger>
             <TabsTrigger value="corrections" className="flex-1 text-xs">Corrections</TabsTrigger>
@@ -407,6 +409,9 @@ const AdminPanel = () => {
               ))}
               {transports.length === 0 && <p className="text-sm text-muted-foreground text-center py-8">No transport schedules yet. Add one above.</p>}
             </div>
+          </TabsContent>
+          <TabsContent value="sports">
+            <SportsEventsTab />
           </TabsContent>
           <TabsContent value="alerts">
             <CityAlertsTab />
