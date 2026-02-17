@@ -6,7 +6,7 @@ import { getZadarHour } from '@/hooks/useSituationalMode';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Trophy, AlertTriangle, Car, Construction, Ship, Megaphone,
-  Coffee, ExternalLink, Zap, Droplets, Wind, WifiOff, Flag
+  Coffee, ExternalLink, Zap, Droplets, Wind, Flag
 } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 
@@ -120,20 +120,6 @@ function useTodayOutagesForFeed() {
   });
 }
 
-function useSportsFetchStatus() {
-  return useQuery({
-    queryKey: ['sports-fetch-status'],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from('sports_fetch_status')
-        .select('*')
-        .eq('id', 'fetch-sports')
-        .maybeSingle();
-      return data;
-    },
-    staleTime: 5 * 60 * 1000,
-  });
-}
 
 function useSportsSourcesHealth() {
   return useQuery({
@@ -178,10 +164,8 @@ export function WhatIsHappeningToday() {
   const { data: sportsData } = useSportsEvents();
   const { data: cityAlerts } = useCityAlertsForFeed();
   const { data: outages } = useTodayOutagesForFeed();
-  const { data: fetchStatus } = useSportsFetchStatus();
   const { data: sourcesHealth } = useSportsSourcesHealth();
   const hour = getZadarHour();
-  const apiDown = fetchStatus && fetchStatus.ok === false;
   const isDebug = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('debug');
 
   const cards: FeedCard[] = useMemo(() => {
@@ -299,47 +283,20 @@ export function WhatIsHappeningToday() {
 
       // If absolutely no sports data
       if (!hasAnySport) {
-        if (apiDown) {
-          feed.push({
-            id: 'api-down',
-            priority: 15,
-            type: 'fallback',
-            icon: WifiOff,
-            iconColor: 'text-muted-foreground',
-            accentClass: 'border-[hsl(var(--status-warning))]/20 bg-[hsl(var(--status-warning))]/5',
-            title: `⚽ ${t('sports.noFreshData')}`,
-            subtitle: t('sports.openExternal'),
-            link: 'https://www.sofascore.com/',
-          });
-        } else {
-          feed.push({
-            id: 'no-sports',
-            priority: 10,
-            type: 'fallback',
-            icon: Trophy,
-            iconColor: 'text-muted-foreground',
-            accentClass: 'border-border',
-            title: t('sports.noFreshData'),
-            subtitle: t('sports.openExternal'),
-            link: 'https://www.sofascore.com/',
-          });
-        }
+        feed.push({
+          id: 'no-sports',
+          priority: 10,
+          type: 'fallback',
+          icon: Trophy,
+          iconColor: 'text-muted-foreground',
+          accentClass: 'border-border',
+          title: t('sports.noFreshData'),
+          subtitle: t('sports.openExternal'),
+          link: 'https://www.sofascore.com/',
+        });
       }
     }
 
-    // API warning banner
-    if (apiDown && sportsData && (sportsData.live.length > 0 || sportsData.today.length > 0 || sportsData.upcoming.length > 0 || sportsData.last.length > 0)) {
-      feed.push({
-        id: 'api-status-warning',
-        priority: 5,
-        type: 'fallback',
-        icon: WifiOff,
-        iconColor: 'text-muted-foreground',
-        accentClass: 'border-[hsl(var(--status-warning))]/20 bg-[hsl(var(--status-warning))]/5',
-        title: t('happening.autoUpdateDown'),
-        subtitle: t('happening.apiUnavailable'),
-      });
-    }
 
     // ── City alerts ────────
     if (cityAlerts) {
@@ -426,7 +383,7 @@ export function WhatIsHappeningToday() {
 
     feed.sort((a, b) => b.priority - a.priority);
     return feed;
-  }, [sportsData, cityAlerts, outages, hour, t, apiDown]);
+  }, [sportsData, cityAlerts, outages, hour, t]);
 
   // Get last update time from sources health
   const lastUpdate = useMemo(() => {
