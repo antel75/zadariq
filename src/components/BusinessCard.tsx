@@ -87,9 +87,7 @@ export function BusinessCard({ business, onReport }: BusinessCardProps) {
           {t('action.call')}
         </a>
         <a
-          href={business.lat && business.lng
-            ? `https://www.google.com/maps/dir/?api=1&destination=${business.lat},${business.lng}`
-            : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.name + ', ' + business.address)}`}
+          href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(business.name + ', ' + business.address)}`}
           target="_blank"
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
@@ -100,9 +98,7 @@ export function BusinessCard({ business, onReport }: BusinessCardProps) {
         </a>
         {business.category === 'restaurants' && (
           <a
-            href={business.lat && business.lng
-              ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.name)}&ll=${business.lat},${business.lng}`
-              : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.name + ', ' + business.address)}`}
+            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.name + ', ' + business.address)}`}
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
