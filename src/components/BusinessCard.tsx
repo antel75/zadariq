@@ -4,7 +4,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { TrustBadge } from '@/components/TrustBadge';
 import { TrustScore } from '@/components/TrustScore';
 import { SmokingStatusInline } from '@/components/SmokingStatusInline';
-import { Phone, Navigation, AlertTriangle, ShieldCheck, Users, Bot, Star } from 'lucide-react';
+import { useShopSundaySchedule, getNextSunday } from '@/hooks/useShopSundaySchedule';
+import { Phone, Navigation, AlertTriangle, ShieldCheck, Users, Bot, Star, CalendarDays } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface BusinessCardProps {
@@ -15,9 +16,12 @@ interface BusinessCardProps {
 export function BusinessCard({ business, onReport }: BusinessCardProps) {
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const { data: sundayEntries } = useShopSundaySchedule();
   const open = isBusinessOpen(business);
   const todayHours = getTodayHours(business);
   const hideOpenBadge = business.reportCount >= 5;
+  const isShop = business.category === 'shops';
+  const nextSunday = isShop && sundayEntries ? getNextSunday(sundayEntries, business.id) : null;
 
   return (
     <div
@@ -50,9 +54,16 @@ export function BusinessCard({ business, onReport }: BusinessCardProps) {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 mb-2">
+      <div className="flex items-center gap-2 mb-2 flex-wrap">
         <p className="text-sm text-muted-foreground">{todayHours}</p>
         {business.category === 'cafes' && <SmokingStatusInline businessId={business.id} />}
+        {nextSunday && (
+          <span className="flex items-center gap-1 text-xs font-medium text-primary">
+            <CalendarDays className="h-3 w-3" />
+            Ned. {new Date(nextSunday.sunday_date + 'T00:00:00').toLocaleDateString('hr', { day: 'numeric', month: 'short' })}
+            {' '}{(nextSunday.open_time || '08:00').slice(0, 5)}–{(nextSunday.close_time || '21:00').slice(0, 5)}
+          </span>
+        )}
       </div>
 
       {/* Warning for 5+ reports */}
