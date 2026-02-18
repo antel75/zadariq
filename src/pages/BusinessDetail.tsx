@@ -174,7 +174,9 @@ export default function BusinessDetail() {
               {t('action.call')}
             </a>
             <a
-              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.category === 'restaurants' ? business.name + ' Zadar' : business.address)}`}
+              href={business.lat && business.lng
+                ? `https://www.google.com/maps/dir/?api=1&destination=${business.lat},${business.lng}`
+                : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.name + ', ' + business.address)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-accent text-accent-foreground font-medium text-sm hover:bg-accent/90 transition-colors"
@@ -185,7 +187,9 @@ export default function BusinessDetail() {
           </div>
           {business.category === 'restaurants' && (
             <a
-              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.name + ' Zadar')}`}
+              href={business.lat && business.lng
+                ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.name)}&ll=${business.lat},${business.lng}`
+                : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.name + ', ' + business.address)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-2 flex items-center justify-center gap-2 py-3 rounded-xl bg-yellow-500/15 text-yellow-600 dark:text-yellow-400 font-medium text-sm hover:bg-yellow-500/25 transition-colors"
