@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { businesses, isBusinessOpen, getTodayHours, getRelativeTime } from '@/data/mockData';
@@ -14,6 +14,7 @@ import {
   UserCheck, Clock, ShieldCheck, Users, Bot, Activity, Tag, Megaphone, CalendarClock, Settings, Star,
 } from 'lucide-react';
 import { Footer } from '@/components/Footer';
+import { useApprovedPlaces } from '@/hooks/useApprovedPlaces';
 
 const dayKeys = ['days.mon', 'days.tue', 'days.wed', 'days.thu', 'days.fri', 'days.sat', 'days.sun'] as const;
 const hourKeys = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
@@ -24,8 +25,14 @@ export default function BusinessDetail() {
   const navigate = useNavigate();
   const [showReport, setShowReport] = useState(false);
   const [showClaim, setShowClaim] = useState(false);
+  const { data: approvedPlaces } = useApprovedPlaces();
 
-  const business = businesses.find(b => b.id === id);
+  const business = useMemo(() => {
+    const fromMock = businesses.find(b => b.id === id);
+    if (fromMock) return fromMock;
+    return approvedPlaces?.find(b => b.id === id) ?? null;
+  }, [id, approvedPlaces]);
+
   if (!business) return <div className="p-8 text-center text-muted-foreground">Not found</div>;
 
   const open = isBusinessOpen(business);
