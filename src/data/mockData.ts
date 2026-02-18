@@ -1,5 +1,29 @@
 import { Business, EmergencyContact, CategoryId, VerificationStatus } from './types';
 import { scoreMatch } from '@/lib/fuzzySearch';
+import { supabase } from '@/integrations/supabase/client';
+
+// --- Hours override cache ---
+type HoursOverride = {
+  business_id: string;
+  day_of_week: number;
+  open_time: string | null;
+  close_time: string | null;
+  is_closed: boolean;
+};
+let _overridesCache: HoursOverride[] = [];
+let _overridesFetched = false;
+
+export async function loadHoursOverrides() {
+  if (_overridesFetched) return;
+  const { data } = await supabase
+    .from('business_hours_overrides')
+    .select('business_id, day_of_week, open_time, close_time, is_closed');
+  _overridesCache = (data as unknown as HoursOverride[]) || [];
+  _overridesFetched = true;
+}
+
+// Call this early (fire and forget)
+loadHoursOverrides();
 
 export const categories: { id: CategoryId; icon: string; labelKey: string }[] = [
   { id: 'pharmacy', icon: 'Pill', labelKey: 'category.pharmacy' },
@@ -298,27 +322,43 @@ export const businesses: Business[] = [
 ];
 
 export function isBusinessOpen(business: Business): boolean | null {
-  if (business.reportCount >= 5) return false; // Hide open status for 5+ reports
+  if (business.reportCount >= 5) return false;
   
   const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Zagreb' }));
   const dayIndex = now.getDay();
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+
+  // Check override first
+  const override = _overridesCache.find(
+    o => o.business_id === business.id && o.day_of_week === dayIndex
+  );
+  if (override) {
+    if (override.is_closed) return false;
+    if (override.open_time && override.close_time) {
+      const [oh, om] = override.open_time.split(':').map(Number);
+      const [ch, cm] = override.close_time.split(':').map(Number);
+      const openMin = oh * 60 + om;
+      const closeMin = ch * 60 + cm;
+      if (closeMin <= openMin) return nowMin >= openMin || nowMin < closeMin;
+      return nowMin >= openMin && nowMin < closeMin;
+    }
+  }
+
+  // Fall back to hardcoded hours
   const dayKeys: (keyof Business['workingHours'])[] = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
   const todayHours = business.workingHours[dayKeys[dayIndex]];
 
   if (!todayHours || todayHours === 'Zatvoreno') return false;
   if (todayHours === 'Besplatno') return true;
-  if (todayHours === '—' || todayHours === '-') return null; // Unknown hours
+  if (todayHours === '—' || todayHours === '-') return null;
 
   const match = todayHours.match(/(\d{2}):(\d{2})–(\d{2}):(\d{2})/);
-  if (!match) return null; // Can't parse = unknown
+  if (!match) return null;
 
   const openMin = parseInt(match[1]) * 60 + parseInt(match[2]);
   const closeMin = parseInt(match[3]) * 60 + parseInt(match[4]);
-  const nowMin = now.getHours() * 60 + now.getMinutes();
 
-  if (closeMin <= openMin) {
-    return nowMin >= openMin || nowMin < closeMin;
-  }
+  if (closeMin <= openMin) return nowMin >= openMin || nowMin < closeMin;
   return nowMin >= openMin && nowMin < closeMin;
 }
 
