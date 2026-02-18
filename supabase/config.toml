@@ -32,3 +32,6 @@ verify_jwt = false
 
 [functions.meteoalarm]
 verify_jwt = false
+
+[functions.import-ev-chargers]
+verify_jwt = false

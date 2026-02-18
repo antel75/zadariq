@@ -367,6 +367,98 @@ export type Database = {
         }
         Relationships: []
       }
+      ev_charger_reports: {
+        Row: {
+          charger_id: string
+          created_at: string
+          id: string
+          status: string
+          user_hash: string
+        }
+        Insert: {
+          charger_id: string
+          created_at?: string
+          id?: string
+          status: string
+          user_hash: string
+        }
+        Update: {
+          charger_id?: string
+          created_at?: string
+          id?: string
+          status?: string
+          user_hash?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ev_charger_reports_charger_id_fkey"
+            columns: ["charger_id"]
+            isOneToOne: false
+            referencedRelation: "ev_chargers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ev_chargers: {
+        Row: {
+          address: string | null
+          confidence: number
+          created_at: string
+          id: string
+          last_reported_at: string | null
+          lat: number
+          lng: number
+          name: string
+          operator: string | null
+          osm_id: string | null
+          plug_count: number | null
+          plug_types: string[] | null
+          power_kw: number | null
+          source: string
+          status: string
+          updated_at: string
+          verified: boolean
+        }
+        Insert: {
+          address?: string | null
+          confidence?: number
+          created_at?: string
+          id?: string
+          last_reported_at?: string | null
+          lat: number
+          lng: number
+          name: string
+          operator?: string | null
+          osm_id?: string | null
+          plug_count?: number | null
+          plug_types?: string[] | null
+          power_kw?: number | null
+          source?: string
+          status?: string
+          updated_at?: string
+          verified?: boolean
+        }
+        Update: {
+          address?: string | null
+          confidence?: number
+          created_at?: string
+          id?: string
+          last_reported_at?: string | null
+          lat?: number
+          lng?: number
+          name?: string
+          operator?: string | null
+          osm_id?: string | null
+          plug_count?: number | null
+          plug_types?: string[] | null
+          power_kw?: number | null
+          source?: string
+          status?: string
+          updated_at?: string
+          verified?: boolean
+        }
+        Relationships: []
+      }
       kino_zona_movies: {
         Row: {
           country: string | null
