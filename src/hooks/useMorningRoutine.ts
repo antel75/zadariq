@@ -186,6 +186,8 @@ export function useMorningRoutine(): MorningSuggestion[] {
     // Cap at 4, ensure minimum 3
     const final = suggestions.slice(0, 4);
 
+
+
     // Mark these as seen
     markSeen(final.map((s) => s.business.id));
 
