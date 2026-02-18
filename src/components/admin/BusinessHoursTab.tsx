@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Plus, Save, Trash2, Pencil, Clock } from 'lucide-react';
 import { businesses, getTodayHours } from '@/data/mockData';
 import { useBusinessHoursOverrides, getDayName, type BusinessHoursOverride } from '@/hooks/useBusinessHoursOverrides';
+import { useApprovedPlaces } from '@/hooks/useApprovedPlaces';
 
 const DAYS = [
   { value: 1, label: 'Ponedjeljak' },
@@ -24,6 +25,7 @@ const DAYS = [
 export const BusinessHoursTab = () => {
   const { overrides, loading, saveOverride, deleteOverride } = useBusinessHoursOverrides();
   const { toast } = useToast();
+  const { data: approvedPlaces } = useApprovedPlaces();
   const [search, setSearch] = useState('');
   const [editing, setEditing] = useState<Partial<BusinessHoursOverride> | null>(null);
   const [bulkBusinessId, setBulkBusinessId] = useState<string | null>(null);
@@ -33,7 +35,11 @@ export const BusinessHoursTab = () => {
   const [bulkClose, setBulkClose] = useState('20:00');
   const [bulkClosed, setBulkClosed] = useState(false);
 
-  const filteredBusinesses = businesses.filter(b =>
+  const allBusinesses = useMemo(() => {
+    return [...businesses, ...(approvedPlaces || [])];
+  }, [approvedPlaces]);
+
+  const filteredBusinesses = allBusinesses.filter(b =>
     b.name.toLowerCase().includes(search.toLowerCase()) ||
     b.id.toLowerCase().includes(search.toLowerCase())
   );
@@ -87,7 +93,7 @@ export const BusinessHoursTab = () => {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center gap-2">
               <Clock className="h-4 w-4" />
-              Postavi radno vrijeme: {businesses.find(b => b.id === bulkBusinessId)?.name}
+              Postavi radno vrijeme: {allBusinesses.find(b => b.id === bulkBusinessId)?.name}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">

@@ -17,6 +17,7 @@ import { ApprovedPlacesTab } from '@/components/admin/ApprovedPlacesTab';
 import { CityAlertsTab } from '@/components/admin/CityAlertsTab';
 import { SportsEventsTab } from '@/components/admin/SportsEventsTab';
 import { BusinessHoursTab } from '@/components/admin/BusinessHoursTab';
+import { ShopSundayTab } from '@/components/admin/ShopSundayTab';
 
 type DutyService = {
   id: string;
@@ -171,13 +172,14 @@ const AdminPanel = () => {
 
       <main className="max-w-2xl mx-auto px-4 py-4">
         <Tabs defaultValue="duty">
-          <TabsList className="w-full">
+          <TabsList className="w-full flex-wrap h-auto gap-1 py-1">
             <TabsTrigger value="duty" className="flex-1 text-xs">Duty</TabsTrigger>
             <TabsTrigger value="transport" className="flex-1 text-xs">Transport</TabsTrigger>
             <TabsTrigger value="sports" className="flex-1 text-xs">Sport</TabsTrigger>
             <TabsTrigger value="alerts" className="flex-1 text-xs">Alerts</TabsTrigger>
             <TabsTrigger value="cafes" className="flex-1 text-xs">Cafes</TabsTrigger>
             <TabsTrigger value="hours" className="flex-1 text-xs">Sati</TabsTrigger>
+            <TabsTrigger value="sundays" className="flex-1 text-xs">Ned.</TabsTrigger>
             <TabsTrigger value="corrections" className="flex-1 text-xs">Corrections</TabsTrigger>
           </TabsList>
 
@@ -423,6 +425,9 @@ const AdminPanel = () => {
           </TabsContent>
           <TabsContent value="hours">
             <BusinessHoursTab />
+          </TabsContent>
+          <TabsContent value="sundays">
+            <ShopSundayTab />
           </TabsContent>
           <TabsContent value="corrections">
             <PendingChangesTab />
