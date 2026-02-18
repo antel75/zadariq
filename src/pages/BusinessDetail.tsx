@@ -51,13 +51,13 @@ export default function BusinessDetail() {
             <span className="px-4 py-1.5 rounded-full text-sm font-bold bg-status-warning/20 text-status-warning">
               ⚠ {t('trust.warningHidden')}
             </span>
-          ) : (
+          ) : open !== null ? (
             <span className={`px-4 py-1.5 rounded-full text-sm font-bold ${
               open ? 'bg-status-open text-status-open-foreground' : 'bg-status-closed text-status-closed-foreground'
             }`}>
               {open ? t('status.open') : t('status.closed')}
             </span>
-          )}
+          ) : null}
           <TrustBadge status={business.verificationStatus} size="md" />
           <CorrectionPopup entityType="business" entityId={business.id} fieldName="workingHours" currentValue={getTodayHours(business)}>
             <span className="text-sm text-muted-foreground cursor-pointer hover:text-accent transition-colors">{getTodayHours(business)}</span>

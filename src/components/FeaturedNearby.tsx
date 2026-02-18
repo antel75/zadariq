@@ -9,7 +9,7 @@ export function FeaturedNearby() {
 
   // Max 3 featured businesses that are open
   const featured = businesses
-    .filter(b => b.featured && isBusinessOpen(b))
+    .filter(b => b.featured && isBusinessOpen(b) !== false)
     .slice(0, 3);
 
   if (featured.length === 0) return null;

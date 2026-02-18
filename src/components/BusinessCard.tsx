@@ -36,7 +36,7 @@ export function BusinessCard({ business, onReport }: BusinessCardProps) {
           <span className="ml-2 px-3 py-1 rounded-full text-xs font-bold flex-shrink-0 bg-status-warning/20 text-status-warning">
             ⚠
           </span>
-        ) : (
+        ) : open !== null ? (
           <span
             className={`ml-2 px-3 py-1 rounded-full text-xs font-bold flex-shrink-0 ${
               open
@@ -46,7 +46,7 @@ export function BusinessCard({ business, onReport }: BusinessCardProps) {
           >
             {open ? t('status.open') : t('status.closed')}
           </span>
-        )}
+        ) : null}
         </div>
       </div>
 
