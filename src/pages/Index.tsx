@@ -16,6 +16,7 @@ import { TodayAlerts } from '@/components/dashboard/TodayAlerts';
 import { QuickActions } from '@/components/dashboard/QuickActions';
 import { ForYouSection } from '@/components/dashboard/ForYouSection';
 import { TransportWidget } from '@/components/dashboard/TransportWidget';
+import { EvChargerWidget } from '@/components/dashboard/EvChargerWidget';
 import { TodayCard } from '@/components/dashboard/TodayCard';
 import { CityPulseSection } from '@/components/dashboard/CityPulseSection';
 import { DailyPollCard } from '@/components/dashboard/DailyPollCard';
@@ -187,6 +188,17 @@ const Index = () => {
             <TransportWidget />
           </motion.section>
         )}
+
+        {/* EV Charger Widget */}
+        <motion.section
+          className="mb-4"
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          custom={sectionIndex++}
+        >
+          <EvChargerWidget />
+        </motion.section>
 
         {/* Weather & city metrics */}
         {show.todayCard && (
