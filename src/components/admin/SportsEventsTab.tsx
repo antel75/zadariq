@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Trash2, Save, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { Plus, Trash2, Save, AlertTriangle, CheckCircle2, Pencil } from 'lucide-react';
 import { SPORTS_LEAGUES, ALL_TEAMS, canTeamsPlay, getTeamTag } from '@/data/sportsTeamsWhitelist';
 
 type SportsEvent = {
@@ -40,6 +40,14 @@ type NewEvent = {
   team_tag: string;
 };
 
+type InlineEdit = {
+  id: string;
+  home_score: string;
+  away_score: string;
+  match_status: string;
+  match_minute: string;
+};
+
 const today = () => {
   const d = new Date();
   return d.toISOString().slice(0, 16); // datetime-local format
@@ -49,6 +57,7 @@ export const SportsEventsTab = () => {
   const { toast } = useToast();
   const [events, setEvents] = useState<SportsEvent[]>([]);
   const [editing, setEditing] = useState<NewEvent | null>(null);
+  const [inlineEdit, setInlineEdit] = useState<InlineEdit | null>(null);
   const [validationWarning, setValidationWarning] = useState<string | null>(null);
 
   useEffect(() => {
@@ -139,6 +148,33 @@ export const SportsEventsTab = () => {
     await supabase.from('sports_events').delete().eq('id', id);
     fetchEvents();
     toast({ title: 'Obrisano' });
+  };
+
+  const startInlineEdit = (ev: SportsEvent) => {
+    setInlineEdit({
+      id: ev.id,
+      home_score: ev.home_score?.toString() || '0',
+      away_score: ev.away_score?.toString() || '0',
+      match_status: ev.match_status,
+      match_minute: '',
+    });
+  };
+
+  const saveInlineEdit = async () => {
+    if (!inlineEdit) return;
+    const { error } = await supabase.from('sports_events').update({
+      home_score: parseInt(inlineEdit.home_score) || 0,
+      away_score: parseInt(inlineEdit.away_score) || 0,
+      match_status: inlineEdit.match_status,
+      match_minute: inlineEdit.match_minute || null,
+    }).eq('id', inlineEdit.id);
+    if (error) {
+      toast({ title: 'Greška', description: error.message, variant: 'destructive' });
+      return;
+    }
+    setInlineEdit(null);
+    fetchEvents();
+    toast({ title: '✅ Rezultat ažuriran' });
   };
 
   const newEvent = (): NewEvent => ({
@@ -334,26 +370,82 @@ export const SportsEventsTab = () => {
       <div className="space-y-2">
         {events.map(ev => (
           <Card key={ev.id} className={ev.is_stale ? 'opacity-40' : ''}>
-            <CardContent className="p-3 flex items-center justify-between">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-medium text-sm text-foreground truncate">
-                    {ev.home_team} {ev.home_score !== null ? `${ev.home_score}:${ev.away_score}` : 'vs'} {ev.away_team}
-                  </span>
-                  <Badge variant={ev.match_status === 'live' ? 'destructive' : ev.match_status === 'finished' ? 'secondary' : 'outline'} className="text-[10px]">
-                    {ev.match_status}
-                  </Badge>
-                  <Badge variant="outline" className="text-[10px]">{ev.source}</Badge>
-                  {ev.is_stale && <Badge variant="destructive" className="text-[10px]">STALE</Badge>}
+            <CardContent className="p-3">
+              <div className="flex items-center justify-between">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-medium text-sm text-foreground truncate">
+                      {ev.home_team} {ev.home_score !== null ? `${ev.home_score}:${ev.away_score}` : 'vs'} {ev.away_team}
+                    </span>
+                    <Badge variant={ev.match_status === 'live' ? 'destructive' : ev.match_status === 'finished' ? 'secondary' : 'outline'} className="text-[10px]">
+                      {ev.match_status}
+                    </Badge>
+                    <Badge variant="outline" className="text-[10px]">{ev.source}</Badge>
+                    {ev.is_stale && <Badge variant="destructive" className="text-[10px]">STALE</Badge>}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {new Date(ev.start_time).toLocaleDateString('hr')} · {ev.league || ev.sport} · {ev.team_tag}
+                  </p>
                 </div>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {new Date(ev.start_time).toLocaleDateString('hr')} · {ev.league || ev.sport} · {ev.team_tag}
-                </p>
+                <div className="flex gap-1 ml-2">
+                  <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => startInlineEdit(ev)}>
+                    <Pencil className="h-3.5 w-3.5" />
+                  </Button>
+                  {ev.source === 'manual' && (
+                    <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => deleteEvent(ev.id)}>
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  )}
+                </div>
               </div>
-              {ev.source === 'manual' && (
-                <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive ml-2" onClick={() => deleteEvent(ev.id)}>
-                  <Trash2 className="h-3.5 w-3.5" />
-                </Button>
+
+              {/* Inline edit panel */}
+              {inlineEdit?.id === ev.id && (
+                <div className="mt-3 pt-3 border-t border-border space-y-3">
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <Label className="text-xs">Domaćin</Label>
+                      <Input
+                        type="number" min="0"
+                        value={inlineEdit.home_score}
+                        onChange={e => setInlineEdit({ ...inlineEdit, home_score: e.target.value })}
+                        className="h-9"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Gost</Label>
+                      <Input
+                        type="number" min="0"
+                        value={inlineEdit.away_score}
+                        onChange={e => setInlineEdit({ ...inlineEdit, away_score: e.target.value })}
+                        className="h-9"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Minuta</Label>
+                      <Input
+                        value={inlineEdit.match_minute}
+                        onChange={e => setInlineEdit({ ...inlineEdit, match_minute: e.target.value })}
+                        placeholder="npr. 45"
+                        className="h-9"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Select value={inlineEdit.match_status} onValueChange={v => setInlineEdit({ ...inlineEdit, match_status: v })}>
+                      <SelectTrigger className="h-9 w-36"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="upcoming">Nadolazeća</SelectItem>
+                        <SelectItem value="live">LIVE</SelectItem>
+                        <SelectItem value="finished">Završena</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button size="sm" onClick={saveInlineEdit}>
+                      <Save className="h-3.5 w-3.5 mr-1" /> Spremi
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => setInlineEdit(null)}>Odustani</Button>
+                  </div>
+                </div>
               )}
             </CardContent>
           </Card>
