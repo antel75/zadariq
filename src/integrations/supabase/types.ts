@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      business_hours_overrides: {
+        Row: {
+          business_id: string
+          close_time: string | null
+          created_at: string
+          day_of_week: number
+          id: string
+          is_closed: boolean
+          notes: string | null
+          open_time: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          business_id: string
+          close_time?: string | null
+          created_at?: string
+          day_of_week: number
+          id?: string
+          is_closed?: boolean
+          notes?: string | null
+          open_time?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          business_id?: string
+          close_time?: string | null
+          created_at?: string
+          day_of_week?: number
+          id?: string
+          is_closed?: boolean
+          notes?: string | null
+          open_time?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       business_ownership: {
         Row: {
           business_id: string
