@@ -297,20 +297,20 @@ export const businesses: Business[] = [
   { id: 'pk2', name: 'OIL — Ulični parking', category: 'parking', address: 'Zone 0–4, Zadar', phone: '0800 1122', website: 'https://oil.hr/parking/', workingHours: wh('08:00–16:00', '08:00–14:00', 'Besplatno'), verified: true, lastVerified: '2026-02-15', reportCount: 0, verificationStatus: 'owner', ownerVerifiedAt: hoursAgo(2), communityConfirmedAt: hoursAgo(1), lastAutoChecked: hoursAgo(1), trustScore: 92, lat: 44.1155, lng: 15.2255 },
 ];
 
-export function isBusinessOpen(business: Business): boolean {
+export function isBusinessOpen(business: Business): boolean | null {
   if (business.reportCount >= 5) return false; // Hide open status for 5+ reports
   
-  const now = new Date();
+  const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Zagreb' }));
   const dayIndex = now.getDay();
   const dayKeys: (keyof Business['workingHours'])[] = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
   const todayHours = business.workingHours[dayKeys[dayIndex]];
 
-  if (!todayHours || todayHours === 'Zatvoreno' || todayHours === 'Besplatno') {
-    return todayHours === 'Besplatno';
-  }
+  if (!todayHours || todayHours === 'Zatvoreno') return false;
+  if (todayHours === 'Besplatno') return true;
+  if (todayHours === '—' || todayHours === '-') return null; // Unknown hours
 
   const match = todayHours.match(/(\d{2}):(\d{2})–(\d{2}):(\d{2})/);
-  if (!match) return false;
+  if (!match) return null; // Can't parse = unknown
 
   const openMin = parseInt(match[1]) * 60 + parseInt(match[2]);
   const closeMin = parseInt(match[3]) * 60 + parseInt(match[4]);
