@@ -818,6 +818,39 @@ export type Database = {
         }
         Relationships: []
       }
+      shop_sunday_schedule: {
+        Row: {
+          business_id: string
+          close_time: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          open_time: string | null
+          sunday_date: string
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          close_time?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          open_time?: string | null
+          sunday_date: string
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          close_time?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          open_time?: string | null
+          sunday_date?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       sports_events: {
         Row: {
           api_match_id: string | null
