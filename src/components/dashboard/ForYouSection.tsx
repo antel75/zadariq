@@ -5,12 +5,13 @@ import { Sunrise, Sun, Sunset, Moon } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 import { useMorningRoutine, MorningSuggestion } from '@/hooks/useMorningRoutine';
 import { businesses, isBusinessOpen } from '@/data/mockData';
+import { getZadarHour } from '@/hooks/useSituationalMode';
 
 type TimeSlot = 'morning' | 'noon' | 'evening' | 'night';
 
 function getTimeSlot(): TimeSlot {
-  const h = new Date().getHours();
-  const m = new Date().getMinutes();
+  const h = getZadarHour();
+  const m = parseInt(new Date().toLocaleString('en-US', { timeZone: 'Europe/Zagreb', minute: 'numeric' }), 10);
   const totalMin = h * 60 + m;
   // Morning engine: 05:30–10:30
   if (totalMin >= 330 && totalMin < 630) return 'morning';
