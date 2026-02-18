@@ -1,7 +1,7 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { BusinessCard } from '@/components/BusinessCard';
 import { Business } from '@/data/types';
-import { Sunrise, Sun, Sunset, Moon, MapPin } from 'lucide-react';
+import { Sunrise, Sun, Sunset, Moon } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 import { useMorningRoutine, MorningSuggestion } from '@/hooks/useMorningRoutine';
 import { businesses, isBusinessOpen } from '@/data/mockData';
@@ -38,14 +38,6 @@ function MorningSuggestionCard({ suggestion, onReport }: { suggestion: MorningSu
     <div className="space-y-1">
       <div className="flex items-center gap-2 px-1">
         <span className="text-[10px] font-semibold text-accent uppercase tracking-wide">{label}</span>
-        {suggestion.distanceKm !== null && (
-          <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
-            <MapPin className="h-2.5 w-2.5" />
-            {suggestion.distanceKm < 1
-              ? `${Math.round(suggestion.distanceKm * 1000)}m`
-              : `${suggestion.distanceKm.toFixed(1)}km`}
-          </span>
-        )}
       </div>
       <BusinessCard business={suggestion.business} onReport={onReport} />
     </div>
