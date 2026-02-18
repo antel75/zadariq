@@ -5,8 +5,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Zadar bounding box
-const ZADAR_BBOX = '44.08,15.18,44.16,15.28';
+// Zadar wider area bounding box (Nin to Biograd, inland to islands)
+const ZADAR_BBOX = '43.90,15.05,44.30,15.55';
 
 const OVERPASS_URL = 'https://overpass-api.de/api/interpreter';
 
