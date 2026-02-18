@@ -19,9 +19,8 @@ const CATEGORY_LABELS: Record<MorningCategory, { hr: string; en: string }> = {
   pharmacy: { hr: 'Ljekarna 💊', en: 'Pharmacy 💊' },
 };
 
-/** Zadar city center reference point */
-const ZADAR_CENTER = { lat: 44.1155, lng: 15.2255 };
-const PREFERRED_RADIUS_KM = 0.6; // 600m bias
+// Geo-bias removed: Zadar is small (~6km diameter), all places are "nearby".
+// Diversity comes from category rotation + daily seed + freshness tracking.
 
 /** Deterministic seeded PRNG (mulberry32) */
 function mulberry32(seed: number) {
@@ -39,16 +38,6 @@ function getDayOfYear(): number {
   return Math.floor((now.getTime() - start.getTime()) / 86400000);
 }
 
-/** Haversine distance in km */
-function distanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLng = ((lng2 - lng1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
 
 /** Freshness tracking via localStorage */
 const SEEN_KEY = 'zadariq_morning_seen';
@@ -98,7 +87,6 @@ function seededShuffle<T>(arr: T[], rng: () => number): T[] {
 export interface MorningSuggestion {
   business: Business;
   categoryLabel: { hr: string; en: string };
-  distanceKm: number | null;
 }
 
 export function useMorningRoutine(): MorningSuggestion[] {
@@ -131,20 +119,6 @@ export function useMorningRoutine(): MorningSuggestion[] {
     // Score and sort each category's businesses
     function scoreBusiness(b: Business): number {
       let score = 0;
-
-      // Distance bias: prefer within 600m
-      if (b.lat && b.lng) {
-        const dist = distanceKm(ZADAR_CENTER.lat, ZADAR_CENTER.lng, b.lat, b.lng);
-        if (dist <= PREFERRED_RADIUS_KM) {
-          score += 30;
-        } else if (dist <= 2) {
-          score += 15;
-        } else if (dist <= 5) {
-          score += 5;
-        }
-      } else {
-        score += 10; // Unknown distance — neutral
-      }
 
       // Freshness boost: unseen in last 48h
       if (!recentlySeen.has(b.id)) {
@@ -188,9 +162,6 @@ export function useMorningRoutine(): MorningSuggestion[] {
         suggestions.push({
           business: pick,
           categoryLabel: CATEGORY_LABELS[cat],
-          distanceKm: pick.lat && pick.lng
-            ? distanceKm(ZADAR_CENTER.lat, ZADAR_CENTER.lng, pick.lat, pick.lng)
-            : null,
         });
         usedCategories.add(cat);
         usedIds.add(pick.id);
@@ -206,9 +177,6 @@ export function useMorningRoutine(): MorningSuggestion[] {
           suggestions.push({
             business: p,
             categoryLabel: CATEGORY_LABELS.pharmacy,
-            distanceKm: p.lat && p.lng
-              ? distanceKm(ZADAR_CENTER.lat, ZADAR_CENTER.lng, p.lat, p.lng)
-              : null,
           });
           usedIds.add(p.id);
         }
