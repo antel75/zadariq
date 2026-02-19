@@ -129,7 +129,7 @@ Deno.serve(async (req) => {
         Authorization: `Bearer ${resendKey}`,
       },
       body: JSON.stringify({
-        from: "ZadarIQ <onboarding@resend.dev>",
+        from: "ZadarIQ <noreply@zadariq.city>",
         to: [email],
         subject: "ZadarIQ — Verifikacijski kod za preuzimanje vlasništva",
         html: `
