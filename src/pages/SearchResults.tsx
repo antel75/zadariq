@@ -45,7 +45,7 @@ export default function SearchResults() {
         <div className="max-w-lg mx-auto px-4 pb-3">
           <div className="flex gap-2 overflow-x-auto no-scrollbar">
             {categories
-              .filter(c => c.id !== 'emergency' && c.id !== 'transport')
+              .filter(c => c.id !== 'emergency' && c.id !== 'transport' && c.id !== 'medicine')
               .map((cat) => {
                 const isActive = selectedCategory === cat.id;
                 return (
