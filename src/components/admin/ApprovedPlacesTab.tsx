@@ -8,6 +8,12 @@ import { Label } from '@/components/ui/label';
 import { Check, X, MapPin, Pencil, Trash2, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
+const PLACE_CATEGORIES = [
+  'cafes', 'restaurants', 'shops', 'pharmacy', 'parking', 'doctors', 'dentists',
+] as const;
+
+type PlaceCategory = typeof PLACE_CATEGORIES[number];
+
 type Place = {
   id: string;
   proposed_name: string;
@@ -23,6 +29,7 @@ type Place = {
 };
 
 export function ApprovedPlacesTab() {
+  const [activeCategory, setActiveCategory] = useState<PlaceCategory>('cafes');
   const [pendingPlaces, setPendingPlaces] = useState<Place[]>([]);
   const [approvedPlaces, setApprovedPlaces] = useState<Place[]>([]);
   const [editing, setEditing] = useState<Place | null>(null);
@@ -33,6 +40,7 @@ export function ApprovedPlacesTab() {
       .from('pending_places')
       .select('*')
       .eq('status', 'pending')
+      .eq('category', activeCategory)
       .order('created_at', { ascending: false });
     if (pending) setPendingPlaces(pending as unknown as Place[]);
 
@@ -40,11 +48,12 @@ export function ApprovedPlacesTab() {
       .from('pending_places')
       .select('*')
       .eq('status', 'approved')
+      .eq('category', activeCategory)
       .order('proposed_name');
     if (approved) setApprovedPlaces(approved as unknown as Place[]);
   };
 
-  useEffect(() => { fetchAll(); }, []);
+  useEffect(() => { fetchAll(); }, [activeCategory]);
 
   const approve = async (place: Place) => {
     await supabase
@@ -143,6 +152,23 @@ export function ApprovedPlacesTab() {
 
   return (
     <div>
+      {/* Category filter chips */}
+      <div className="flex flex-wrap gap-1.5 mb-4">
+        {PLACE_CATEGORIES.map((cat) => (
+          <button
+            key={cat}
+            onClick={() => { setActiveCategory(cat); setEditing(null); }}
+            className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+              activeCategory === cat
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted text-muted-foreground hover:bg-muted/80'
+            }`}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
       {/* Edit modal */}
       {editing && (
         <Card className="mb-4 border-primary/30">
@@ -179,7 +205,15 @@ export function ApprovedPlacesTab() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label className="text-xs">Category</Label>
-                <Input value={editing.category} onChange={e => setEditing({ ...editing, category: e.target.value })} />
+                <select
+                  value={editing.category}
+                  onChange={e => setEditing({ ...editing, category: e.target.value })}
+                  className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm"
+                >
+                  {PLACE_CATEGORIES.map(c => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <Label className="text-xs">Smoking</Label>
@@ -198,14 +232,14 @@ export function ApprovedPlacesTab() {
       <p className="text-sm font-medium text-foreground mb-2">⏳ Pending ({pendingPlaces.length})</p>
       <div className="space-y-2 mb-6">
         {pendingPlaces.map(p => renderPlaceCard(p, true))}
-        {pendingPlaces.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">No pending submissions.</p>}
+        {pendingPlaces.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">No pending {activeCategory}.</p>}
       </div>
 
       {/* Approved places */}
       <p className="text-sm font-medium text-foreground mb-2">✅ Approved ({approvedPlaces.length})</p>
       <div className="space-y-2">
         {approvedPlaces.map(p => renderPlaceCard(p, false))}
-        {approvedPlaces.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">No approved places yet.</p>}
+        {approvedPlaces.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">No approved {activeCategory} yet.</p>}
       </div>
     </div>
   );
