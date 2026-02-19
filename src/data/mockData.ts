@@ -33,6 +33,7 @@ export const categories: { id: CategoryId; icon: string; labelKey: string }[] = 
   { id: 'shops', icon: 'ShoppingBag', labelKey: 'category.shops' },
   { id: 'restaurants', icon: 'UtensilsCrossed', labelKey: 'category.restaurants' },
   { id: 'cafes', icon: 'Coffee', labelKey: 'category.cafes' },
+  { id: 'gas', icon: 'Fuel', labelKey: 'category.gas' },
   { id: 'parking', icon: 'ParkingSquare', labelKey: 'category.parking' },
   { id: 'transport', icon: 'Bus', labelKey: 'category.transport' },
   { id: 'emergency', icon: 'Siren', labelKey: 'category.emergency' },

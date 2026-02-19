@@ -4,13 +4,13 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { categories } from '@/data/mockData';
 import { CategoryId } from '@/data/types';
 import {
-  Pill, Stethoscope, ShoppingBag, UtensilsCrossed, Coffee,
+  Pill, Stethoscope, ShoppingBag, UtensilsCrossed, Coffee, Fuel,
   ParkingSquare, Bus, Siren, CalendarDays, Building2, ChevronDown, Landmark, Film,
 } from 'lucide-react';
 import { ComponentType } from 'react';
 
 const iconMap: Record<string, ComponentType<{ className?: string }>> = {
-  Pill, Stethoscope, ShoppingBag, UtensilsCrossed, Coffee,
+  Pill, Stethoscope, ShoppingBag, UtensilsCrossed, Coffee, Fuel,
   ParkingSquare, Bus, Siren, CalendarDays, Building2, Film,
 };
 
