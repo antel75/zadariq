@@ -5,18 +5,25 @@ import { categories } from '@/data/mockData';
 import { CategoryId } from '@/data/types';
 import {
   Pill, Stethoscope, ShoppingBag, UtensilsCrossed, Coffee, Fuel,
-  ParkingSquare, Bus, Siren, CalendarDays, Building2, ChevronDown, Landmark, Film,
+  ParkingSquare, Bus, Siren, CalendarDays, Building2, ChevronDown, Film,
 } from 'lucide-react';
 import { ComponentType } from 'react';
 
+// Custom tooth icon for dentists
+const ToothIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 2C9.5 2 7 3.5 7 6c0 2 .5 3.5 0 6-.5 2.5-1.5 5-1 7 .5 1.5 1.5 3 3 3s2-1.5 3-4c1 2.5 1.5 4 3 4s2.5-1.5 3-3c.5-2-.5-4.5-1-7-.5-2.5 0-4 0-6 0-2.5-2.5-4-5-4z" />
+  </svg>
+);
+
 const iconMap: Record<string, ComponentType<{ className?: string }>> = {
   Pill, Stethoscope, ShoppingBag, UtensilsCrossed, Coffee, Fuel,
-  ParkingSquare, Bus, Siren, CalendarDays, Building2, Film,
+  ParkingSquare, Bus, Siren, CalendarDays, Building2, Film, ToothIcon,
 };
 
-// Categories that are subcategories of 'doctor' and should be hidden from main scroll
-const doctorSubcategories: CategoryId[] = ['dentist', 'medicine'];
-const mainCategories = categories.filter(c => !doctorSubcategories.includes(c.id));
+// Hide 'medicine' subcategory — doctor and dentist are now separate top-level
+const hiddenCategories: CategoryId[] = ['medicine'];
+const mainCategories = categories.filter(c => !hiddenCategories.includes(c.id));
 
 // Public services submenu items
 const publicServicesSubmenu = [
@@ -38,12 +45,10 @@ interface CategoryScrollProps {
 export function CategoryScroll({ onSelect }: CategoryScrollProps) {
   const { t, language } = useLanguage();
   const navigate = useNavigate();
-  const [openSubmenu, setOpenSubmenu] = useState<'doctor' | 'publicServices' | 'cinema' | null>(null);
+  const [openSubmenu, setOpenSubmenu] = useState<'publicServices' | 'cinema' | null>(null);
 
   const handleCategoryClick = (id: CategoryId | string) => {
-    if (id === 'doctor') {
-      setOpenSubmenu(openSubmenu === 'doctor' ? null : 'doctor');
-    } else if (id === 'publicServices') {
+    if (id === 'publicServices') {
       navigate('/public-services');
     } else if (id === 'cinema') {
       setOpenSubmenu(openSubmenu === 'cinema' ? null : 'cinema');
@@ -53,28 +58,23 @@ export function CategoryScroll({ onSelect }: CategoryScrollProps) {
     }
   };
 
-  const hasSubmenu = (id: string) => id === 'doctor' || id === 'publicServices' || id === 'cinema';
+  const hasSubmenu = (id: string) => id === 'publicServices' || id === 'cinema';
 
   return (
     <div className="space-y-2">
       <div className="flex gap-2 overflow-x-auto scrollbar-hide py-1 -mx-1 px-1">
         {mainCategories.map((cat) => {
           const Icon = iconMap[cat.icon];
-          const isActive = hasSubmenu(cat.id) && openSubmenu === (cat.id === 'doctor' ? 'doctor' : cat.id === 'publicServices' ? 'publicServices' : null);
           return (
             <button
               key={cat.id}
               onClick={() => handleCategoryClick(cat.id)}
-              className={`flex flex-col items-center gap-1.5 min-w-[72px] px-3 py-3 rounded-2xl bg-card border transition-all active:scale-95 ${
-                isActive
-                  ? 'border-accent bg-accent/10'
-                  : 'border-border hover:border-accent hover:bg-accent/10'
-              }`}
+              className="flex flex-col items-center gap-1.5 min-w-[72px] max-w-[80px] px-2 py-3 rounded-2xl bg-card border border-border hover:border-accent hover:bg-accent/10 transition-all active:scale-95"
             >
-              {Icon && <Icon className="h-5 w-5 text-accent" />}
-              <span className="text-[11px] font-medium text-foreground whitespace-nowrap flex items-center gap-0.5">
+              {Icon && <Icon className="h-5 w-5 text-accent shrink-0" />}
+              <span className="text-[10px] leading-tight font-medium text-foreground text-center line-clamp-2 flex items-center gap-0.5">
                 {t(cat.labelKey)}
-                {hasSubmenu(cat.id) && <ChevronDown className={`h-3 w-3 transition-transform ${isActive ? 'rotate-180' : ''}`} />}
+                {hasSubmenu(cat.id) && <ChevronDown className="h-3 w-3 shrink-0" />}
               </span>
             </button>
           );
@@ -82,41 +82,19 @@ export function CategoryScroll({ onSelect }: CategoryScrollProps) {
         {/* Kino button */}
         <button
           onClick={() => handleCategoryClick('cinema')}
-          className={`flex flex-col items-center gap-1.5 min-w-[72px] px-3 py-3 rounded-2xl bg-card border transition-all active:scale-95 ${
+          className={`flex flex-col items-center gap-1.5 min-w-[72px] max-w-[80px] px-2 py-3 rounded-2xl bg-card border transition-all active:scale-95 ${
             openSubmenu === 'cinema'
               ? 'border-accent bg-accent/10'
               : 'border-border hover:border-accent hover:bg-accent/10'
           }`}
         >
-          <Film className="h-5 w-5 text-accent" />
-          <span className="text-[11px] font-medium text-foreground whitespace-nowrap flex items-center gap-0.5">
+          <Film className="h-5 w-5 text-accent shrink-0" />
+          <span className="text-[10px] leading-tight font-medium text-foreground text-center flex items-center gap-0.5">
             {language === 'hr' ? 'Kino' : 'Cinema'}
-            <ChevronDown className={`h-3 w-3 transition-transform ${openSubmenu === 'cinema' ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`h-3 w-3 shrink-0 transition-transform ${openSubmenu === 'cinema' ? 'rotate-180' : ''}`} />
           </span>
         </button>
       </div>
-
-      {/* Doctor subcategories */}
-      {openSubmenu === 'doctor' && (
-        <div className="flex gap-2 pl-1 animate-in slide-in-from-top-2 duration-200">
-          {doctorSubcategories.map((subId) => {
-            const subCat = categories.find(c => c.id === subId);
-            if (!subCat) return null;
-            return (
-              <button
-                key={subId}
-                onClick={() => { onSelect(subId); setOpenSubmenu(null); }}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-accent/10 border border-accent/30 hover:bg-accent/20 transition-all active:scale-95"
-              >
-                <Stethoscope className="h-4 w-4 text-accent" />
-                <span className="text-xs font-medium text-foreground whitespace-nowrap">
-                  {t(subCat.labelKey)}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      )}
 
       {/* Cinema submenu */}
       {openSubmenu === 'cinema' && (
