@@ -36,6 +36,34 @@ export function SearchBar({ value, onChange, onSubmit }: SearchBarProps) {
       }
       hints.push('Parking centar', 'Ljekarna otvorena sada');
       if (isWeekend) hints.push('Što je otvoreno nedjeljom?');
+    } else if (language === 'de') {
+      if (hour >= 6 && hour < 10) {
+        hints.push('Bäckerei jetzt geöffnet', 'Café für Kaffee');
+      } else if (hour >= 10 && hour < 14) {
+        hints.push('Restaurant zum Mittagessen', 'Apotheke in der Nähe');
+      } else if (hour >= 14 && hour < 18) {
+        hints.push('Zahnarzt Zadar', 'Geschäft geöffnet');
+      } else if (hour >= 18 && hour < 22) {
+        hints.push('Café am Meer', 'Restaurant zum Abendessen');
+      } else {
+        hints.push('Nachtapotheke', 'Tankstelle 0-24');
+      }
+      hints.push('Parkplatz Zentrum', 'Apotheke jetzt geöffnet');
+      if (isWeekend) hints.push('Was hat sonntags geöffnet?');
+    } else if (language === 'it') {
+      if (hour >= 6 && hour < 10) {
+        hints.push('Panetteria aperta ora', 'Caffè per il caffè');
+      } else if (hour >= 10 && hour < 14) {
+        hints.push('Ristorante per pranzo', 'Farmacia vicina');
+      } else if (hour >= 14 && hour < 18) {
+        hints.push('Dentista Zadar', 'Negozio aperto');
+      } else if (hour >= 18 && hour < 22) {
+        hints.push('Caffè sul mare', 'Ristorante per cena');
+      } else {
+        hints.push('Farmacia notturna', 'Distributore 0-24');
+      }
+      hints.push('Parcheggio centro', 'Farmacia aperta ora');
+      if (isWeekend) hints.push('Cosa è aperto la domenica?');
     } else {
       if (hour >= 6 && hour < 10) {
         hints.push('Bakery open now', 'Coffee shop nearby');
