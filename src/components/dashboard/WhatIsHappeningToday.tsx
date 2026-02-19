@@ -88,10 +88,12 @@ function useCityAlertsForFeed() {
   return useQuery({
     queryKey: ['city-alerts-feed'],
     queryFn: async () => {
+      const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
       const { data, error } = await supabase
         .from('city_alerts')
         .select('*')
         .gt('valid_until', new Date().toISOString())
+        .gt('created_at', cutoff)
         .order('priority', { ascending: false })
         .limit(5);
       if (error) throw error;
