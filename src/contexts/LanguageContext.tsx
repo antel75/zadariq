@@ -28,6 +28,7 @@ const translations: Translations = {
   'category.restaurants': { hr: 'Restorani', en: 'Restaurants', de: 'Restaurants', it: 'Ristoranti' },
   'category.cafes': { hr: 'Kafići', en: 'Cafes', de: 'Cafés', it: 'Caffè' },
   'category.gas': { hr: 'Benzinska', en: 'Gas Station', de: 'Tankstelle', it: 'Distributore' },
+  'category.nauticalGas': { hr: 'Nautičke', en: 'Nautical Gas', de: 'Nautik-Tankstelle', it: 'Distributore nautico' },
   'category.parking': { hr: 'Parking', en: 'Parking', de: 'Parken', it: 'Parcheggio' },
   'category.transport': { hr: 'Prijevoz', en: 'Transport', de: 'Transport', it: 'Trasporti' },
   'category.emergency': { hr: 'Hitno', en: 'Emergency', de: 'Notfall', it: 'Emergenza' },

@@ -5,7 +5,7 @@ import { categories } from '@/data/mockData';
 import { CategoryId } from '@/data/types';
 import {
   Pill, Stethoscope, ShoppingBag, UtensilsCrossed, Coffee, Fuel,
-  ParkingSquare, Bus, Siren, CalendarDays, Building2, ChevronDown, Film,
+  ParkingSquare, Bus, Siren, CalendarDays, Building2, ChevronDown, Film, Anchor,
 } from 'lucide-react';
 import { ComponentType } from 'react';
 
@@ -18,7 +18,7 @@ const ToothIcon = ({ className }: { className?: string }) => (
 
 const iconMap: Record<string, ComponentType<{ className?: string }>> = {
   Pill, Stethoscope, ShoppingBag, UtensilsCrossed, Coffee, Fuel,
-  ParkingSquare, Bus, Siren, CalendarDays, Building2, Film, ToothIcon,
+  ParkingSquare, Bus, Siren, CalendarDays, Building2, Film, ToothIcon, Anchor,
 };
 
 // Hide 'medicine' subcategory — doctor and dentist are now separate top-level
