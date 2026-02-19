@@ -9,7 +9,7 @@ import { Check, X, MapPin, Pencil, Trash2, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const PLACE_CATEGORIES = [
-  'cafes', 'restaurants', 'shops', 'pharmacy', 'parking', 'doctors', 'dentists',
+  'cafes', 'restaurants', 'shops', 'pharmacy', 'gas', 'parking', 'doctors', 'dentists',
 ] as const;
 
 type PlaceCategory = typeof PLACE_CATEGORIES[number];

@@ -1,4 +1,4 @@
-export type CategoryId = 'pharmacy' | 'doctor' | 'dentist' | 'medicine' | 'shops' | 'restaurants' | 'cafes' | 'parking' | 'transport' | 'emergency' | 'events' | 'publicServices';
+export type CategoryId = 'pharmacy' | 'doctor' | 'dentist' | 'medicine' | 'shops' | 'restaurants' | 'cafes' | 'gas' | 'parking' | 'transport' | 'emergency' | 'events' | 'publicServices';
 
 export type VerificationStatus = 'owner' | 'community' | 'unverified' | 'possibly_incorrect';
 
