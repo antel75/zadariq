@@ -1,6 +1,7 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Search } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { InstantSearchDropdown } from './InstantSearchDropdown';
 
 interface SearchBarProps {
   value: string;
@@ -13,15 +14,15 @@ const ROTATE_INTERVAL = 3000;
 export function SearchBar({ value, onChange, onSubmit }: SearchBarProps) {
   const { t, language } = useLanguage();
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
+  const [isFocused, setIsFocused] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   const contextualHints = useMemo(() => {
     const hour = new Date().getHours();
     const isWeekend = [0, 6].includes(new Date().getDay());
-
     const hints: string[] = [];
 
     if (language === 'hr') {
-      // Time-aware hints
       if (hour >= 6 && hour < 10) {
         hints.push('Pekara otvorena sada', 'Kafić za kavu');
       } else if (hour >= 10 && hour < 14) {
@@ -33,8 +34,6 @@ export function SearchBar({ value, onChange, onSubmit }: SearchBarProps) {
       } else {
         hints.push('Noćna ljekarna', 'Benzinska 0-24');
       }
-
-      // Always-relevant
       hints.push('Parking centar', 'Ljekarna otvorena sada');
       if (isWeekend) hints.push('Što je otvoreno nedjeljom?');
     } else {
@@ -53,33 +52,54 @@ export function SearchBar({ value, onChange, onSubmit }: SearchBarProps) {
       if (isWeekend) hints.push('What is open on Sunday?');
     }
 
-    // Deduplicate
     return [...new Set(hints)];
   }, [language]);
 
   useEffect(() => {
-    if (value) return; // Don't rotate when user is typing
+    if (value) return;
     const timer = setInterval(() => {
       setPlaceholderIndex((i) => (i + 1) % contextualHints.length);
     }, ROTATE_INTERVAL);
     return () => clearInterval(timer);
   }, [value, contextualHints.length]);
 
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setIsFocused(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
   const placeholder = value ? '' : contextualHints[placeholderIndex] || t('search.placeholder');
+  const showDropdown = isFocused && value.trim().length >= 2;
 
   return (
-    <form
-      onSubmit={(e) => { e.preventDefault(); onSubmit(); }}
-      className="relative w-full"
-    >
-      <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="w-full h-12 pl-12 pr-4 rounded-2xl bg-card border border-border text-foreground text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all"
-      />
-    </form>
+    <div ref={wrapperRef} className="relative w-full">
+      <form
+        onSubmit={(e) => { e.preventDefault(); onSubmit(); setIsFocused(false); }}
+        className="relative w-full"
+      >
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onFocus={() => setIsFocused(true)}
+          placeholder={placeholder}
+          className="w-full h-12 pl-12 pr-4 rounded-2xl bg-card border border-border text-foreground text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all"
+        />
+      </form>
+
+      {showDropdown && (
+        <InstantSearchDropdown
+          query={value}
+          onSelect={() => { setIsFocused(false); onChange(''); }}
+        />
+      )}
+    </div>
   );
 }
