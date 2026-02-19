@@ -28,7 +28,7 @@ loadHoursOverrides();
 export const categories: { id: CategoryId; icon: string; labelKey: string }[] = [
   { id: 'pharmacy', icon: 'Pill', labelKey: 'category.pharmacy' },
   { id: 'doctor', icon: 'Stethoscope', labelKey: 'category.doctor' },
-  { id: 'dentist', icon: 'Stethoscope', labelKey: 'category.dentist' },
+  { id: 'dentist', icon: 'ToothIcon', labelKey: 'category.dentist' },
   { id: 'medicine', icon: 'Stethoscope', labelKey: 'category.medicine' },
   { id: 'shops', icon: 'ShoppingBag', labelKey: 'category.shops' },
   { id: 'restaurants', icon: 'UtensilsCrossed', labelKey: 'category.restaurants' },
