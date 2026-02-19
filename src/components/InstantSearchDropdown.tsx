@@ -50,7 +50,7 @@ export function InstantSearchDropdown({ query, onSelect }: InstantSearchDropdown
       <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-popover border border-border rounded-2xl shadow-lg overflow-hidden">
         <div className="px-4 py-6 text-center">
           <p className="text-sm text-muted-foreground">
-            {language === 'hr' ? 'Nema rezultata za' : 'No results for'} "{trimmed}"
+            {{ hr: 'Nema rezultata za', en: 'No results for', de: 'Keine Ergebnisse für', it: 'Nessun risultato per' }[language] || 'No results for'} "{trimmed}"
           </p>
         </div>
       </div>
@@ -64,7 +64,7 @@ export function InstantSearchDropdown({ query, onSelect }: InstantSearchDropdown
         {matchedCategories.length > 0 && (
           <div className="px-3 pt-3 pb-1">
             <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground px-1 mb-1">
-              {language === 'hr' ? 'Kategorije' : 'Categories'}
+              {{ hr: 'Kategorije', en: 'Categories', de: 'Kategorien', it: 'Categorie' }[language] || 'Categories'}
             </p>
             {matchedCategories.map(cat => (
               <button
@@ -88,7 +88,7 @@ export function InstantSearchDropdown({ query, onSelect }: InstantSearchDropdown
         {matchedBusinesses.length > 0 && (
           <div className="px-3 pt-2 pb-2">
             <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground px-1 mb-1">
-              {language === 'hr' ? 'Mjesta' : 'Places'}
+              {{ hr: 'Mjesta', en: 'Places', de: 'Orte', it: 'Luoghi' }[language] || 'Places'}
             </p>
             {matchedBusinesses.map(b => {
               const open = isBusinessOpen(b);
@@ -132,7 +132,7 @@ export function InstantSearchDropdown({ query, onSelect }: InstantSearchDropdown
           >
             <Search className="h-4 w-4 text-accent" />
             <span className="text-sm text-accent font-medium">
-              {language === 'hr' ? `Pretraži sve za "${trimmed}"` : `Search all for "${trimmed}"`}
+              {{ hr: `Pretraži sve za "${trimmed}"`, en: `Search all for "${trimmed}"`, de: `Alle Ergebnisse für "${trimmed}"`, it: `Cerca tutto per "${trimmed}"` }[language] || `Search all for "${trimmed}"`}
             </span>
           </button>
         </div>
