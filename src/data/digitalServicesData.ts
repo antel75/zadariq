@@ -22,7 +22,7 @@ export const digitalServiceCategories: DigitalServiceCategory[] = [
         id: 'moja-cistoca',
         name: 'Moja Čistoća',
         description: 'Stanje računa, raspored odvoza, e-račun, reklamacije',
-        loginUrl: 'https://moja.cistoca-zadar.hr/login',
+        loginUrl: 'https://moja.cistoca-zadar.hr/',
         icon: 'Recycle',
         proTip: 'Za registraciju treba OIB i šifra kupca s uplatnice',
       },
