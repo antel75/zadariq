@@ -64,19 +64,12 @@ export const digitalServiceCategories: DigitalServiceCategory[] = [
     labelKey: 'digital.cat.parking',
     services: [
       {
-        id: 'obala-parking',
-        name: 'Obala usluge — Parking',
-        description: 'SMS parking, pretplate, pregled kazni, e-usluge',
-        loginUrl: 'https://www.obala-usluge.hr',
+        id: 'bmove-parking',
+        name: 'bMOVE — Plaćanje parkinga',
+        description: 'Online kupnja parkirne karte, pretplate, pregled zona',
+        loginUrl: 'https://app.bmove.com/odabir-karte/zadar/',
         icon: 'Car',
         proTip: 'SMS parking: pošalji registraciju na 785785',
-      },
-      {
-        id: 'enis-parking',
-        name: 'Enís Parking App',
-        description: 'Mobilna aplikacija za plaćanje parkinga u Zadru',
-        loginUrl: 'https://www.enisparking.com',
-        icon: 'Smartphone',
       },
     ],
   },
