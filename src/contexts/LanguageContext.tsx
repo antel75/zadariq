@@ -136,6 +136,11 @@ const translations: Translations = {
   'quick.bus': { hr: 'Autobus', en: 'Bus', de: 'Bus', it: 'Autobus' },
   'quick.cinema': { hr: 'Kino', en: 'Cinema', de: 'Kino', it: 'Cinema' },
   'quick.digital': { hr: 'e-Usluge', en: 'e-Services', de: 'e-Dienste', it: 'e-Servizi' },
+  // Tourist quick actions
+  'tourist.explore': { hr: 'Istraži Zadar', en: 'Explore Zadar', de: 'Zadar entdecken', it: 'Esplora Zara' },
+  'tourist.beaches': { hr: 'Plaže', en: 'Beaches', de: 'Strände', it: 'Spiagge' },
+  'tourist.sights': { hr: 'Znamenitosti', en: 'Sightseeing', de: 'Sehenswürdigkeiten', it: 'Attrazioni' },
+  'tourist.restaurants': { hr: 'Restorani', en: 'Restaurants', de: 'Restaurants', it: 'Ristoranti' },
   // For you
   'foryou.morning': { hr: 'Za tebe ujutro', en: 'For you this morning', de: 'Für dich am Morgen', it: 'Per te stamattina' },
   'foryou.noon': { hr: 'Za ručak u blizini', en: 'Lunch nearby', de: 'Mittagessen in der Nähe', it: 'Pranzo nelle vicinanze' },

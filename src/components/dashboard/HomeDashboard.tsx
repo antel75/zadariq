@@ -17,6 +17,7 @@ import { ModeIndicator } from './ModeIndicator';
 import { ZadarClock } from './ZadarClock';
 import { TodayAlerts } from './TodayAlerts';
 import { QuickActions } from './QuickActions';
+import { TouristQuickActions } from './TouristQuickActions';
 import { ForYouSection } from './ForYouSection';
 import { TransportWidget } from './TransportWidget';
 import { EvChargerWidget } from './EvChargerWidget';
@@ -137,7 +138,7 @@ export function HomeDashboard({ onReportTarget, reportTarget }: HomeDashboardPro
   ) : null;
 
   const quickActionsBlock = show.quickActions ? (
-    <Section className="mb-4"><QuickActions /></Section>
+    <Section className="mb-4">{mode === 'tourist' ? <TouristQuickActions /> : <QuickActions />}</Section>
   ) : null;
 
   const alertsBlock = show.alerts ? (
