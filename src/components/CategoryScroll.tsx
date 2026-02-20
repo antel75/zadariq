@@ -47,9 +47,17 @@ export function CategoryScroll({ onSelect }: CategoryScrollProps) {
   const navigate = useNavigate();
   const [openSubmenu, setOpenSubmenu] = useState<'publicServices' | 'cinema' | null>(null);
 
+  // Categories that route to dedicated pages instead of CategoryBrowse
+  const directRoutes: Record<string, string> = {
+    publicServices: '/public-services',
+    transport: '/transport',
+    parking: '/parking',
+    emergency: '/emergency',
+  };
+
   const handleCategoryClick = (id: CategoryId | string) => {
-    if (id === 'publicServices') {
-      navigate('/public-services');
+    if (directRoutes[id]) {
+      navigate(directRoutes[id]);
     } else if (id === 'cinema') {
       setOpenSubmenu(openSubmenu === 'cinema' ? null : 'cinema');
     } else {
