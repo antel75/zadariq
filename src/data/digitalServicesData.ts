@@ -167,7 +167,7 @@ export const digitalServiceCategories: DigitalServiceCategory[] = [
         id: 'cezih',
         name: 'CEZIH — Moji nalazi',
         description: 'Laboratorijski nalazi, e-Uputnice, e-Recepti',
-        loginUrl: 'https://www.cezih.hr/mojinalazi/',
+        loginUrl: 'https://mojinalazi.cezih.hr/',
         icon: 'Heart',
         proTip: 'Pristup preko e-Građani — trebate eOI ili FINA certifikat',
       },
@@ -175,7 +175,7 @@ export const digitalServiceCategories: DigitalServiceCategory[] = [
         id: 'hzzo',
         name: 'HZZO — e-Usluge',
         description: 'Status osiguranja, doznake, uputnice',
-        loginUrl: 'https://hzzo.hr/e-usluge',
+        loginUrl: 'https://www.hzzo.hr/',
         icon: 'ShieldCheck',
       },
       {
