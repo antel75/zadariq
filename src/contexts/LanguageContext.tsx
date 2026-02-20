@@ -135,6 +135,7 @@ const translations: Translations = {
   'quick.emergency': { hr: 'Hitno', en: 'Emergency', de: 'Notfall', it: 'Emergenza' },
   'quick.bus': { hr: 'Autobus', en: 'Bus', de: 'Bus', it: 'Autobus' },
   'quick.cinema': { hr: 'Kino', en: 'Cinema', de: 'Kino', it: 'Cinema' },
+  'quick.digital': { hr: 'e-Usluge', en: 'e-Services', de: 'e-Dienste', it: 'e-Servizi' },
   // For you
   'foryou.morning': { hr: 'Za tebe ujutro', en: 'For you this morning', de: 'Für dich am Morgen', it: 'Per te stamattina' },
   'foryou.noon': { hr: 'Za ručak u blizini', en: 'Lunch nearby', de: 'Mittagessen in der Nähe', it: 'Pranzo nelle vicinanze' },

@@ -19,6 +19,7 @@ import KinoZona from "./pages/KinoZona";
 import PublicServices from "./pages/PublicServices";
 import PublicServicesMenu from "./pages/PublicServicesMenu";
 import UtilityCompanies from "./pages/UtilityCompanies";
+import DigitalZadar from "./pages/DigitalZadar";
 import AdminLogin from "./pages/AdminLogin";
 import AdminSignup from "./pages/AdminSignup";
 import AdminPanel from "./pages/AdminPanel";
@@ -52,6 +53,7 @@ const App = () => (
               <Route path="/public-services" element={<PublicServicesMenu />} />
               <Route path="/public-services/:orgId" element={<PublicServices />} />
               <Route path="/utility-companies" element={<UtilityCompanies />} />
+              <Route path="/digital-zadar" element={<DigitalZadar />} />
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin/signup" element={<AdminSignup />} />
               <Route path="/admin" element={<AdminPanel />} />

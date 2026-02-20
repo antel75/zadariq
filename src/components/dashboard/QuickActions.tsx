@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Pill, Car, Siren, Ship } from 'lucide-react';
+import { Pill, Car, Siren, Ship, Globe } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 
 interface QuickAction {
@@ -39,12 +39,18 @@ export function QuickActions() {
       action: () => navigate('/parking'),
       color: 'bg-accent/10 text-accent',
     },
+    {
+      icon: Globe,
+      labelKey: 'quick.digital',
+      action: () => navigate('/digital-zadar'),
+      color: 'bg-secondary text-secondary-foreground',
+    },
   ];
 
   return (
     <div>
       <h2 className="text-sm font-semibold text-foreground mb-2">{t('dashboard.quickActions')}</h2>
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-5 gap-2">
         {actions.map((a) => {
           const Icon = a.icon;
           return (
