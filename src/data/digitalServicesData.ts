@@ -196,7 +196,7 @@ export const digitalServiceCategories: DigitalServiceCategory[] = [
         id: 'fina',
         name: 'FINA e-Usluge',
         description: 'Digitalni certifikati, e-Potpis, e-Banka',
-        loginUrl: 'https://www.fina.hr/e-usluge',
+        loginUrl: 'https://www.fina.hr',
         icon: 'KeyRound',
       },
       {
