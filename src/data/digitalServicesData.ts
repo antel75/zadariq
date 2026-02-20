@@ -103,7 +103,7 @@ export const digitalServiceCategories: DigitalServiceCategory[] = [
         id: 'e-katastar',
         name: 'e-Katastar',
         description: 'Pregled katastarskih planova i čestica',
-        loginUrl: 'https://oss.uredjenazemlja.hr/public/cadServices.jsp?action=publicCadParcels',
+        loginUrl: 'https://oss.uredjenazemlja.hr/public/cadServices.jsp',
         icon: 'MapPin',
       },
       {
