@@ -153,7 +153,7 @@ export const digitalServiceCategories: DigitalServiceCategory[] = [
         id: 'hac-enc',
         name: 'HAC/ENC — Autoceste',
         description: 'ENC uređaj, dopuna, stanje računa, e-cestarina',
-        loginUrl: 'https://www.enc.hr',
+        loginUrl: 'https://www.hac.hr/hr/enc',
         icon: 'Gauge',
         proTip: 'ENC dopuna online — bez čekanja na naplatnim kućicama',
       },
