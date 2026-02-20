@@ -96,7 +96,7 @@ export const digitalServiceCategories: DigitalServiceCategory[] = [
         id: 'e-izvadak',
         name: 'e-Izvadak iz zemljišnih knjiga',
         description: 'Online uvid u zemljišne knjige',
-        loginUrl: 'https://oss.uredjenazemlja.hr/public/lrServices.jsp?action=publicLdbExtract',
+        loginUrl: 'https://oss.uredjenazemlja.hr/',
         icon: 'Map',
       },
       {
