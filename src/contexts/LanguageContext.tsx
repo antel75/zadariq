@@ -167,6 +167,9 @@ const translations: Translations = {
   'biz.liveOccupancy': { hr: 'Zauzetost', en: 'Live occupancy', de: 'Aktuelle Auslastung', it: 'Occupazione live' },
   'biz.waitTime': { hr: 'Vrijeme čekanja', en: 'Wait time', de: 'Wartezeit', it: 'Tempo di attesa' },
   'biz.nextAppt': { hr: 'Sljedeći termin', en: 'Next available', de: 'Nächster Termin', it: 'Prossimo disponibile' },
+  // Mode switch
+  'mode.resident': { hr: 'Rezident', en: 'Resident', de: 'Einwohner', it: 'Residente' },
+  'mode.tourist': { hr: 'Turist', en: 'Tourist', de: 'Tourist', it: 'Turista' },
   // Featured
   'featured.title': { hr: 'Istaknuto u blizini', en: 'Featured today nearby', de: 'Empfohlen in der Nähe', it: 'In evidenza oggi vicino' },
   // Follow/notify
