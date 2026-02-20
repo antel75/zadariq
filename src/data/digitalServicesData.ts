@@ -165,9 +165,9 @@ export const digitalServiceCategories: DigitalServiceCategory[] = [
     services: [
       {
         id: 'cezih',
-        name: 'CEZIH — Moji nalazi',
-        description: 'Laboratorijski nalazi, e-Uputnice, e-Recepti',
-        loginUrl: 'https://mojinalazi.cezih.hr/',
+        name: 'Portal zdravlja — Moji nalazi',
+        description: 'Laboratorijski nalazi, e-Uputnice, e-Recepti, eKarton',
+        loginUrl: 'https://portal.zdravlje.hr/portalzdravlja/login.html',
         icon: 'Heart',
         proTip: 'Pristup preko e-Građani — trebate eOI ili FINA certifikat',
       },
@@ -182,8 +182,9 @@ export const digitalServiceCategories: DigitalServiceCategory[] = [
         id: 'narucivanje',
         name: 'Naručivanje kod liječnika',
         description: 'Online naručivanje u ambulantu obiteljske medicine',
-        loginUrl: 'https://www.e-narudzbe.hr',
+        loginUrl: 'https://portal.zdravlje.hr/portalzdravlja/login.html',
         icon: 'CalendarCheck',
+        proTip: 'Naručivanje je dostupno unutar Portala zdravlja (e-Građani)',
       },
     ],
   },
