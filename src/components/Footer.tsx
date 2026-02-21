@@ -9,6 +9,15 @@ export const Footer = () => (
       >
         Pravne informacije
       </Link>
+      <Link
+        to="/data-sources"
+        className="text-accent font-medium underline underline-offset-2 hover:text-accent/80 transition-colors"
+      >
+        Izvori podataka
+      </Link>
+      <p className="text-[10px] text-muted-foreground/60 leading-relaxed mt-1">
+        ZadarIQ je nezavisni informativni projekt čiji je cilj objediniti javno dostupne gradske informacije na jednom mjestu radi lakšeg snalaženja građana i posjetitelja.
+      </p>
       <span className="text-muted-foreground">© {new Date().getFullYear()} ZadarIQ</span>
     </div>
   </footer>

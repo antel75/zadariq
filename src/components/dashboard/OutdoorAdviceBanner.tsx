@@ -66,11 +66,14 @@ export function OutdoorAdviceBanner() {
           </p>
         )}
       </div>
-      {updatedTime && (
-        <span className="text-[9px] opacity-50 flex-shrink-0 self-end">
-          {t('outdoor.updated')} {updatedTime}
-        </span>
-      )}
+      <div className="flex items-center gap-2">
+        {updatedTime && (
+          <span className="text-[9px] opacity-50 flex-shrink-0 self-end">
+            {t('outdoor.updated')} {updatedTime}
+          </span>
+        )}
+        <span className="text-[9px] opacity-40 flex-shrink-0 self-end ml-auto">Izvor: Open-Meteo</span>
+      </div>
     </button>
   );
 }

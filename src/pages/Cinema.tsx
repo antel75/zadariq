@@ -169,19 +169,9 @@ export default function Cinema() {
                   className="flex gap-3 p-3 cursor-pointer"
                   onClick={() => setExpandedMovie(isExpanded ? null : movie.id)}
                 >
-                  {/* Poster */}
-                  {movie.poster_url ? (
-                    <img
-                      src={movie.poster_url}
-                      alt={movie.title}
-                      className="w-16 h-24 rounded-lg object-cover flex-shrink-0"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="w-16 h-24 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
-                      <Film className="w-6 h-6 text-muted-foreground/40" />
-                    </div>
-                  )}
+                  <div className="w-16 h-24 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+                    <Film className="w-6 h-6 text-muted-foreground/40" />
+                  </div>
 
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-sm text-foreground leading-tight">{movie.title}</h3>
@@ -223,10 +213,6 @@ export default function Cinema() {
                 {/* Expanded details */}
                 {isExpanded && (
                   <div className="border-t border-border px-3 py-3 space-y-3 bg-muted/30">
-                    {movie.description && (
-                      <p className="text-xs text-muted-foreground leading-relaxed">{movie.description}</p>
-                    )}
-
                     {/* Screenings grouped by date */}
                     {screeningGroups.map(([date, dateScreenings]) => (
                       <div key={date}>
@@ -257,9 +243,10 @@ export default function Cinema() {
                         className="inline-flex items-center gap-1.5 text-xs text-accent font-medium hover:underline"
                       >
                         <ExternalLink className="w-3 h-3" />
-                        {language === 'hr' ? 'Kupi ulaznice na CineStar.hr' : 'Buy tickets on CineStar.hr'}
+                        {language === 'hr' ? 'Detalji na izvoru' : 'Details on source'}
                       </a>
                     )}
+                    <p className="text-[9px] text-muted-foreground/50">Izvor: CineStar</p>
                   </div>
                 )}
               </div>

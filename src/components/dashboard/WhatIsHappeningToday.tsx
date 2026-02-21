@@ -456,6 +456,9 @@ export function WhatIsHappeningToday() {
                     {card.sourceMeta && (
                       <p className="text-[9px] text-muted-foreground/60 mt-0.5">{card.sourceMeta}</p>
                     )}
+                    {card.type === 'upcoming_sport' || card.type === 'live_sport' || card.type === 'finished_sport' ? (
+                      <p className="text-[9px] text-muted-foreground/50 mt-0.5">Izvor: javni sportski podaci</p>
+                    ) : null}
                     {isDebug && card.debugInfo && (
                       <p className="text-[8px] text-muted-foreground/40 mt-0.5 font-mono break-all">{card.debugInfo}</p>
                     )}
