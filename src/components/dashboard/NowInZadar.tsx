@@ -395,7 +395,7 @@ export function NowInZadar({ mode = 'day', appMode = 'normal' }: NowInZadarProps
         candidates.push({
           icon: Trophy,
           iconColor: 'text-[hsl(var(--status-warning))]',
-          label: `${emoji} ${t('happening.todayPlays')}`,
+          label: `${emoji} ${ev.is_local_team ? t('happening.todayPlays') : t('happening.todayMatchGeneric')}`,
           answer: `${ev.home_team} – ${ev.away_team} ${t('happening.at')} ${new Date(ev.start_time).toLocaleTimeString('hr-HR', { hour: '2-digit', minute: '2-digit' })}`,
           action: () => {},
           priority: 116,
