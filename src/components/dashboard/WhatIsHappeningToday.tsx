@@ -206,13 +206,16 @@ export function WhatIsHappeningToday() {
         if (live.some((l: any) => l.id === ev.id)) continue;
         const emoji = sportEmoji(ev.team_tag);
         const isF1 = ev.team_tag === 'f1';
+        const eventDate = new Date(ev.start_time);
+        const todayDate = new Date();
+        const isTomorrow = eventDate.toDateString() !== todayDate.toDateString();
         const teamLabel = ev.is_local_team
-          ? t('happening.todayPlays')
+          ? t(isTomorrow ? 'happening.tomorrowPlays' : 'happening.todayPlays')
           : ev.team_tag === 'hajduk'
-            ? t('happening.todayPlaysHajduk')
+            ? t(isTomorrow ? 'happening.tomorrowPlaysHajduk' : 'happening.todayPlaysHajduk')
             : ev.team_tag === 'croatia_football' || ev.team_tag === 'croatia_nt'
-              ? t('happening.todayPlaysCroatia')
-              : t('happening.todayMatchGeneric');
+              ? t(isTomorrow ? 'happening.tomorrowPlaysCroatia' : 'happening.todayPlaysCroatia')
+              : t(isTomorrow ? 'happening.tomorrowMatchGeneric' : 'happening.todayMatchGeneric');
         const label = isF1 ? t('happening.nextRace') : teamLabel;
         const hoursUntil = (new Date(ev.start_time).getTime() - now) / 3600000;
         const priority = hoursUntil < 3 ? 100 : 90;
