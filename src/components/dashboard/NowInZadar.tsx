@@ -326,25 +326,47 @@ export function NowInZadar({ mode = 'day', appMode = 'normal' }: NowInZadarProps
     });
   }
 
-  if (powerOutages.length > 0) {
-    const first = powerOutages[0];
+  // Filter power outages to only show active ones (time_until not yet passed)
+  const activePowerOutages = powerOutages.filter(o => {
+    if (!o.time_until) return true;
+    const today = new Date().toISOString().split('T')[0];
+    const endTime = new Date(`${today}T${o.time_until}:00`);
+    return endTime > new Date();
+  });
+
+  if (activePowerOutages.length > 0) {
+    const first = activePowerOutages[0];
     const timeRange = first.time_from && first.time_until ? `${first.time_from}–${first.time_until}` : '';
+    const shortArea = first.area.length > 60 ? first.area.substring(0, 57) + '…' : first.area;
     candidates.push({
       icon: Zap, iconColor: 'text-yellow-400', label: t('now.powerOutage'),
-      answer: powerOutages.length > 1
-        ? `⚡ ${powerOutages.length} ${t('now.areasAffected')}`
-        : `⚡ ${first.area}${timeRange ? ` ${timeRange}` : ''}`,
+      answer: activePowerOutages.length > 1
+        ? `⚡ ${activePowerOutages.length} ${t('now.areasAffected')}`
+        : `⚡ ${shortArea}${timeRange ? ` ${timeRange}` : ''}`,
       action: () => navigate('/utility-companies'),
       priority: 112, isActionable: true,
     });
   }
 
-  if (waterOutages.length > 0) {
+  // Filter water outages to only show active ones (time_until not yet passed)
+  const activeWaterOutages = waterOutages.filter(o => {
+    if (!o.time_until) return true;
+    const today = new Date().toISOString().split('T')[0];
+    const endTime = new Date(`${today}T${o.time_until}:00`);
+    return endTime > new Date();
+  });
+
+  if (activeWaterOutages.length > 0) {
+    const areaText = activeWaterOutages[0].area;
+    const timeRange = activeWaterOutages[0].time_from && activeWaterOutages[0].time_until
+      ? `${activeWaterOutages[0].time_from}–${activeWaterOutages[0].time_until}`
+      : '';
+    const shortArea = areaText.length > 60 ? areaText.substring(0, 57) + '…' : areaText;
     candidates.push({
       icon: Droplets, iconColor: 'text-blue-400', label: t('now.waterOutage'),
-      answer: waterOutages.length > 1
-        ? `💧 ${waterOutages.length} ${t('now.areasAffected')}`
-        : `💧 ${waterOutages[0].area}`,
+      answer: activeWaterOutages.length > 1
+        ? `💧 ${activeWaterOutages.length} ${t('now.areasAffected')}`
+        : `💧 ${shortArea}${timeRange ? ` ${timeRange}` : ''}`,
       action: () => navigate('/utility-companies'),
       priority: 112, isActionable: true,
     });
