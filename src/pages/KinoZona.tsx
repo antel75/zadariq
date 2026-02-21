@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft, Clock, Film, ExternalLink, Loader2, Play } from 'lucide-react';
+import { ArrowLeft, Clock, Film, ExternalLink, Loader2 } from 'lucide-react';
 import { Footer } from '@/components/Footer';
 import { format, parseISO, isToday, isTomorrow, addDays } from 'date-fns';
 import { hr } from 'date-fns/locale';
@@ -137,13 +137,9 @@ export default function KinoZona() {
                   className="flex gap-3 p-3 cursor-pointer"
                   onClick={() => setExpandedMovie(isExpanded ? null : movie.id)}
                 >
-                  {movie.poster_url ? (
-                    <img src={movie.poster_url} alt={movie.title} className="w-16 h-24 rounded-lg object-cover flex-shrink-0" loading="lazy" />
-                  ) : (
-                    <div className="w-16 h-24 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
-                      <Film className="w-6 h-6 text-muted-foreground/40" />
-                    </div>
-                  )}
+                  <div className="w-16 h-24 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+                    <Film className="w-6 h-6 text-muted-foreground/40" />
+                  </div>
 
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-sm text-foreground leading-tight">{movie.title}</h3>
@@ -169,9 +165,6 @@ export default function KinoZona() {
 
                 {isExpanded && (
                   <div className="border-t border-border px-3 py-3 space-y-3 bg-muted/30">
-                    {movie.description && (
-                      <p className="text-xs text-muted-foreground leading-relaxed">{movie.description}</p>
-                    )}
                     {movie.country && (
                       <p className="text-[10px] text-muted-foreground">{movie.country}{movie.year ? ` · ${movie.year}` : ''}</p>
                     )}
@@ -189,21 +182,14 @@ export default function KinoZona() {
                       </div>
                     ))}
 
-                    <div className="flex gap-3">
-                      {movie.kino_zona_url && (
-                        <a href={movie.kino_zona_url} target="_blank" rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-xs text-accent font-medium hover:underline">
-                          <ExternalLink className="w-3 h-3" />
-                          {language === 'hr' ? 'Više na kino-zona.com' : 'More on kino-zona.com'}
-                        </a>
-                      )}
-                      {movie.trailer_url && (
-                        <a href={movie.trailer_url} target="_blank" rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-xs text-accent font-medium hover:underline">
-                          <Play className="w-3 h-3" /> Trailer
-                        </a>
-                      )}
-                    </div>
+                    {movie.kino_zona_url && (
+                      <a href={movie.kino_zona_url} target="_blank" rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-xs text-accent font-medium hover:underline">
+                        <ExternalLink className="w-3 h-3" />
+                        {language === 'hr' ? 'Detalji na izvoru' : 'Details on source'}
+                      </a>
+                    )}
+                    <p className="text-[9px] text-muted-foreground/50">Izvor: kino-zona.com</p>
                   </div>
                 )}
               </div>

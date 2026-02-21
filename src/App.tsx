@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { LegalNoticeBar } from "@/components/LegalNoticeBar";
+import { lazy, Suspense } from "react";
 import Index from "./pages/Index";
 import SearchResults from "./pages/SearchResults";
 import BusinessDetail from "./pages/BusinessDetail";
@@ -27,6 +29,8 @@ import PravneInformacije from "./pages/PravneInformacije";
 import AddCafe from "./pages/AddCafe";
 import EvChargers from "./pages/EvChargers";
 import NotFound from "./pages/NotFound";
+
+const DataSources = lazy(() => import("./pages/DataSources"));
 
 const queryClient = new QueryClient();
 
@@ -60,8 +64,10 @@ const App = () => (
               <Route path="/pravne-informacije" element={<PravneInformacije />} />
               <Route path="/add-cafe" element={<AddCafe />} />
               <Route path="/ev-chargers" element={<EvChargers />} />
+              <Route path="/data-sources" element={<Suspense fallback={null}><DataSources /></Suspense>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <LegalNoticeBar />
           </BrowserRouter>
         </TooltipProvider>
       </LanguageProvider>

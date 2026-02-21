@@ -303,6 +303,7 @@ export function TodayCard() {
             );
           })}
         </div>
+        <p className="text-[9px] text-muted-foreground/50 mt-2 text-right">Izvor: DHMZ / Open-Meteo</p>
       </div>
 
       {/* Modals */}
