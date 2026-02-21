@@ -206,7 +206,7 @@ export function WhatIsHappeningToday() {
         if (live.some((l: any) => l.id === ev.id)) continue;
         const emoji = sportEmoji(ev.team_tag);
         const isF1 = ev.team_tag === 'f1';
-        const label = isF1 ? t('happening.nextRace') : t('happening.todayPlays');
+        const label = isF1 ? t('happening.nextRace') : (ev.is_local_team ? t('happening.todayPlays') : t('happening.todayMatchGeneric'));
         const hoursUntil = (new Date(ev.start_time).getTime() - now) / 3600000;
         const priority = hoursUntil < 3 ? 100 : 90;
         const fetchedTime = ev.fetched_at ? new Date(ev.fetched_at).toLocaleTimeString('hr-HR', { hour: '2-digit', minute: '2-digit' }) : '';

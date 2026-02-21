@@ -524,6 +524,8 @@ const translations: Translations = {
   'happening.at': { hr: 'u', en: 'at', de: 'um', it: 'alle' },
   'happening.liveMatch': { hr: 'Utakmica u tijeku', en: 'Match in progress', de: 'Spiel läuft', it: 'Partita in corso' },
   'happening.todayPlays': { hr: 'Danas igra Zadar', en: 'Zadar plays today', de: 'Zadar spielt heute', it: 'Zadar gioca oggi' },
+  'happening.todayMatch': { hr: 'Sutra nogometni derbi', en: 'Football derby tomorrow', de: 'Fußballderby morgen', it: 'Derby di calcio domani' },
+  'happening.todayMatchGeneric': { hr: 'Utakmica danas', en: 'Match today', de: 'Spiel heute', it: 'Partita oggi' },
   'happening.nextMatch': { hr: 'Sljedeća utakmica', en: 'Next match', de: 'Nächstes Spiel', it: 'Prossima partita' },
   'happening.lastResult': { hr: 'Zadnji rezultat', en: 'Last result', de: 'Letztes Ergebnis', it: 'Ultimo risultato' },
   'happening.noSportsData': { hr: 'Nema dostupnih sportskih podataka', en: 'No sports data available', de: 'Keine Sportdaten verfügbar', it: 'Nessun dato sportivo disponibile' },
