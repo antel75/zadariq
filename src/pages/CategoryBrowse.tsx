@@ -18,7 +18,7 @@ function distanceKm(lat1: number, lng1: number, lat2: number, lng2: number): num
 }
 
 // Categories that should sort by proximity when location is available
-const proximitySortCategories: string[] = ['gas', 'nauticalGas', 'chargers'];
+const proximitySortCategories: string[] = ['gas', 'nauticalGas', 'chargers', 'shops'];
 // Extract the meaningful sort key from a business name
 function getSortKey(name: string): string {
   let n = name;
@@ -53,12 +53,11 @@ export default function CategoryBrowse() {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [openOnly, setOpenOnly] = useState(searchParams.get('open') === '1');
+  const useProximity = proximitySortCategories.includes(categoryId || '');
+  const [openOnly, setOpenOnly] = useState(searchParams.get('open') === '1' || useProximity);
   const [reportTarget, setReportTarget] = useState<Business | null>(null);
   const { data: approvedPlaces } = useApprovedPlaces();
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
-
-  const useProximity = proximitySortCategories.includes(categoryId || '');
 
   // Request geolocation for proximity-sorted categories
   useEffect(() => {
