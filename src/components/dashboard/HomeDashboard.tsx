@@ -81,7 +81,7 @@ export function HomeDashboard({ onReportTarget, reportTarget }: HomeDashboardPro
   if (!residentTouristModeEnabled) {
     return <OriginalLayout
       modeConfig={modeConfig} appMode={appMode} show={show} isMatchActive={isMatchActive}
-      query={query} setQuery={setQuery} handleSearch={handleSearch} handleCategory={handleCategory}
+      handleCategory={handleCategory}
       trendingSearches={trendingSearches} nearbyOpen={nearbyOpen}
       onReportTarget={onReportTarget} t={t} navigate={navigate}
     />;
@@ -133,7 +133,7 @@ export function HomeDashboard({ onReportTarget, reportTarget }: HomeDashboardPro
 
   const searchBlock = show.search ? (
     <Section className="mb-4">
-      <SearchBar value={query} onChange={setQuery} onSubmit={handleSearch} />
+      <SearchBar  />
     </Section>
   ) : null;
 
@@ -280,7 +280,7 @@ function OriginalLayout({ modeConfig, appMode, show, isMatchActive, query, setQu
         <NowInZadar mode={modeConfig.mode} appMode={appMode.mode} />
       </motion.section>
       {show.quickActions && <motion.section className="mb-4" variants={fadeUp} initial="hidden" animate="visible" custom={sectionIndex++}><QuickActions /></motion.section>}
-      {show.search && <motion.div className="mb-4" variants={fadeUp} initial="hidden" animate="visible" custom={sectionIndex++}><SearchBar value={query} onChange={setQuery} onSubmit={handleSearch} /></motion.div>}
+      {show.search && <motion.div className="mb-4" variants={fadeUp} initial="hidden" animate="visible" custom={sectionIndex++}><SearchBar  /></motion.div>}
       {show.alerts && <motion.section className="mb-4" variants={fadeUp} initial="hidden" animate="visible" custom={sectionIndex++}><TodayAlerts /></motion.section>}
       {show.transport && <motion.section className="mb-4" variants={fadeUp} initial="hidden" animate="visible" custom={sectionIndex++}><TransportWidget /></motion.section>}
       <motion.section className="mb-4" variants={fadeUp} initial="hidden" animate="visible" custom={sectionIndex++}><EvChargerWidget /></motion.section>

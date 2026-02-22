@@ -386,7 +386,7 @@ export function NowInZadar({ mode = 'day', appMode = 'normal' }: NowInZadarProps
           iconColor: 'text-destructive',
           label: `${emoji} ${t('happening.liveMatch')}`,
           answer: `${ev.home_team} ${ev.home_score ?? 0}:${ev.away_score ?? 0} ${ev.away_team}${ev.match_minute ? ` (${ev.match_minute}')` : ''}`,
-          action: () => ev.link_url ? window.open(ev.link_url, '_blank') : window.open('https://www.sofascore.com/', '_blank'),
+          action: () => {},
           priority: 120,
           isActionable: true,
           pinFirst: true,
@@ -407,7 +407,7 @@ export function NowInZadar({ mode = 'day', appMode = 'normal' }: NowInZadarProps
           iconColor: 'text-[hsl(var(--status-warning))]',
           label: `${emoji} ${isF1 ? t('happening.nextRace') : teamLabel}`,
           answer: `${ev.home_team} – ${ev.away_team} ${t('happening.at')} ${new Date(ev.start_time).toLocaleTimeString('hr-HR', { hour: '2-digit', minute: '2-digit' })}`,
-          action: () => ev.link_url ? window.open(ev.link_url, '_blank') : window.open('https://www.sofascore.com/', '_blank'),
+          action: () => {},
           priority: 116,
           isActionable: true,
         });
