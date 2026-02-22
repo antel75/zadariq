@@ -220,7 +220,7 @@ const translations: Translations = {
   'utilities.emergency': { hr: 'Hitno', en: 'Emergency', de: 'Notfall', it: 'Emergenza' },
   'utilities.services': { hr: 'Usluge', en: 'Services', de: 'Dienste', it: 'Servizi' },
   // Transport
-  'quick.transport': { hr: 'Prijevoz', en: 'Transport', de: 'Transport', it: 'Trasporti' },
+  'quick.transport': { hr: 'Javni prijevoz', en: 'Public transport', de: 'Öffentl. Verkehr', it: 'Trasporto pubblico' },
   'transport.title': { hr: 'Prijevoz', en: 'Transport', de: 'Transport', it: 'Trasporti' },
   'transport.subtitle': { hr: 'Trajekti, autobusi i više', en: 'Ferries, buses & more', de: 'Fähren, Busse & mehr', it: 'Traghetti, autobus e altro' },
   'transport.ferries': { hr: 'Trajekti', en: 'Ferries', de: 'Fähren', it: 'Traghetti' },
