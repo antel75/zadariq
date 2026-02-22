@@ -222,13 +222,13 @@ export function HomeDashboard({ onReportTarget, reportTarget }: HomeDashboardPro
         {modeIndicatorBlock}
         {matchOrNow}
         {quickActionsBlock}
+        {categoriesBlock}
         {searchBlock}
         {forYouBlock}
         {evChargerBlock}
         {alertsBlock}
         {todayCardBlock}
         {transportBlock}
-        {categoriesBlock}
         {whatIsHappeningBlock}
         {dailyPollBlock}
         {cityPulseBlock}

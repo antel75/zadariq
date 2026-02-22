@@ -288,7 +288,7 @@ export function TodayAlerts() {
           return (
             <div
               key={`${alert.id}-${idx}`}
-              className={`flex-shrink-0 w-[210px] rounded-xl bg-card border border-border p-3 flex flex-col gap-1.5 ${alert.link ? 'cursor-pointer hover:shadow-md hover:border-primary/30 transition-all' : ''}`}
+              className={`flex-shrink-0 w-[260px] rounded-xl bg-card border border-border p-3 flex flex-col gap-1.5 ${alert.link ? 'cursor-pointer hover:shadow-md hover:border-primary/30 transition-all' : ''}`}
               onClick={() => alert.link && window.open(alert.link, '_blank', 'noopener,noreferrer')}
             >
               <div className="flex items-center gap-2">
@@ -296,7 +296,7 @@ export function TodayAlerts() {
                 <p className="text-xs font-semibold text-foreground truncate flex-1">{alert.title}</p>
                 {alert.link && <ExternalLink className="h-3 w-3 text-muted-foreground flex-shrink-0" />}
               </div>
-              <p className="text-[10px] text-muted-foreground line-clamp-2 leading-relaxed">{alert.desc}</p>
+              <p className="text-[10px] text-muted-foreground line-clamp-3 leading-relaxed">{alert.desc}</p>
               {alert.updatedAt && (
                 <p className="text-[9px] text-muted-foreground/60 mt-auto">
                   {formatDistanceToNow(new Date(alert.updatedAt), { addSuffix: true, locale })}

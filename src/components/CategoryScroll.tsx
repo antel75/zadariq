@@ -22,7 +22,7 @@ const iconMap: Record<string, ComponentType<{ className?: string }>> = {
 };
 
 // Hide 'medicine' subcategory — doctor and dentist are now separate top-level
-const hiddenCategories: CategoryId[] = ['medicine'];
+const hiddenCategories: CategoryId[] = ['medicine', 'pharmacy', 'emergency', 'transport', 'parking'];
 const mainCategories = categories.filter(c => !hiddenCategories.includes(c.id));
 
 // Public services submenu items
