@@ -128,17 +128,19 @@ function useSportsForNow() {
       const { data: today } = await supabase
         .from('sports_events').select('*').eq('match_status', 'upcoming').eq('is_stale', false)
         .gte('start_time', now).lte('start_time', next24h).order('start_time', { ascending: true });
-      if (today && today.length > 0) return { events: today, tier: 'today' as const };
+      const todayFiltered = (today || []).filter((e: any) => e.team_tag !== 'f1');
+      if (todayFiltered.length > 0) return { events: todayFiltered, tier: 'today' as const };
 
       // 3) Next match (non-stale)
       const { data: next } = await supabase
         .from('sports_events').select('*').eq('match_status', 'upcoming').eq('is_stale', false)
-        .gte('start_time', now).order('start_time', { ascending: true }).limit(1);
-      if (next && next.length > 0) return { events: next, tier: 'next' as const };
+        .gte('start_time', now).order('start_time', { ascending: true }).limit(6);
+      const nextFiltered = (next || []).filter((e: any) => e.team_tag !== 'f1');
+      if (nextFiltered.length > 0) return { events: [nextFiltered[0]], tier: 'next' as const };
 
       // 4) Last result (non-stale only — within 7 days)
       const { data: last } = await supabase
-        .from('sports_events').select('*').eq('match_status', 'finished').eq('is_stale', false)
+        .from('sports_events').select('*').eq('match_status', 'finished').eq('is_stale', false).neq('team_tag', 'f1')
         .order('start_time', { ascending: false }).limit(1);
       if (last && last.length > 0) return { events: last, tier: 'last' as const };
 

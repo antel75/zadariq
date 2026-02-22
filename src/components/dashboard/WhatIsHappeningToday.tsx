@@ -51,6 +51,7 @@ function useSportsEvents() {
         .eq('is_stale', false)
         .gte('start_time', now)
         .lte('start_time', next24h)
+        .neq('team_tag', 'f1')
         .order('start_time', { ascending: true });
 
       // 3) Next upcoming (non-stale)
