@@ -25,6 +25,7 @@ import { TodayCard } from './TodayCard';
 import { CityPulseSection } from './CityPulseSection';
 import { DailyPollCard } from './DailyPollCard';
 import { WhatIsHappeningToday } from './WhatIsHappeningToday';
+import { EventsWidget } from './EventsWidget';
 import { FeaturedNearby } from '@/components/FeaturedNearby';
 import { SearchBar } from '@/components/SearchBar';
 import { CategoryScroll } from '@/components/CategoryScroll';
@@ -207,6 +208,10 @@ export function HomeDashboard({ onReportTarget, reportTarget }: HomeDashboardPro
     </Section>
   ) : null;
 
+  const eventsWidgetBlock = (
+    <Section className="mb-4"><EventsWidget /></Section>
+  );
+
   const whatIsHappeningBlock = (
     <Section className="mb-6 mt-2"><WhatIsHappeningToday /></Section>
   );
@@ -229,6 +234,7 @@ export function HomeDashboard({ onReportTarget, reportTarget }: HomeDashboardPro
         {alertsBlock}
         {todayCardBlock}
         {transportBlock}
+        {eventsWidgetBlock}
         {whatIsHappeningBlock}
         {dailyPollBlock}
         {cityPulseBlock}
@@ -251,6 +257,7 @@ export function HomeDashboard({ onReportTarget, reportTarget }: HomeDashboardPro
       {matchOrNow}
       {searchBlock}
       {whatIsHappeningBlock}
+      {eventsWidgetBlock}
       {categoriesBlock}
       {featuredBlock}
       {transportBlock}

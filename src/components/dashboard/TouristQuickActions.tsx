@@ -24,7 +24,7 @@ export function TouristQuickActions() {
     {
       icon: Landmark,
       labelKey: 'tourist.sights',
-      action: () => navigate('/search?q=landmarks'),
+      action: () => navigate('/znamenitosti'),
       color: 'bg-accent/10 text-accent',
     },
     {

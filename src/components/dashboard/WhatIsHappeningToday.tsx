@@ -105,6 +105,26 @@ function useCityAlertsForFeed() {
   });
 }
 
+
+function useCityEventsForFeed() {
+  return useQuery({
+    queryKey: ['city-events-feed'],
+    queryFn: async () => {
+      const today = new Date().toISOString().split('T')[0];
+      const next7days = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      const { data, error } = await supabase
+        .from('city_events')
+        .select('id, title, venue, location, event_date_from, event_date_to, category, region, website_url')
+        .gte('event_date_to', today)
+        .lte('event_date_from', next7days)
+        .order('event_date_from', { ascending: true })
+        .limit(5);
+      if (error) throw error;
+      return data || [];
+    },
+    staleTime: 10 * 60 * 1000,
+  });
+}
 function useTodayOutagesForFeed() {
   return useQuery({
     queryKey: ['outages-feed'],
@@ -167,6 +187,7 @@ export function WhatIsHappeningToday() {
   const { data: sportsData } = useSportsEvents();
   const { data: cityAlerts } = useCityAlertsForFeed();
   const { data: outages } = useTodayOutagesForFeed();
+  const { data: cityEventsData } = useCityEventsForFeed();
   const { data: sourcesHealth } = useSportsSourcesHealth();
   const hour = getZadarHour();
   const isDebug = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('debug');
@@ -371,7 +392,41 @@ export function WhatIsHappeningToday() {
       });
     }
 
-    // ── Fallback: calm status ─────────────────────
+
+    // ── City events (upcoming 7 days) ─────────────
+    if (cityEventsData) {
+      const categoryEmoji: Record<string, string> = {
+        kultura: '🎭',
+        'nocni-zivot': '🎉',
+        festival: '🎪',
+        sport: '🏃',
+      };
+      for (const ev of cityEventsData) {
+        const emoji = categoryEmoji[ev.category] || '📅';
+        const dateFrom = ev.event_date_from ? new Date(ev.event_date_from) : null;
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        const isToday = dateFrom && dateFrom.toDateString() === new Date().toDateString();
+        const isTomorrow = dateFrom && dateFrom.getTime() - today.getTime() === 86400000;
+        const dateLabel = isToday ? 'Danas' : isTomorrow ? 'Sutra' : dateFrom ? dateFrom.toLocaleDateString('hr-HR', { day: 'numeric', month: 'short' }) : '';
+        const venue = ev.venue || ev.location || '';
+        feed.push({
+          id: `city-event-${ev.id}`,
+          priority: isToday ? 60 : isTomorrow ? 50 : 35,
+          type: 'city_event',
+          icon: Megaphone,
+          iconColor: 'text-accent',
+          accentClass: 'border-accent/20 bg-accent/5',
+          title: `${emoji} ${ev.title}`,
+          subtitle: [dateLabel, venue].filter(Boolean).join(' · '),
+          link: ev.website_url || '/events',
+          badge: isToday ? 'Danas' : undefined,
+          badgeClass: 'bg-accent text-white',
+        });
+      }
+    }
+
+    // ── Fallback ─────────────────────
     if (feed.length === 0) {
       const isAfternoon = hour >= 14 && hour < 18;
       const isEvening = hour >= 18;
