@@ -270,46 +270,55 @@ export type Database = {
       }
       city_events: {
         Row: {
+          category: string
           created_at: string
           description: string | null
-          event_date: string | null
-          event_time: string | null
+          event_date_from: string | null
+          event_date_to: string | null
           hash: string
           id: string
           image_url: string | null
           location: string | null
+          region: string
           source: string
-          source_url: string | null
           title: string
           updated_at: string
+          venue: string | null
+          website_url: string | null
         }
         Insert: {
+          category?: string
           created_at?: string
           description?: string | null
-          event_date?: string | null
-          event_time?: string | null
+          event_date_from?: string | null
+          event_date_to?: string | null
           hash: string
           id?: string
           image_url?: string | null
           location?: string | null
+          region?: string
           source: string
-          source_url?: string | null
           title: string
           updated_at?: string
+          venue?: string | null
+          website_url?: string | null
         }
         Update: {
+          category?: string
           created_at?: string
           description?: string | null
-          event_date?: string | null
-          event_time?: string | null
+          event_date_from?: string | null
+          event_date_to?: string | null
           hash?: string
           id?: string
           image_url?: string | null
           location?: string | null
+          region?: string
           source?: string
-          source_url?: string | null
           title?: string
           updated_at?: string
+          venue?: string | null
+          website_url?: string | null
         }
         Relationships: []
       }

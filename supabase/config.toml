@@ -41,3 +41,12 @@ verify_jwt = false
 
 [functions.scrape-vodovod]
 verify_jwt = false
+
+[functions.scrape-zadar-events]
+verify_jwt = false
+
+[functions.scrape-zrce-events]
+verify_jwt = false
+
+[functions.scrape-garden-events]
+verify_jwt = false
