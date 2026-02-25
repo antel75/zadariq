@@ -28,6 +28,23 @@ interface CinemaScreening {
   format: string | null;
 }
 
+const GENRE_STYLES: Record<string, { bg: string; emoji: string }> = {
+  'Triler':       { bg: 'bg-slate-700',   emoji: '🔪' },
+  'Drama':        { bg: 'bg-purple-800',  emoji: '🎭' },
+  'Animirani':    { bg: 'bg-orange-600',  emoji: '🎠' },
+  'Komedija':     { bg: 'bg-yellow-600',  emoji: '😂' },
+  'Akcija':       { bg: 'bg-red-700',     emoji: '💥' },
+  'Horor':        { bg: 'bg-gray-900',    emoji: '👻' },
+  'Romantika':    { bg: 'bg-pink-700',    emoji: '❤️' },
+  'Sci-Fi':       { bg: 'bg-blue-700',    emoji: '🚀' },
+  'Dokumentarac': { bg: 'bg-green-700',   emoji: '🎥' },
+  'Fantasy':      { bg: 'bg-indigo-700',  emoji: '🧙' },
+};
+
+function getInitials(title: string): string {
+  return title.split(' ').filter(w => w.length > 2).slice(0, 2).map(w => w[0].toUpperCase()).join('') || title.slice(0, 2).toUpperCase();
+}
+
 type DayFilter = 'today' | 'tomorrow' | 'week';
 
 export default function Cinema() {
@@ -169,9 +186,15 @@ export default function Cinema() {
                   className="flex gap-3 p-3 cursor-pointer"
                   onClick={() => setExpandedMovie(isExpanded ? null : movie.id)}
                 >
-                  <div className="w-16 h-24 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
-                    <Film className="w-6 h-6 text-muted-foreground/40" />
-                  </div>
+                  {(() => {
+                    const gs = GENRE_STYLES[movie.genre] || { bg: 'bg-primary/70', emoji: '🎬' };
+                    return (
+                      <div className={`w-16 h-24 rounded-lg ${gs.bg} flex flex-col items-center justify-center flex-shrink-0 gap-1`}>
+                        <span className="text-2xl">{gs.emoji}</span>
+                        <span className="text-sm font-bold text-white/90 text-center leading-tight px-1">{getInitials(movie.title)}</span>
+                      </div>
+                    );
+                  })()}
 
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-sm text-foreground leading-tight">{movie.title}</h3>
