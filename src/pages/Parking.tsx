@@ -1,34 +1,81 @@
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageSelector } from '@/components/LanguageSelector';
-import { ArrowLeft, Car, MessageSquare, AlertTriangle, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Car, MessageSquare, ExternalLink } from 'lucide-react';
 import { Footer } from '@/components/Footer';
 import {
   parkingZones,
   getCurrentRegime,
-  getParkingStatus,
   getRegimeLabel,
-  getParkingHoursLabel,
   type ParkingRegime,
 } from '@/data/parkingData';
 
-function getPriceForRegime(zone: typeof parkingZones[0], regime: ParkingRegime) {
-  return zone[regime];
+type ZoneStatus = 'free' | 'cheap' | 'expensive';
+
+function getZoneStatus(zoneId: string, regime: ParkingRegime, now: Date): ZoneStatus {
+  const day = now.getDay();
+  const h = now.getHours();
+  const m = now.getMinutes();
+  const t = h * 60 + m;
+
+  if (zoneId === 'zona-0') return regime === 'peakSummer' ? 'expensive' : 'cheap';
+
+  if (regime === 'winter') {
+    if (day === 0) return 'free';
+    if (day === 6) return (t >= 480 && t < 840) ? 'cheap' : 'free';
+    return (t >= 480 && t < 960) ? 'cheap' : 'free';
+  }
+  // summer / peakSummer
+  if (day === 0 && regime !== 'peakSummer') return 'free';
+  if (t >= 480 && t < 1320) return regime === 'peakSummer' ? 'expensive' : 'cheap';
+  return 'free';
 }
 
+function getUntilLabel(zoneId: string, regime: ParkingRegime, now: Date, language: string): string {
+  const day = now.getDay();
+  const h = now.getHours();
+  const m = now.getMinutes();
+  const t = h * 60 + m;
+
+  if (zoneId === 'zona-0') {
+    return language === 'hr' ? 'Uvijek se naplaćuje' : 'Always charged';
+  }
+
+  const freeLabel = language === 'hr' ? 'Besplatno' : 'Free';
+  const paidUntil = (until: string) => language === 'hr' ? `Naplata do ${until}` : `Paid until ${until}`;
+
+  if (regime === 'winter') {
+    if (day === 0) return freeLabel;
+    if (day === 6) {
+      if (t >= 480 && t < 840) return paidUntil('14:00');
+      return freeLabel;
+    }
+    if (t >= 480 && t < 960) return paidUntil('16:00');
+    return freeLabel;
+  }
+  if (day === 0 && regime !== 'peakSummer') return freeLabel;
+  if (t >= 480 && t < 1320) return paidUntil('22:00');
+  return freeLabel;
+}
+
+const statusColors: Record<ZoneStatus, { bg: string; border: string; text: string; dot: string }> = {
+  free:      { bg: 'bg-green-500/10',  border: 'border-green-500/30',  text: 'text-green-500',  dot: 'bg-green-500' },
+  cheap:     { bg: 'bg-yellow-500/10', border: 'border-yellow-500/30', text: 'text-yellow-500', dot: 'bg-yellow-500' },
+  expensive: { bg: 'bg-red-500/10',    border: 'border-red-500/30',    text: 'text-red-500',    dot: 'bg-red-500' },
+};
+
+const statusLabel: Record<ZoneStatus, Record<string, string>> = {
+  free:      { hr: 'BESPLATNO', en: 'FREE',       de: 'KOSTENLOS',           it: 'GRATUITO' },
+  cheap:     { hr: 'NAPLATA',   en: 'PAID',        de: 'GEBÜHRENPFLICHTIG',   it: 'A PAGAMENTO' },
+  expensive: { hr: 'NAPLATA',   en: 'PAID',        de: 'GEBÜHRENPFLICHTIG',   it: 'A PAGAMENTO' },
+};
+
 const Parking = () => {
-  const { t, language } = useLanguage();
+  const { language } = useLanguage();
   const navigate = useNavigate();
   const now = new Date();
   const regime = getCurrentRegime(now);
-  const status = getParkingStatus(now);
   const regimeLabel = getRegimeLabel(regime);
-  const hoursLabel = getParkingHoursLabel(now);
-
-  const statusLabels = {
-    free: { hr: 'BESPLATNO', en: 'FREE', de: 'KOSTENLOS', it: 'GRATUITO' },
-    paid: { hr: 'NAPLATA', en: 'PAID', de: 'GEBÜHRENPFLICHTIG', it: 'A PAGAMENTO' },
-  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -48,76 +95,30 @@ const Parking = () => {
       </header>
 
       <main className="max-w-lg mx-auto px-4 pb-8">
-        {/* Current status banner */}
-        <section className="mt-4 mb-4">
-          <div className={`rounded-2xl p-4 border ${status === 'free'
-            ? 'bg-[hsl(var(--status-open))]/10 border-[hsl(var(--status-open))]/30'
-            : 'bg-[hsl(var(--status-warning))]/10 border-[hsl(var(--status-warning))]/30'
-          }`}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Car className={`h-6 w-6 ${status === 'free' ? 'text-[hsl(var(--status-open))]' : 'text-[hsl(var(--status-warning))]'}`} />
-                <div>
-                  <span className={`text-lg font-bold ${status === 'free' ? 'text-[hsl(var(--status-open))]' : 'text-[hsl(var(--status-warning))]'}`}>
-                    {statusLabels[status][language] || statusLabels[status].hr}
-                  </span>
-                  <p className="text-xs text-muted-foreground">{hoursLabel}</p>
-                </div>
-              </div>
-            </div>
-          </div>
+        {/* Legend */}
+        <section className="mt-4 mb-4 flex gap-3 text-xs text-muted-foreground">
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500 inline-block"/> {language === 'hr' ? 'Besplatno' : 'Free'}</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-yellow-500 inline-block"/> {language === 'hr' ? 'Jeftinije' : 'Cheaper'}</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500 inline-block"/> {language === 'hr' ? 'Skuplje' : 'Expensive'}</span>
         </section>
 
-        {/* Notice: Branimir closed */}
-        <section className="mb-4">
-          <div className="rounded-2xl bg-destructive/10 border border-destructive/20 p-4">
-            <div className="flex gap-3">
-              <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
-              <div>
-                <h3 className="text-sm font-semibold text-foreground">
-                  {language === 'hr' ? 'Parkiralište Branimir zatvoreno' : 'Branimir parking closed'}
-                </h3>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {language === 'hr'
-                    ? 'Sub 14.02. do ned 15.02.2026. — karnevalska povorka'
-                    : 'Sat 14.02. to Sun 15.02.2026 — carnival parade'}
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Notice: Relja automat */}
-        <section className="mb-5">
-          <div className="rounded-2xl bg-accent/10 border border-accent/20 p-4">
-            <div className="flex gap-3">
-              <AlertTriangle className="h-5 w-5 text-accent shrink-0 mt-0.5" />
-              <div>
-                <h3 className="text-sm font-semibold text-foreground">
-                  {language === 'hr' ? 'Parking Relja — novi sustav' : 'Relja parking — new system'}
-                </h3>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {language === 'hr'
-                    ? 'Zatvoreni parking Ul. kneza Višeslava prelazi na parkirne automate.'
-                    : 'Closed parking on Kneza Višeslava St. switching to ticket machines.'}
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Zone prices */}
+        {/* Zone cards */}
         <section className="mb-6">
           <h2 className="text-sm font-semibold text-foreground mb-3">
             {language === 'hr' ? 'Zone i cijene' : 'Zones & prices'}
           </h2>
           <div className="flex flex-col gap-2">
             {parkingZones.map(zone => {
-              const price = getPriceForRegime(zone, regime);
+              const zoneStatus = getZoneStatus(zone.id, regime, now);
+              const colors = statusColors[zoneStatus];
+              const price = zone[regime];
+              const until = getUntilLabel(zone.id, regime, now, language);
+
               return (
-                <div key={zone.id} className="rounded-xl bg-card border border-border p-3">
+                <div key={zone.id} className={`rounded-xl border p-3 ${colors.bg} ${colors.border}`}>
                   <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center gap-2">
+                      <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${colors.dot}`} />
                       <span className="text-sm font-bold text-foreground">{zone.name}</span>
                       {zone.note && (
                         <span className="text-[10px] bg-secondary text-secondary-foreground px-1.5 py-0.5 rounded-full">
@@ -125,26 +126,33 @@ const Parking = () => {
                         </span>
                       )}
                     </div>
-                    <a
-                      href={`sms:${zone.smsCode}`}
-                      className="flex items-center gap-1 text-xs text-primary font-medium"
-                    >
-                      <MessageSquare className="h-3 w-3" />
-                      {zone.smsCode}
-                    </a>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs font-bold ${colors.text}`}>
+                        {statusLabel[zoneStatus][language] || statusLabel[zoneStatus].hr}
+                      </span>
+                      <a href={`sms:${zone.smsCode}`} className="flex items-center gap-1 text-xs text-primary font-medium">
+                        <MessageSquare className="h-3 w-3" />
+                        {zone.smsCode}
+                      </a>
+                    </div>
                   </div>
-                  <div className="flex gap-4 text-xs text-muted-foreground">
-                    <span>{price.eurPerHour.toFixed(2)} €/sat</span>
-                    {price.eurPerDay !== null && <span>{price.eurPerDay.toFixed(2)} €/dan</span>}
+                  <div className="flex items-center justify-between text-xs text-muted-foreground mt-1">
+                    <div className="flex gap-3">
+                      {zoneStatus !== 'free' && (
+                        <>
+                          <span className={`font-semibold ${colors.text}`}>{price.eurPerHour.toFixed(2)} €/sat</span>
+                          {price.eurPerDay !== null && <span>{price.eurPerDay.toFixed(2)} €/dan</span>}
+                        </>
+                      )}
+                    </div>
+                    <span className="text-[11px]">{until}</span>
                   </div>
                 </div>
               );
             })}
           </div>
           <p className="text-[10px] text-muted-foreground mt-2">
-            {language === 'hr'
-              ? 'Naknada mobilnom operateru: 0,13 €. Izvor: oil.hr'
-              : 'Mobile operator fee: €0.13. Source: oil.hr'}
+            {language === 'hr' ? 'Naknada mobilnom operateru: 0,13 €. Izvor: oil.hr' : 'Mobile operator fee: €0.13. Source: oil.hr'}
           </p>
         </section>
 
