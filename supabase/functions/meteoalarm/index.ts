@@ -112,6 +112,14 @@ function parseDHMZAlerts(xml: string): MeteoAlert[] {
     const onsetMatch = info.match(/<onset>([^<]*)<\/onset>/i);
     const expiresMatch = info.match(/<expires>([^<]*)<\/expires>/i);
 
+    // Skip expired alerts
+    if (expiresMatch?.[1]) {
+      const expiresDate = new Date(expiresMatch[1]);
+      if (!isNaN(expiresDate.getTime()) && expiresDate.getTime() < Date.now()) {
+        continue;
+      }
+    }
+
     // Deduplicate — avoid adding same type+level combo
     const existing = alerts.find(a => a.type === type && a.levelNum === levelNum);
     if (existing) continue;
@@ -165,6 +173,14 @@ function parseMeteoalarmAtomAlerts(xml: string): MeteoAlert[] {
       entry.match(/from[:\s]*(\d{4}-\d{2}-\d{2}T[\d:]+)/i);
     const untilMatch = entry.match(/<cap:expires>([^<]*)<\/cap:expires>/i) ||
       entry.match(/until[:\s]*(\d{4}-\d{2}-\d{2}T[\d:]+)/i);
+
+    // Skip expired alerts
+    if (untilMatch?.[1]) {
+      const expiresDate = new Date(untilMatch[1]);
+      if (!isNaN(expiresDate.getTime()) && expiresDate.getTime() < Date.now()) {
+        continue;
+      }
+    }
 
     alerts.push({
       title,
