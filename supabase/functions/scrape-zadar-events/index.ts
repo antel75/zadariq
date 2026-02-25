@@ -38,6 +38,8 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
+    const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+
     // Step 1: Fetch sitemap
     const sitemapRes = await fetch("https://www.zadar.hr/sitemap.xml", {
       headers: { "User-Agent": "ZadarIQ/1.0 (event-aggregator)" },
@@ -45,7 +47,7 @@ Deno.serve(async (req) => {
     if (!sitemapRes.ok) throw new Error(`sitemap returned ${sitemapRes.status}`);
     const sitemapXml = await sitemapRes.text();
 
-    // Step 2: Extract /en/events/ URLs, exclude ?month= and ?city=
+    // Step 2: Extract /en/events/ URLs, exclude ?month=, ?city=, and years < 2025
     const locRegex = /<loc>([^<]+)<\/loc>/gi;
     const eventUrls: string[] = [];
     let m;
@@ -55,9 +57,11 @@ Deno.serve(async (req) => {
         url.includes('/en/events/') &&
         !url.includes('?month=') &&
         !url.includes('?city=') &&
-        // Must have a slug after /en/events/
         url.match(/\/en\/events\/[^/?]+/)
       ) {
+        // Filter out URLs containing years before 2025
+        const yearMatch = url.match(/\/(\d{4})\//);
+        if (yearMatch && parseInt(yearMatch[1]) < 2025) continue;
         eventUrls.push(url);
       }
     }
@@ -152,6 +156,13 @@ Deno.serve(async (req) => {
         if (/festival/i.test(text)) category = 'festival';
         else if (/sport|run|trail|marathon|race|regat|jump/i.test(text)) category = 'sport';
         else if (/party|club|dj|noćn|night/i.test(text)) category = 'nocni-zivot';
+
+        // Skip events whose end date (or start date) is in the past
+        const relevantDate = eventDateTo || eventDateFrom;
+        if (relevantDate && relevantDate < today) {
+          skipped++;
+          continue;
+        }
 
         const hash = simpleHash(`zadar.hr:${eventUrl}`);
         const { error } = await supabase
