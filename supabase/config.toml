@@ -35,3 +35,9 @@ verify_jwt = false
 
 [functions.import-ev-chargers]
 verify_jwt = false
+
+[functions.scrape-hep]
+verify_jwt = false
+
+[functions.scrape-vodovod]
+verify_jwt = false

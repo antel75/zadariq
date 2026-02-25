@@ -37,7 +37,7 @@ export default function SearchResults() {
             <ArrowLeft className="h-5 w-5 text-foreground" />
           </button>
           <div className="flex-1">
-            <SearchBar value={query} onChange={setQuery} onSubmit={() => {}} />
+            <SearchBar />
           </div>
         </div>
 
