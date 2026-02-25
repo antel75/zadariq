@@ -41,7 +41,7 @@ function useMeteoAlerts() {
         description: string;
       }>;
     },
-    staleTime: 30 * 60 * 1000,
+    staleTime: 5 * 60 * 1000,
     retry: 1,
   });
 }
@@ -139,7 +139,7 @@ export function getOutdoorRecommendation(
   }
 
   // ── B) BAD ──
-  if (precipitationProbability >= 60 || precipitationMm > 0) {
+  if (precipitationProbability >= 70 || precipitationMm >= 0.3) {
     return {
       labelKey: 'outdoor.label.bad',
       reasonKey: precipitationMm > 0 ? 'outdoor.reason.lightRain' : 'outdoor.reason.rainLikely',
