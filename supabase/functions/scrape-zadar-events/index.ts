@@ -14,16 +14,17 @@ function simpleHash(str: string): string {
   return Math.abs(hash).toString(36);
 }
 
-interface ScrapedEvent {
-  title: string;
-  description?: string;
-  location?: string;
-  venue?: string;
-  event_date_from?: string;
-  event_date_to?: string;
-  image_url?: string;
-  website_url?: string;
-  category: string;
+function parseEnglishDate(dateStr: string): string | undefined {
+  // "Aug 23, 2025" or "Jun 1, 2026" etc
+  const months: Record<string, string> = {
+    jan: '01', feb: '02', mar: '03', apr: '04', may: '05', jun: '06',
+    jul: '07', aug: '08', sep: '09', oct: '10', nov: '11', dec: '12',
+  };
+  const m = dateStr.trim().match(/^(\w{3})\s+(\d{1,2}),?\s+(\d{4})/i);
+  if (!m) return undefined;
+  const mon = months[m[1].toLowerCase()];
+  if (!mon) return undefined;
+  return `${m[3]}-${mon}-${m[2].padStart(2, '0')}`;
 }
 
 Deno.serve(async (req) => {
@@ -37,112 +38,159 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    const events: ScrapedEvent[] = [];
-
-    const res = await fetch("https://www.zadar.hr/hr/dogadanja", {
+    // Step 1: Fetch sitemap
+    const sitemapRes = await fetch("https://www.zadar.hr/sitemap.xml", {
       headers: { "User-Agent": "ZadarIQ/1.0 (event-aggregator)" },
     });
-    if (!res.ok) throw new Error(`zadar.hr returned ${res.status}`);
-    const html = await res.text();
+    if (!sitemapRes.ok) throw new Error(`sitemap returned ${sitemapRes.status}`);
+    const sitemapXml = await sitemapRes.text();
 
-    // Split HTML into c-postcard card chunks
-    const startRegex = /<a\s[^>]*class="c-postcard[^"]*"[^>]*href="([^"]*)"[^>]*>/gi;
-    const starts: { idx: number; href: string }[] = [];
+    // Step 2: Extract /en/events/ URLs, exclude ?month= and ?city=
+    const locRegex = /<loc>([^<]+)<\/loc>/gi;
+    const eventUrls: string[] = [];
     let m;
-    while ((m = startRegex.exec(html)) !== null) {
-      starts.push({ idx: m.index, href: m[1] });
+    while ((m = locRegex.exec(sitemapXml)) !== null) {
+      const url = m[1].trim();
+      if (
+        url.includes('/en/events/') &&
+        !url.includes('?month=') &&
+        !url.includes('?city=') &&
+        // Must have a slug after /en/events/
+        url.match(/\/en\/events\/[^/?]+/)
+      ) {
+        eventUrls.push(url);
+      }
     }
 
-    for (let i = 0; i < starts.length; i++) {
-      const end = i + 1 < starts.length ? starts[i + 1].idx : html.length;
-      const card = html.slice(starts[i].idx, end);
-      const href = starts[i].href;
-
-      // Title
-      const titleMatch = card.match(/c-postcard__title[^>]*>([\s\S]*?)<\/h1>/i);
-      const title = titleMatch ? titleMatch[1].replace(/&amp;/g, '&').replace(/<[^>]+>/g, '').trim() : null;
-      if (!title || title.length < 3) continue;
-
-      // Info values: location, date
-      const infoValues: string[] = [];
-      const infoRegex = /c-postcard__info-item-value">([^<]+)<\/span>/gi;
-      let im;
-      while ((im = infoRegex.exec(card)) !== null) {
-        const v = im[1].trim();
-        if (v && !infoValues.includes(v)) infoValues.push(v);
-      }
-      const location = infoValues[0] || undefined;
-      const dateStr = infoValues[1] || undefined;
-
-      let eventDateFrom: string | undefined;
-      if (dateStr) {
-        // Format: DD-MM-YYYY or DD-MM-YYYY - DD-MM-YYYY
-        const parts = dateStr.split(/\s*-\s*/);
-        if (parts.length >= 3) {
-          // Single date DD-MM-YYYY
-          const dm = dateStr.match(/(\d{2})-(\d{2})-(\d{4})/);
-          if (dm) eventDateFrom = `${dm[3]}-${dm[2]}-${dm[1]}`;
-        }
-      }
-
-      // Image
-      const imgMatch = card.match(/src="(https:\/\/www\.zadar\.hr\/datastore[^"]+)"/i);
-      const imageUrl = imgMatch ? imgMatch[1] : undefined;
-
-      // Description
-      const descMatch = card.match(/c-postcard__article-intro">([\s\S]*?)<\/div>/i);
-      const description = descMatch ? descMatch[1].replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim().slice(0, 500) : undefined;
-
-      const sourceUrl = href.startsWith('http') ? href : `https://www.zadar.hr${href}`;
-
-      // Try to determine category from title/description
-      const text = `${title} ${description || ''}`.toLowerCase();
-      let category = 'kultura';
-      if (/festival/i.test(text)) category = 'festival';
-      else if (/sport|utrk|maraton|regat/i.test(text)) category = 'sport';
-      else if (/party|club|dj|noćn/i.test(text)) category = 'nocni-zivot';
-
-      events.push({
-        title,
-        description: description || undefined,
-        location,
-        venue: location,
-        event_date_from: eventDateFrom,
-        image_url: imageUrl,
-        website_url: sourceUrl,
-        category,
-      });
-    }
-
-    console.log(`zadar.hr: found ${events.length} events`);
+    console.log(`Sitemap: found ${eventUrls.length} event URLs`);
 
     let upserted = 0;
     let errors = 0;
+    let skipped = 0;
 
-    for (const ev of events) {
-      const hash = simpleHash(`zadar.hr:${ev.title}:${ev.event_date_from || ''}`);
-      const { error } = await supabase
-        .from("city_events")
-        .upsert({
-          title: ev.title,
-          description: ev.description || null,
-          location: ev.location || null,
-          venue: ev.venue || null,
-          event_date_from: ev.event_date_from || null,
-          event_date_to: ev.event_date_to || null,
-          image_url: ev.image_url || null,
-          website_url: ev.website_url || null,
-          source: 'zadar.hr',
-          category: ev.category,
-          region: 'zadar',
-          hash,
-        }, { onConflict: "hash" });
+    // Step 3: Fetch each event page and parse
+    for (const eventUrl of eventUrls) {
+      try {
+        const pageRes = await fetch(eventUrl, {
+          headers: { "User-Agent": "ZadarIQ/1.0 (event-aggregator)" },
+        });
+        if (!pageRes.ok) {
+          console.warn(`Skip ${eventUrl}: HTTP ${pageRes.status}`);
+          skipped++;
+          continue;
+        }
+        const html = await pageRes.text();
 
-      if (error) { console.error(`Upsert error "${ev.title}":`, error.message); errors++; }
-      else upserted++;
+        // Title: h1 with class b-overview__title
+        const titleMatch = html.match(/b-overview__title[^>]*>([\s\S]*?)<\/h1>/i);
+        const title = titleMatch
+          ? titleMatch[1].replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&nbsp;/g, ' ').trim()
+          : null;
+        if (!title || title.length < 2) { skipped++; continue; }
+
+        // Location
+        const locMatch = html.match(/<span[^>]*class="b-overview__type"[^>]*>Location<\/span>\s*([^<]+)/i);
+        const location = locMatch ? locMatch[1].trim() : undefined;
+
+        // Date
+        const dateMatch = html.match(/<span[^>]*class="b-overview__type"[^>]*>Date\s*<\/span>\s*([^<]+)/i);
+        let eventDateFrom: string | undefined;
+        let eventDateTo: string | undefined;
+        if (dateMatch) {
+          const raw = dateMatch[1].trim();
+          // Could be "Aug 23, 2025" or "Aug 23, 2025 - Sep 1, 2025" or "Aug 23 - Sep 1, 2025"
+          const rangeParts = raw.split(/\s*[-–]\s*/);
+          if (rangeParts.length >= 2) {
+            // Try parsing each part
+            eventDateFrom = parseEnglishDate(rangeParts[0]);
+            eventDateTo = parseEnglishDate(rangeParts[rangeParts.length - 1]);
+          }
+          if (!eventDateFrom) {
+            eventDateFrom = parseEnglishDate(raw);
+          }
+        }
+
+        // Image: find img with src from datastore inside slider
+        const imgMatch = html.match(/src="(https:\/\/www\.zadar\.hr\/datastore\/imagestore\/[^"]+)"[^>]*class="[^"]*image-slider__image/i);
+        const imgMatch2 = !imgMatch ? html.match(/src="(\/datastore\/imagestore\/[^"]+)"[^>]*class="[^"]*image-slider__image/i) : null;
+        // Also try: class before src
+        const imgMatch3 = !imgMatch && !imgMatch2 ? html.match(/class="[^"]*image-slider__image[^"]*"[^>]*src="(https?:\/\/[^"]+)"/i) : null;
+        const imgMatch4 = !imgMatch && !imgMatch2 && !imgMatch3 ? html.match(/class="[^"]*image-slider__image[^"]*"[^>]*src="(\/datastore[^"]+)"/i) : null;
+        let imageUrl = imgMatch ? imgMatch[1]
+          : imgMatch2 ? `https://www.zadar.hr${imgMatch2[1]}`
+          : imgMatch3 ? imgMatch3[1]
+          : imgMatch4 ? `https://www.zadar.hr${imgMatch4[1]}`
+          : undefined;
+
+        // Description from master-article__intro
+        const descMatch = html.match(/master-article__intro">([\s\S]*?)<\/div>/i);
+        let description: string | undefined;
+        if (descMatch) {
+          description = descMatch[1]
+            .replace(/<[^>]+>/g, '')
+            .replace(/&nbsp;/g, ' ')
+            .replace(/&amp;/g, '&')
+            .trim()
+            .slice(0, 500);
+        }
+        // Fallback: master-article__innner-wrap
+        if (!description || description.length < 10) {
+          const descMatch2 = html.match(/master-article__innner-wrap">([\s\S]*?)<\/div>/i);
+          if (descMatch2) {
+            description = descMatch2[1]
+              .replace(/<[^>]+>/g, '')
+              .replace(/&nbsp;/g, ' ')
+              .replace(/&amp;/g, '&')
+              .trim()
+              .slice(0, 500);
+          }
+        }
+
+        // Category from title/description
+        const text = `${title} ${description || ''}`.toLowerCase();
+        let category = 'kultura';
+        if (/festival/i.test(text)) category = 'festival';
+        else if (/sport|run|trail|marathon|race|regat|jump/i.test(text)) category = 'sport';
+        else if (/party|club|dj|noćn|night/i.test(text)) category = 'nocni-zivot';
+
+        const hash = simpleHash(`zadar.hr:${eventUrl}`);
+        const { error } = await supabase
+          .from("city_events")
+          .upsert({
+            title,
+            description: description || null,
+            location: location || null,
+            venue: location || null,
+            event_date_from: eventDateFrom || null,
+            event_date_to: eventDateTo || null,
+            image_url: imageUrl || null,
+            website_url: eventUrl,
+            source: 'zadar.hr',
+            category,
+            region: 'zadar',
+            hash,
+          }, { onConflict: "hash" });
+
+        if (error) {
+          console.error(`Upsert error "${title}":`, error.message);
+          errors++;
+        } else {
+          upserted++;
+        }
+      } catch (pageErr) {
+        console.warn(`Error fetching ${eventUrl}:`, (pageErr as Error).message);
+        skipped++;
+      }
     }
 
-    const result = { success: true, source: 'zadar.hr', total_scraped: events.length, upserted, errors };
+    const result = {
+      success: true,
+      source: 'zadar.hr',
+      sitemap_urls: eventUrls.length,
+      upserted,
+      errors,
+      skipped,
+    };
     console.log("Result:", JSON.stringify(result));
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
