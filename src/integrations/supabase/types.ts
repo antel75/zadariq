@@ -268,6 +268,51 @@ export type Database = {
         }
         Relationships: []
       }
+      city_events: {
+        Row: {
+          created_at: string
+          description: string | null
+          event_date: string | null
+          event_time: string | null
+          hash: string
+          id: string
+          image_url: string | null
+          location: string | null
+          source: string
+          source_url: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          event_date?: string | null
+          event_time?: string | null
+          hash: string
+          id?: string
+          image_url?: string | null
+          location?: string | null
+          source: string
+          source_url?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          event_date?: string | null
+          event_time?: string | null
+          hash?: string
+          id?: string
+          image_url?: string | null
+          location?: string | null
+          source?: string
+          source_url?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       city_pulse_votes: {
         Row: {
           created_at: string
