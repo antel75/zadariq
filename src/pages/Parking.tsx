@@ -12,7 +12,8 @@ import {
 
 type ZoneStatus = 'free' | 'cheap' | 'expensive';
 
-function getZoneStatus(zoneId: string, regime: ParkingRegime, now: Date): ZoneStatus {
+function getZoneStatus(zoneId: string, regime: ParkingRegime, now: Date, price?: { eurPerHour: number }): ZoneStatus {
+  if (price && price.eurPerHour === 0) return 'free';
   const day = now.getDay();
   const h = now.getHours();
   const m = now.getMinutes();
@@ -109,7 +110,7 @@ const Parking = () => {
           </h2>
           <div className="flex flex-col gap-2">
             {parkingZones.map(zone => {
-              const zoneStatus = getZoneStatus(zone.id, regime, now);
+              const zoneStatus = getZoneStatus(zone.id, regime, now, zone[regime]);
               const colors = statusColors[zoneStatus];
               const price = zone[regime];
               const until = getUntilLabel(zone.id, regime, now, language);
