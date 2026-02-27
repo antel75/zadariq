@@ -30,6 +30,7 @@ import AddCafe from "./pages/AddCafe";
 import EvChargers from "./pages/EvChargers";
 import NotFound from "./pages/NotFound";
 import Znamenitosti from "./pages/Znamenitosti";
+import ZadarQuest from "./pages/ZadarQuest";
 import Events from "./pages/Events";
 
 const DataSources = lazy(() => import("./pages/DataSources"));
@@ -69,6 +70,7 @@ const App = () => (
               <Route path="/data-sources" element={<Suspense fallback={null}><DataSources /></Suspense>} />
               <Route path="/events" element={<Events />} />
               <Route path="/znamenitosti" element={<Znamenitosti />} />
+              <Route path="/quest" element={<ZadarQuest />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <LegalNoticeBar />
