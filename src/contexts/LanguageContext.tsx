@@ -140,6 +140,7 @@ const translations: Translations = {
   'tourist.explore': { hr: 'Istraži Zadar', en: 'Explore Zadar', de: 'Zadar entdecken', it: 'Esplora Zara' },
   'tourist.beaches': { hr: 'Plaže', en: 'Beaches', de: 'Strände', it: 'Spiagge' },
   'tourist.sights': { hr: 'Znamenitosti', en: 'Sightseeing', de: 'Sehenswürdigkeiten', it: 'Attrazioni' },
+  'tourist.quest': { hr: 'Zadar Quest', en: 'Zadar Quest', de: 'Zadar Quest', it: 'Zadar Quest' },
   'tourist.restaurants': { hr: 'Restorani', en: 'Restaurants', de: 'Restaurants', it: 'Ristoranti' },
   // For you
   'foryou.morning': { hr: 'Za tebe ujutro', en: 'For you this morning', de: 'Für dich am Morgen', it: 'Per te stamattina' },

@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { UtensilsCrossed, Landmark, Waves, Car, Ship, Pill } from 'lucide-react';
+import { UtensilsCrossed, Landmark, Waves, Car, Ship, Pill, Map } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 
 interface TouristAction {
@@ -44,6 +44,12 @@ export function TouristQuickActions() {
       labelKey: 'quick.transport',
       action: () => navigate('/transport'),
       color: 'bg-primary/10 text-primary',
+    },
+    {
+      icon: Map,
+      labelKey: 'tourist.quest',
+      action: () => navigate('/quest'),
+      color: 'bg-accent/10 text-accent',
     },
     {
       icon: Pill,
