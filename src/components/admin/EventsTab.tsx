@@ -47,7 +47,7 @@ export function EventsTab() {
     if (editing.id) {
       await supabase.from('city_events').update(editing).eq('id', editing.id);
     } else {
-      await supabase.from('city_events').insert(editing);
+      await supabase.from('city_events').insert([editing as any]);
     }
     toast({ title: 'Spremljeno!' });
     setEditing(null);
