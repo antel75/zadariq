@@ -964,6 +964,157 @@ export type Database = {
         }
         Relationships: []
       }
+      quest_checkpoints: {
+        Row: {
+          challenge_correct: string | null
+          challenge_options: Json | null
+          challenge_question: Json | null
+          challenge_type: string
+          created_at: string
+          id: string
+          lat: number
+          lng: number
+          local_tip: Json | null
+          order_num: number
+          points: number
+          quest_id: string
+          radius_inner: number
+          radius_outer: number
+          story: Json | null
+          updated_at: string
+        }
+        Insert: {
+          challenge_correct?: string | null
+          challenge_options?: Json | null
+          challenge_question?: Json | null
+          challenge_type?: string
+          created_at?: string
+          id?: string
+          lat: number
+          lng: number
+          local_tip?: Json | null
+          order_num?: number
+          points?: number
+          quest_id: string
+          radius_inner?: number
+          radius_outer?: number
+          story?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          challenge_correct?: string | null
+          challenge_options?: Json | null
+          challenge_question?: Json | null
+          challenge_type?: string
+          created_at?: string
+          id?: string
+          lat?: number
+          lng?: number
+          local_tip?: Json | null
+          order_num?: number
+          points?: number
+          quest_id?: string
+          radius_inner?: number
+          radius_outer?: number
+          story?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quest_checkpoints_quest_id_fkey"
+            columns: ["quest_id"]
+            isOneToOne: false
+            referencedRelation: "quests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quest_progress: {
+        Row: {
+          checkpoints_completed: Json | null
+          completed_at: string | null
+          created_at: string
+          id: string
+          quest_id: string
+          session_id: string
+          started_at: string
+          status: string
+          total_points: number
+        }
+        Insert: {
+          checkpoints_completed?: Json | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          quest_id: string
+          session_id: string
+          started_at?: string
+          status?: string
+          total_points?: number
+        }
+        Update: {
+          checkpoints_completed?: Json | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          quest_id?: string
+          session_id?: string
+          started_at?: string
+          status?: string
+          total_points?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quest_progress_quest_id_fkey"
+            columns: ["quest_id"]
+            isOneToOne: false
+            referencedRelation: "quests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quests: {
+        Row: {
+          active: boolean
+          availability: string
+          created_at: string
+          description: Json | null
+          duration_minutes: number | null
+          id: string
+          time_end: string | null
+          time_start: string | null
+          title: Json
+          total_points: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          availability?: string
+          created_at?: string
+          description?: Json | null
+          duration_minutes?: number | null
+          id?: string
+          time_end?: string | null
+          time_start?: string | null
+          title: Json
+          total_points?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          availability?: string
+          created_at?: string
+          description?: Json | null
+          duration_minutes?: number | null
+          id?: string
+          time_end?: string | null
+          time_start?: string | null
+          title?: Json
+          total_points?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       shop_sunday_schedule: {
         Row: {
           business_id: string
