@@ -18,7 +18,7 @@ export function TouristQuickActions() {
     {
       icon: Waves,
       labelKey: 'tourist.beaches',
-      action: () => navigate('/search?q=beach'),
+      action: () => navigate('/place'),
       color: 'bg-primary/10 text-primary',
     },
     {
