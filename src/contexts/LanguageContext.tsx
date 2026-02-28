@@ -242,6 +242,8 @@ const translations: Translations = {
   'transport.searchDestination': { hr: 'Pretraži destinaciju…', en: 'Search destination…', de: 'Ziel suchen…', it: 'Cerca destinazione…' },
   'transport.platform': { hr: 'Peron', en: 'Platform', de: 'Gleis', it: 'Banchina' },
   'transport.noResults': { hr: 'Nema rezultata', en: 'No results', de: 'Keine Ergebnisse', it: 'Nessun risultato' },
+  'search.noResults': { hr: 'Nema rezultata', en: 'No results found', de: 'Keine Ergebnisse', it: 'Nessun risultato' },
+  'search.clearFilter': { hr: 'Ukloni filter', en: 'Clear filter', de: 'Filter entfernen', it: 'Rimuovi filtro' },
   'transport.line': { hr: 'Linija', en: 'Line', de: 'Linie', it: 'Linea' },
   'transport.widget': { hr: 'Prijevoz uskoro', en: 'Transport soon', de: 'Transport bald', it: 'Trasporti a breve' },
   'transport.cachedToday': { hr: 'Offline spremno', en: 'Cached today', de: 'Heute gespeichert', it: 'Salvato oggi' },
