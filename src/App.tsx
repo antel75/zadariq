@@ -33,6 +33,7 @@ import Znamenitosti from "./pages/Znamenitosti";
 import ZadarQuest from "./pages/ZadarQuest";
 import SundayRadar from "./pages/SundayRadar";
 import Place from "./pages/Place";
+import Join from "./pages/Join";
 import Events from "./pages/Events";
 
 const DataSources = lazy(() => import("./pages/DataSources"));
@@ -75,6 +76,7 @@ const App = () => (
               <Route path="/quest" element={<ZadarQuest />} />
               <Route path="/sunday-radar" element={<SundayRadar />} />
               <Route path="/place" element={<Place />} />
+              <Route path="/join" element={<Join />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <LegalNoticeBar />
