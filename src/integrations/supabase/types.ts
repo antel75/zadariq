@@ -53,6 +53,42 @@ export type Database = {
         }
         Relationships: []
       }
+      business_offers: {
+        Row: {
+          active: boolean
+          business_id: string
+          created_at: string
+          description: string | null
+          id: string
+          owner_user_id: string
+          title: string
+          valid_from: string
+          valid_to: string
+        }
+        Insert: {
+          active?: boolean
+          business_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          owner_user_id: string
+          title: string
+          valid_from?: string
+          valid_to: string
+        }
+        Update: {
+          active?: boolean
+          business_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          owner_user_id?: string
+          title?: string
+          valid_from?: string
+          valid_to?: string
+        }
+        Relationships: []
+      }
       business_ownership: {
         Row: {
           admin_notes: string | null

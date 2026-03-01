@@ -25,7 +25,7 @@ export default function OwnerVerify() {
           html: `<div style="font-family:sans-serif;padding:24px"><h2>OIB verifikacija</h2><p><b>Korisnik:</b> ${user.email}</p><p><b>OIB:</b> ${oib}</p></div>`
         }
       });
-      await supabase.from('owner_profiles').update({ oib }).eq('user_id', user.id);
+      // OIB stored via admin review, not directly on profile
       setSent('oib');
     } catch (err) {
       setError(err.message || 'Greška');
