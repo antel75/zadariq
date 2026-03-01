@@ -70,7 +70,7 @@ export default function ZadarQuest() {
 
   const fetchQuests = async () => {
     const { data } = await supabase.from('quests').select('*').eq('active', true);
-    setQuests(data || []);
+    setQuests((data as any) || []);
   };
 
   // GPS tracking
@@ -111,7 +111,7 @@ export default function ZadarQuest() {
 
   const startQuest = async (quest: Quest) => {
     const { data: cps } = await supabase.from('quest_checkpoints').select('*').eq('quest_id', quest.id).order('order_num');
-    setCheckpoints(cps || []);
+    setCheckpoints((cps as any) || []);
     setActiveQuest(quest);
     setCurrentCpIndex(0);
     setTotalPoints(0);
