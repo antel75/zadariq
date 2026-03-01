@@ -38,6 +38,7 @@ import OwnerLogin from "./pages/owner/Login";
 import OwnerDashboard from "./pages/owner/Dashboard";
 import OwnerClaim from "./pages/owner/Claim";
 import OwnerCreate from "./pages/owner/Create";
+import OwnerVerify from "./pages/owner/Verify";
 import Events from "./pages/Events";
 import EmailConfirmed from "./pages/EmailConfirmed";
 
@@ -86,6 +87,7 @@ const App = () => (
               <Route path="/owner/dashboard" element={<OwnerDashboard />} />
               <Route path="/owner/claim" element={<OwnerClaim />} />
               <Route path="/owner/create" element={<OwnerCreate />} />
+              <Route path="/owner/verify" element={<OwnerVerify />} />
               <Route path="/email-confirmed" element={<EmailConfirmed />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
