@@ -109,8 +109,9 @@ export default function OwnerLogin() {
         <div className="space-y-3">
           <button
             onClick={async () => {
-              const { error } = await supabase.auth.signInWithOAuth('google', {
-                redirect_uri: window.location.origin,
+              const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: { redirectTo: window.location.origin + '/owner/dashboard' },
               });
               if (error) setError(error.message || 'Greška pri Google prijavi');
             }}
@@ -122,8 +123,9 @@ export default function OwnerLogin() {
 
           <button
             onClick={async () => {
-              const { error } = await supabase.auth.signInWithOAuth('apple', {
-                redirect_uri: window.location.origin,
+              const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'apple',
+                options: { redirectTo: window.location.origin + '/owner/dashboard' },
               });
               if (error) setError(error.message || 'Greška pri Apple prijavi');
             }}

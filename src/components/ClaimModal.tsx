@@ -5,8 +5,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { UserCheck, ShieldCheck, Loader2, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { checkSimilarity } from '@/utils/similarity';
-import { businesses } from '@/data/mockData';
 
 interface ClaimModalProps {
   businessId: string;
@@ -32,47 +30,18 @@ export function ClaimModal({ businessId, businessName, businessAddress, open, on
     setError('');
 
     try {
-      // Similarity check
-      const candidates = businesses.map(b => ({ id: b.id, name: b.name, address: b.address }));
-      const similar = checkSimilarity(businessName, businessAddress || '', candidates);
-      if (similar && similar.match.id !== businessId) {
-        await supabase.functions.invoke('send-email', {
-          body: {
-            to: 'admin@zadariq.city',
-            subject: `[ZadarIQ] ⚠️ Potencijalni duplikat — ${businessName}`,
-            html: `<div style="font-family:sans-serif;padding:24px;background:#0f0f1a;color:#fff">
-              <h2 style="color:#f59e0b">⚠️ Upozorenje: Potencijalni duplikat</h2>
-              <p><b>Novi profil:</b> ${businessName} — ${businessAddress}</p>
-              <p><b>Sličan postojećem:</b> ${similar.match.name} — ${similar.match.address}</p>
-              <p><b>Podudaranje:</b> ${Math.round(similar.score * 100)}%</p>
-              <p><b>Korisnik:</b> ${user!.email}</p>
-              <p style="color:#f59e0b">Provjeri je li ovo legitimno preuzimanje ili hostile takeover!</p>
-            </div>`
-          }
-        });
-      }
-
-      // Log the claim request
-      await supabase.from('ownership_audit_log').insert({
-        business_id: businessId,
-        action: 'claim_requested',
-        actor_user_id: user!.id,
-        email: user!.email,
-        details: { 
-          business_name: businessName, 
-          business_address: businessAddress,
-          source: 'profile_button'
-        }
-      });
-
       // Insert pending claim
+      const codeHash = crypto.randomUUID();
+      const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
       const { error: claimError } = await supabase
         .from('ownership_claim_requests')
         .insert({
           business_id: businessId,
-          email: user!.email,
+          email: user!.email!,
           status: 'pending',
           requester_user_id: user!.id,
+          code_hash: codeHash,
+          expires_at: expiresAt,
         });
 
       if (claimError && !claimError.message.includes('duplicate')) throw claimError;
