@@ -850,6 +850,7 @@ export type Database = {
           reviewed_at: string | null
           reviewed_by: string | null
           status: string
+          submitter_email: string | null
           website: string | null
         }
         Insert: {
@@ -868,6 +869,7 @@ export type Database = {
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
+          submitter_email?: string | null
           website?: string | null
         }
         Update: {
@@ -886,6 +888,7 @@ export type Database = {
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
+          submitter_email?: string | null
           website?: string | null
         }
         Relationships: []
