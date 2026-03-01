@@ -34,6 +34,9 @@ import ZadarQuest from "./pages/ZadarQuest";
 import SundayRadar from "./pages/SundayRadar";
 import Place from "./pages/Place";
 import Join from "./pages/Join";
+import OwnerLogin from "./pages/owner/Login";
+import OwnerDashboard from "./pages/owner/Dashboard";
+import OwnerClaim from "./pages/owner/Claim";
 import Events from "./pages/Events";
 import EmailConfirmed from "./pages/EmailConfirmed";
 
@@ -78,6 +81,9 @@ const App = () => (
               <Route path="/sunday-radar" element={<SundayRadar />} />
               <Route path="/place" element={<Place />} />
               <Route path="/join" element={<Join />} />
+              <Route path="/owner/login" element={<OwnerLogin />} />
+              <Route path="/owner/dashboard" element={<OwnerDashboard />} />
+              <Route path="/owner/claim" element={<OwnerClaim />} />
               <Route path="/email-confirmed" element={<EmailConfirmed />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
