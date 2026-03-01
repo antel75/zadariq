@@ -39,6 +39,7 @@ import OwnerDashboard from "./pages/owner/Dashboard";
 import OwnerClaim from "./pages/owner/Claim";
 import OwnerCreate from "./pages/owner/Create";
 import OwnerVerify from "./pages/owner/Verify";
+import OwnerOffers from "./pages/owner/Offers";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Events from "./pages/Events";
@@ -90,6 +91,7 @@ const App = () => (
               <Route path="/owner/claim" element={<OwnerClaim />} />
               <Route path="/owner/create" element={<OwnerCreate />} />
               <Route path="/owner/verify" element={<OwnerVerify />} />
+              <Route path="/owner/offers" element={<OwnerOffers />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/email-confirmed" element={<EmailConfirmed />} />
