@@ -77,9 +77,22 @@ export default function SundayRadar() {
     link.rel = 'stylesheet';
     link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
     document.head.appendChild(link);
+    const link2 = document.createElement('link');
+    link2.rel = 'stylesheet';
+    link2.href = 'https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css';
+    document.head.appendChild(link2);
+    const link3 = document.createElement('link');
+    link3.rel = 'stylesheet';
+    link3.href = 'https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css';
+    document.head.appendChild(link);
     const script = document.createElement('script');
     script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-    script.onload = () => setMapLoaded(true);
+    script.onload = () => {
+      const script2 = document.createElement('script');
+      script2.src = 'https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js';
+      script2.onload = () => setMapLoaded(true);
+      document.head.appendChild(script2);
+    };
     document.head.appendChild(script);
   };
 
@@ -152,6 +165,18 @@ export default function SundayRadar() {
       markersRef.current.push(m);
     }
 
+    // Create cluster group
+    const clusterGroup = (window as any).L.markerClusterGroup({
+      maxClusterRadius: 40,
+      iconCreateFunction: (cluster: any) => {
+        const count = cluster.getChildCount();
+        return L.divIcon({
+          html: `<div style="background:#22c55e;color:white;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;border:2px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3)">${count}</div>`,
+          iconSize: [36, 36], iconAnchor: [18, 18], className: ''
+        });
+      }
+    });
+
     // Shop markers
     const shopsWithDist = shops.map(s => ({
       ...s,
@@ -161,8 +186,8 @@ export default function SundayRadar() {
     for (const shop of shopsWithDist) {
       const color = shop.isOpenNow ? '#22c55e' : '#6b7280';
       const icon = L.divIcon({
-        html: `<div style="background:${color};color:white;border-radius:8px;padding:4px 8px;font-size:11px;font-weight:600;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.2);border:2px solid white">🛒 ${shop.name.split('—')[0].trim()}</div>`,
-        iconSize: [null, null] as any, iconAnchor: [0, 20], className: ''
+        html: `<div style="width:18px;height:18px;background:${color};border-radius:50%;border:2.5px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.35)"></div>`,
+        iconSize: [18, 18], iconAnchor: [9, 9], className: ''
       });
       const marker = L.marker([shop.lat, shop.lng], { icon })
         .addTo(map)
