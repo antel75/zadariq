@@ -34,10 +34,10 @@ const Index = () => {
             </button>
             <button
               onClick={() => navigate('/for-business')}
-              className="p-2 rounded-xl bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
-              title={t('forbiz.title')}
+              className="px-3 py-1.5 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary/90 transition-colors flex items-center gap-1.5 shadow-sm"
             >
-              <Briefcase className="h-4 w-4" />
+              <Briefcase className="h-3.5 w-3.5" />
+              Za tvrtke
             </button>
             <ThemeToggle />
             <LanguageSelector />
