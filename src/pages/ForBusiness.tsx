@@ -73,7 +73,7 @@ export default function ForBusiness() {
 
         {/* CTA */}
         <button
-          onClick={() => navigate('/search')}
+          onClick={() => navigate('/join')}
           className="w-full py-4 rounded-2xl bg-primary text-primary-foreground font-semibold text-sm flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors"
         >
           {t('forbiz.cta')}
