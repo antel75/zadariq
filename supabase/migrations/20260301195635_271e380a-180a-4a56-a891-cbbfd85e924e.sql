@@ -1,0 +1,1 @@
+ALTER TABLE public.pending_places ADD COLUMN submitter_email text;
