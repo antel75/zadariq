@@ -55,31 +55,46 @@ export type Database = {
       }
       business_ownership: {
         Row: {
+          admin_notes: string | null
           business_id: string
           created_at: string | null
+          document_url: string | null
           id: string
+          oib: string | null
           owner_user_id: string | null
           updated_at: string | null
+          verification_level: number | null
           verified: boolean | null
           verified_at: string | null
+          verified_by: string | null
         }
         Insert: {
+          admin_notes?: string | null
           business_id: string
           created_at?: string | null
+          document_url?: string | null
           id?: string
+          oib?: string | null
           owner_user_id?: string | null
           updated_at?: string | null
+          verification_level?: number | null
           verified?: boolean | null
           verified_at?: string | null
+          verified_by?: string | null
         }
         Update: {
+          admin_notes?: string | null
           business_id?: string
           created_at?: string | null
+          document_url?: string | null
           id?: string
+          oib?: string | null
           owner_user_id?: string | null
           updated_at?: string | null
+          verification_level?: number | null
           verified?: boolean | null
           verified_at?: string | null
+          verified_by?: string | null
         }
         Relationships: []
       }
@@ -635,6 +650,42 @@ export type Database = {
         }
         Relationships: []
       }
+      owner_profiles: {
+        Row: {
+          created_at: string | null
+          email: string
+          full_name: string | null
+          id: string
+          is_active: boolean | null
+          last_login: string | null
+          phone: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          full_name?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_login?: string | null
+          phone?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          full_name?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_login?: string | null
+          phone?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       ownership_audit_log: {
         Row: {
           action: string
@@ -673,46 +724,64 @@ export type Database = {
       }
       ownership_claim_requests: {
         Row: {
+          admin_reviewed_at: string | null
+          admin_reviewed_by: string | null
           attempts: number | null
           business_id: string
           code_hash: string
           created_at: string | null
+          document_url: string | null
           email: string
           expires_at: string
           id: string
           ip: string | null
           last_attempt_at: string | null
+          oib: string | null
+          rejection_reason: string | null
           requester_user_id: string | null
           status: string | null
           user_agent: string | null
+          verification_level: number | null
         }
         Insert: {
+          admin_reviewed_at?: string | null
+          admin_reviewed_by?: string | null
           attempts?: number | null
           business_id: string
           code_hash: string
           created_at?: string | null
+          document_url?: string | null
           email: string
           expires_at: string
           id?: string
           ip?: string | null
           last_attempt_at?: string | null
+          oib?: string | null
+          rejection_reason?: string | null
           requester_user_id?: string | null
           status?: string | null
           user_agent?: string | null
+          verification_level?: number | null
         }
         Update: {
+          admin_reviewed_at?: string | null
+          admin_reviewed_by?: string | null
           attempts?: number | null
           business_id?: string
           code_hash?: string
           created_at?: string | null
+          document_url?: string | null
           email?: string
           expires_at?: string
           id?: string
           ip?: string | null
           last_attempt_at?: string | null
+          oib?: string | null
+          rejection_reason?: string | null
           requester_user_id?: string | null
           status?: string | null
           user_agent?: string | null
+          verification_level?: number | null
         }
         Relationships: []
       }
