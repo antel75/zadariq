@@ -34,7 +34,7 @@ const Index = () => {
             </button>
             <button
               onClick={() => navigate('/for-business')}
-              className="px-3 py-1.5 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary/90 transition-colors flex items-center gap-1.5 shadow-sm"
+              className="px-3 py-1.5 rounded-xl bg-primary/15 text-primary text-xs font-medium hover:bg-primary/25 transition-all duration-200 flex items-center gap-1.5 border border-primary/20 backdrop-blur-sm"
             >
               <Briefcase className="h-3.5 w-3.5" />
               Za tvrtke
