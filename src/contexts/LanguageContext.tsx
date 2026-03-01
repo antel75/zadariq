@@ -206,7 +206,7 @@ const translations: Translations = {
   'forbiz.trustEconomy.rule2': { hr: 'Neaktivni profili padaju niže.', en: 'Inactive profiles rank lower.', de: 'Inaktive Profile sinken in den Ergebnissen.', it: 'I profili inattivi scendono nei risultati.' },
   'forbiz.trustEconomy.rule3': { hr: 'Nema plaćenog rangiranja — samo aktivnost i pouzdanost.', en: 'No paid ranking — only activity and reliability.', de: 'Kein bezahltes Ranking — nur Aktivität und Zuverlässigkeit.', it: 'Nessun posizionamento a pagamento — solo attività e affidabilità.' },
   'forbiz.cta': { hr: 'Preuzmi svoj profil', en: 'Claim your profile', de: 'Profil beanspruchen', it: 'Rivendica il tuo profilo' },
-  'forbiz.free': { hr: 'Potpuno besplatno. Zauvijek.', en: 'Completely free. Forever.', de: 'Komplett kostenlos. Für immer.', it: 'Completamente gratuito. Per sempre.' },
+  'forbiz.free': { hr: 'Potpuno besplatno.', en: 'Completely free.', de: 'Komplett kostenlos. Für immer.', it: 'Completamente gratuito.' },
   // Public services
   'publicServices.title': { hr: 'Javne službe', en: 'Public Services', de: 'Öffentliche Dienste', it: 'Servizi Pubblici' },
   'publicServices.subtitle': { hr: 'Gradske institucije i službe', en: 'City institutions & services', de: 'Städtische Institutionen & Dienste', it: 'Istituzioni e servizi comunali' },
