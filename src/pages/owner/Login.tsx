@@ -4,7 +4,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { ArrowLeft, Mail, Lock, Building2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { lovable } from '@/integrations/lovable/index';
+
 
 export default function OwnerLogin() {
   const navigate = useNavigate();
@@ -109,7 +109,7 @@ export default function OwnerLogin() {
         <div className="space-y-3">
           <button
             onClick={async () => {
-              const { error } = await lovable.auth.signInWithOAuth('google', {
+              const { error } = await supabase.auth.signInWithOAuth('google', {
                 redirect_uri: window.location.origin,
               });
               if (error) setError(error.message || 'Greška pri Google prijavi');
@@ -122,7 +122,7 @@ export default function OwnerLogin() {
 
           <button
             onClick={async () => {
-              const { error } = await lovable.auth.signInWithOAuth('apple', {
+              const { error } = await supabase.auth.signInWithOAuth('apple', {
                 redirect_uri: window.location.origin,
               });
               if (error) setError(error.message || 'Greška pri Apple prijavi');
