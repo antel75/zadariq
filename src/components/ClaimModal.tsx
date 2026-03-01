@@ -19,6 +19,7 @@ export function ClaimModal({ businessId, businessName, businessAddress, open, on
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
   const [sent, setSent] = useState(false);
   const [tosAccepted, setTosAccepted] = useState(false);
   const [error, setError] = useState('');
@@ -152,6 +153,45 @@ export function ClaimModal({ businessId, businessName, businessAddress, open, on
               className="mt-2 px-6 py-2.5 rounded-xl bg-primary text-white font-medium text-sm hover:bg-primary/90">
               Zatvori
             </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  // Confirmation step
+  if (!confirmed) {
+    return (
+      <Dialog open={open} onOpenChange={handleClose}>
+        <DialogContent className="sm:max-w-sm rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <UserCheck className="h-5 w-5 text-accent" />
+              Potvrda preuzimanja
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <p className="text-sm text-muted-foreground">Odabrali ste preuzimanje profila:</p>
+            <div className="p-4 rounded-xl bg-secondary border border-border">
+              <p className="font-bold text-foreground">{businessName}</p>
+              {businessAddress && <p className="text-xs text-muted-foreground mt-1">{businessAddress}</p>}
+            </div>
+            <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
+              <p className="text-sm font-medium text-amber-300 mb-1">⚠️ Važno!</p>
+              <p className="text-xs text-amber-200 leading-relaxed">
+                Preuzimanjem profila pod materijalnom i krivičnom odgovornošću potvrđujete da ste zakoniti vlasnik ili ovlašteni predstavnik navedenog objekta.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <button onClick={handleClose}
+                className="flex-1 py-3 rounded-xl bg-secondary border border-border text-foreground font-medium text-sm hover:bg-secondary/80">
+                ✗ Nije točno
+              </button>
+              <button onClick={() => setConfirmed(true)}
+                className="flex-1 py-3 rounded-xl bg-primary text-white font-medium text-sm hover:bg-primary/90">
+                ✓ Da, to sam ja
+              </button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>

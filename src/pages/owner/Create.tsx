@@ -10,7 +10,7 @@ const CATEGORIES = [
   { key: 'trgovina', label: '🛒 Trgovina', sub: ['Prehrambena', 'Moda & obuća', 'Ljekarna', 'Drogerija', 'Cvjećarna', 'Suveniri', 'Sport & oprema'] },
   { key: 'obrti', label: '🔧 Obrti & majstori', sub: ['Vodoinstalater', 'Električar', 'Soboslikar', 'Keramičar', 'Staklar', 'Zidar', 'Vulkanizer', 'Autoservis', 'Klima serviser'] },
   { key: 'ljepota', label: '💇 Ljepota & wellness', sub: ['Frizer', 'Kozmetičar', 'Manikura/pedikura', 'Masaža', 'Teretana', 'Yoga/pilates', 'Tattoo studio'] },
-  { key: 'zdravlje', label: '🏥 Zdravlje', sub: ['Opća praksa', 'Stomatolog', 'Pedijatrija', 'Fizioterapija', 'Zubotehničar', 'Veterinar', 'Ljekarna', 'Oftalmologija'] },
+  { key: 'zdravlje', label: '🏥 Zdravlje', sub: ['Opća praksa', 'Stomatolog', 'Dentalna radiologija', 'Oralna kirurgija', 'Ortodoncija', 'Pedijatrija', 'Fizioterapija', 'Zubotehničar', 'Veterinar', 'Ljekarna', 'Oftalmologija', 'Dermatologija', 'Psihologija', 'Ginekologija'] },
   { key: 'poslovne', label: '⚖️ Poslovne usluge', sub: ['Odvjetnik', 'Javni bilježnik', 'Računovođa', 'Agencija za nekretnine', 'Osiguranje', 'Prevoditelj'] },
   { key: 'prijevoz', label: '🚗 Prijevoz', sub: ['Taxi', 'Rent-a-car', 'Iznajmljivanje skutera', 'Transfer aerodrom', 'Brodski prijevoz'] },
   { key: 'turizam', label: '🌊 Turizam', sub: ['Turistička agencija', 'Ronjenje', 'Izleti', 'Kajak', 'Surf', 'Ribolov'] },
@@ -73,7 +73,7 @@ export default function OwnerCreate() {
     }
 
     function initMap() {
-      const map = (window as any).L.map(mapRef.current!).setView([44.1194, 15.2314], 14);
+      const map = (window as any).L.map(mapRef.current!, { zoomControl: true }).setView([44.1194, 15.2314], 16);
       (window as any).L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
       leafletMapRef.current = map;
       let marker: any = null;
