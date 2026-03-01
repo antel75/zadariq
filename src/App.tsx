@@ -35,6 +35,7 @@ import SundayRadar from "./pages/SundayRadar";
 import Place from "./pages/Place";
 import Join from "./pages/Join";
 import Events from "./pages/Events";
+import EmailConfirmed from "./pages/EmailConfirmed";
 
 const DataSources = lazy(() => import("./pages/DataSources"));
 
@@ -77,6 +78,7 @@ const App = () => (
               <Route path="/sunday-radar" element={<SundayRadar />} />
               <Route path="/place" element={<Place />} />
               <Route path="/join" element={<Join />} />
+              <Route path="/email-confirmed" element={<EmailConfirmed />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <LegalNoticeBar />

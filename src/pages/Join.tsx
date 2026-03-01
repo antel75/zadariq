@@ -37,7 +37,7 @@ export default function Join() {
             phone: form.phone,
             tos_accepted_at: new Date().toISOString(),
           },
-          emailRedirectTo: `${window.location.origin}/owner/dashboard`
+          emailRedirectTo: 'https://zadariq.city/email-confirmed'
         }
       });
       if (error) throw error;
