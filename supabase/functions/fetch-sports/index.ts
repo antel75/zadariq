@@ -400,6 +400,22 @@ serve(async (req) => {
       }
     }
 
+    // ── Auto-finish stale "live" matches (started >4h ago) ──
+    const liveStaleThreshold = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString();
+    const { data: staleLive } = await supabase
+      .from("sports_events")
+      .select("id, home_team, away_team")
+      .eq("match_status", "live")
+      .lt("start_time", liveStaleThreshold);
+    if (staleLive && staleLive.length > 0) {
+      const staleIds = staleLive.map((e: any) => e.id);
+      await supabase
+        .from("sports_events")
+        .update({ match_status: "finished", is_stale: false })
+        .in("id", staleIds);
+      console.log(`[AUTO-FINISH] Marked ${staleLive.length} stale live matches as finished`);
+    }
+
     // ── Cleanup: keep top 5 finished, remove the rest ──
     const { data: finishedEvents } = await supabase
       .from("sports_events")

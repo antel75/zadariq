@@ -113,22 +113,22 @@ export default function OwnerCreate() {
       if (!user) { navigate('/owner/login'); return; }
 
       const { error } = await supabase.from('pending_places').insert({
-        name: form.name,
-        address: form.address,
+        proposed_name: form.name,
+        proposed_address: form.address,
         category: selectedCategory,
         phone: form.phone,
         website: form.website,
-        description: form.description,
-        lat: form.lat,
-        lng: form.lng,
-        submitted_by: user.id,
+        notes: [
+          form.description,
+          selectedSub ? `Podkategorija: ${selectedSub}` : '',
+          form.forte ? `Forte: ${form.forte}` : '',
+          form.hours ? `Radno vrijeme: ${form.hours}` : '',
+        ].filter(Boolean).join(' | ') || null,
+        lat: form.lat || null,
+        lng: form.lng || null,
+        fingerprint_hash: user.id,
         submitter_email: user.email,
         status: 'pending',
-        details: {
-          subcategory: selectedSub,
-          forte: form.forte,
-          hours: form.hours,
-        }
       });
 
       if (error) throw error;
