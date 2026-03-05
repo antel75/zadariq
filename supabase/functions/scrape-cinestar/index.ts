@@ -132,8 +132,8 @@ function parseMovies(html: string): MovieData[] {
     const formatMatch = block.match(/data-format="([^"]+)"/);
     const format = formatMatch ? formatMatch[1] : null;
 
-    // Extract title from h2
-    const titleMatch = block.match(/<h2>([^<]+)<\/h2>/);
+    // Extract title from h2 (handle inner spans like "Pretprodaja", "OSCAR REVIJA")
+    const titleMatch = block.match(/<h2>([^<]+)/);
     if (!titleMatch) continue;
     const title = decodeHtmlEntities(titleMatch[1].trim());
 
