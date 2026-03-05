@@ -7,38 +7,65 @@ export function useAuth() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [adminChecked, setAdminChecked] = useState(false);
 
   useEffect(() => {
+    let isMounted = true;
+
+    const checkAdminRole = async (userId: string) => {
+      try {
+        const { data } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', userId)
+          .eq('role', 'admin')
+          .maybeSingle();
+        if (isMounted) {
+          setIsAdmin(!!data);
+          setAdminChecked(true);
+          setLoading(false);
+        }
+      } catch {
+        if (isMounted) {
+          setIsAdmin(false);
+          setAdminChecked(true);
+          setLoading(false);
+        }
+      }
+    };
+
+    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      (_event, session) => {
+        if (!isMounted) return;
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
-          // Check admin role - use setTimeout to avoid deadlock with auth state change
-          setTimeout(async () => {
-            const { data } = await supabase
-              .from('user_roles')
-              .select('role')
-              .eq('user_id', session.user.id)
-              .eq('role', 'admin')
-              .maybeSingle();
-            setIsAdmin(!!data);
-            setLoading(false);
-          }, 0);
+          // Use setTimeout to avoid deadlock with auth state change
+          setTimeout(() => checkAdminRole(session.user.id), 0);
         } else {
           setIsAdmin(false);
+          setAdminChecked(true);
           setLoading(false);
         }
       }
     );
 
+    // Then check current session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!isMounted) return;
       setSession(session);
       setUser(session?.user ?? null);
-      if (!session?.user) setLoading(false);
+      if (!session?.user) {
+        setAdminChecked(true);
+        setLoading(false);
+      }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
@@ -50,5 +77,5 @@ export function useAuth() {
     await supabase.auth.signOut();
   };
 
-  return { user, session, loading, isAdmin, signIn, signOut };
+  return { user, session, loading, isAdmin, adminChecked, signIn, signOut };
 }

@@ -54,7 +54,7 @@ type TransportSchedule = {
 const today = () => new Date().toISOString().split('T')[0];
 
 const AdminPanel = () => {
-  const { user, loading, isAdmin, signOut } = useAuth();
+  const { user, loading, isAdmin, adminChecked, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -64,12 +64,12 @@ const AdminPanel = () => {
   const [editingTransport, setEditingTransport] = useState<Partial<TransportSchedule> | null>(null);
 
   useEffect(() => {
-    if (!loading && !user) navigate('/admin/login');
-    if (!loading && user && !isAdmin) {
+    if (!loading && adminChecked && !user) navigate('/admin/login');
+    if (!loading && adminChecked && user && !isAdmin) {
       toast({ title: 'Access denied', description: 'You are not an admin.', variant: 'destructive' });
       navigate('/');
     }
-  }, [loading, user, isAdmin]);
+  }, [loading, user, isAdmin, adminChecked]);
 
   useEffect(() => {
     if (isAdmin) {
@@ -152,7 +152,7 @@ const AdminPanel = () => {
     toast({ title: 'Deleted' });
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Loading...</div>;
+  if (loading || !adminChecked) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Loading...</div>;
   if (!isAdmin) return null;
 
   const newDuty = (): Partial<DutyService> => ({ type: 'pharmacy', name: '', valid_from: today(), valid_until: today(), source: 'official', enabled: true });
