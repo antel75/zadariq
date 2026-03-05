@@ -66,31 +66,16 @@ const AdminPanel = () => {
   useEffect(() => {
     if (loading || !adminChecked) return;
 
-    let cancelled = false;
+    if (!user) {
+      navigate('/admin/login', { replace: true });
+      return;
+    }
 
-    const verifySessionAndRedirect = async () => {
-      const { data: { session: latestSession } } = await supabase.auth.getSession();
-      if (cancelled) return;
-
-      const currentUser = latestSession?.user ?? user;
-
-      if (!currentUser) {
-        navigate('/admin/login');
-        return;
-      }
-
-      if (!isAdmin) {
-        toast({ title: 'Access denied', description: 'You are not an admin.', variant: 'destructive' });
-        navigate('/');
-      }
-    };
-
-    void verifySessionAndRedirect();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [loading, user, isAdmin, adminChecked, navigate, toast]);
+    if (!isAdmin) {
+      toast({ title: 'Access denied', description: 'You are not an admin.', variant: 'destructive' });
+      navigate('/', { replace: true });
+    }
+  }, [loading, adminChecked, user?.id, isAdmin, navigate, toast]);
 
   useEffect(() => {
     if (isAdmin) {
