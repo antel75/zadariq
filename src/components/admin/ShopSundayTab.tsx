@@ -27,7 +27,10 @@ function getSundaysOfYear(year: number): string[] {
   // Move to first Sunday
   while (d.getDay() !== 0) d.setDate(d.getDate() + 1);
   while (d.getFullYear() === year) {
-    sundays.push(d.toISOString().split('T')[0]);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    sundays.push(`${yyyy}-${mm}-${dd}`);
     d.setDate(d.getDate() + 7);
   }
   return sundays;
