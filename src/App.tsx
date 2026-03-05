@@ -44,6 +44,7 @@ import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Events from "./pages/Events";
 import EmailConfirmed from "./pages/EmailConfirmed";
+import ResetPassword from "./pages/ResetPassword";
 
 const DataSources = lazy(() => import("./pages/DataSources"));
 
@@ -95,6 +96,7 @@ const App = () => (
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/email-confirmed" element={<EmailConfirmed />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <LegalNoticeBar />
