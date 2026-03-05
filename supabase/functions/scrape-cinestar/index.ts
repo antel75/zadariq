@@ -2,12 +2,15 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
+
+const FETCH_TIMEOUT_MS = 15_000;
+const MIN_MOVIES_SAFETY = 3; // Don't wipe DB if fewer movies found
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response('ok', { headers: corsHeaders });
   }
 
   try {
@@ -16,38 +19,73 @@ Deno.serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     console.log('Fetching CineStar Zadar page...');
-    const response = await fetch('https://cinestarcinemas.hr/zadar-city-galleria', {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; ZadarIQ/1.0)',
-        'Accept': 'text/html',
-        'Accept-Language': 'hr',
-      },
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
+    let response: Response;
+    try {
+      response = await fetch('https://cinestarcinemas.hr/zadar-city-galleria', {
+        signal: controller.signal,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; ZadarIQ/1.0)',
+          'Accept': 'text/html',
+          'Accept-Language': 'hr',
+        },
+      });
+    } finally {
+      clearTimeout(timeout);
+    }
 
     if (!response.ok) {
       throw new Error(`Failed to fetch CineStar page: ${response.status}`);
     }
 
     const html = await response.text();
-    console.log('Page fetched, parsing movies...');
+    console.log(`Page fetched (${html.length} bytes), parsing movies...`);
+
+    if (html.length < 1000) {
+      throw new Error('Page body too short, site may be down or returning error page');
+    }
 
     // Parse movies from HTML
     const movies = parseMovies(html);
     console.log(`Found ${movies.length} movies`);
 
     if (movies.length === 0) {
+      console.log('No movies found — preserving existing data');
       return new Response(
-        JSON.stringify({ success: true, message: 'No movies found', count: 0 }),
+        JSON.stringify({ success: true, message: 'No movies found, existing data preserved', count: 0 }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
+    // Safety: check current count before wiping
+    const { count: existingCount } = await supabase
+      .from('cinema_movies')
+      .select('*', { count: 'exact', head: true });
+
+    if (existingCount && existingCount > 0 && movies.length < MIN_MOVIES_SAFETY && movies.length < existingCount / 2) {
+      console.warn(`Safety: only ${movies.length} movies found vs ${existingCount} existing. Skipping wipe.`);
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: `Safety check failed: found only ${movies.length} movies vs ${existingCount} existing. Site structure may have changed.` 
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Clear old data (screenings first due to FK, then movies)
-    await supabase.from('cinema_screenings').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-    await supabase.from('cinema_movies').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    const { error: delScreenErr } = await supabase.from('cinema_screenings').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    if (delScreenErr) console.error('Error deleting old screenings:', delScreenErr);
+
+    const { error: delMovieErr } = await supabase.from('cinema_movies').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    if (delMovieErr) console.error('Error deleting old movies:', delMovieErr);
 
     // Insert movies and screenings
     let totalScreenings = 0;
+    let insertedMovies = 0;
+
     for (const movie of movies) {
       const { data: insertedMovie, error: movieError } = await supabase
         .from('cinema_movies')
@@ -67,6 +105,8 @@ Deno.serve(async (req) => {
         console.error(`Error inserting movie ${movie.title}:`, movieError);
         continue;
       }
+
+      insertedMovies++;
 
       if (movie.screenings.length > 0) {
         const screeningRows = movie.screenings.map(s => ({
@@ -89,10 +129,10 @@ Deno.serve(async (req) => {
       }
     }
 
-    console.log(`Done! ${movies.length} movies, ${totalScreenings} screenings`);
+    console.log(`Done! ${insertedMovies} movies, ${totalScreenings} screenings`);
 
     return new Response(
-      JSON.stringify({ success: true, movies: movies.length, screenings: totalScreenings }),
+      JSON.stringify({ success: true, movies: insertedMovies, screenings: totalScreenings }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
@@ -136,11 +176,11 @@ function parseMovies(html: string): MovieData[] {
     const titleMatch = block.match(/<h2>([^<]+)/);
     if (!titleMatch) continue;
     const title = decodeHtmlEntities(titleMatch[1].trim());
+    if (!title) continue;
 
     // Extract poster URL
-    const posterMatch = block.match(/class="img-fluid"\s*>\s*$|src="([^"]+)"\s+alt="[^"]*"\s+class="img-fluid"/);
-    const posterMatch2 = block.match(/src="(https?:\/\/[^"]+(?:\.jpg|\.png|\.webp)[^"]*)"\s+alt=/);
-    const posterUrl = posterMatch2 ? posterMatch2[1] : null;
+    const posterMatch = block.match(/src="(https?:\/\/[^"]+(?:\.jpg|\.png|\.webp)[^"]*)"\s+alt=/);
+    const posterUrl = posterMatch ? posterMatch[1] : null;
 
     // Extract URL
     const urlMatch = block.match(/href="(https:\/\/cinestarcinemas\.hr\/zadar-city-galleria\/[^"]+)"/);
@@ -165,7 +205,6 @@ function parseMovies(html: string): MovieData[] {
     for (let j = 1; j < dayBlocks.length; j++) {
       const dayBlock = dayBlocks[j];
       
-      // Extract date from day text like "DANAS, 14.02." or "SUTRA, 15.02." or "ponedjeljak, 16.02."
       const dayMatch = dayBlock.match(/class="day">([^<]+)<\/div>/);
       if (!dayMatch) continue;
       
@@ -186,16 +225,22 @@ function parseMovies(html: string): MovieData[] {
       }
     }
 
-    movies.push({
-      title,
-      genre,
-      duration,
-      posterUrl,
-      url,
-      ageRating,
-      description,
-      screenings,
-    });
+    // Merge with existing movie if same title (different format variant)
+    const existing = movies.find(m => m.title === title);
+    if (existing) {
+      for (const s of screenings) {
+        const alreadyHas = existing.screenings.some(
+          es => es.date === s.date && es.time === s.time && es.hall === s.hall
+        );
+        if (!alreadyHas) {
+          existing.screenings.push(s);
+        }
+      }
+    } else {
+      movies.push({
+        title, genre, duration, posterUrl, url, ageRating, description, screenings,
+      });
+    }
   }
 
   return movies;
@@ -209,7 +254,7 @@ function parseDateFromDayText(text: string): string | null {
     const month = parseInt(dateMatch[2]);
     const now = new Date();
     let year = now.getFullYear();
-    // If month is less than current month, assume next year
+    // If month is before current month, assume next year (year rollover)
     if (month < now.getMonth() + 1) {
       year++;
     }
@@ -231,5 +276,6 @@ function decodeHtmlEntities(text: string): string {
     .replace(/&mdash;/g, '—')
     .replace(/&uuml;/g, 'ü')
     .replace(/&ouml;/g, 'ö')
-    .replace(/&auml;/g, 'ä');
+    .replace(/&auml;/g, 'ä')
+    .replace(/&nbsp;/g, ' ');
 }
