@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User, Session } from '@supabase/supabase-js';
 
@@ -8,11 +8,20 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminChecked, setAdminChecked] = useState(false);
+  const lastCheckedUserId = useRef<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
 
-    const checkAdminRole = async (userId: string) => {
+    const checkAdminRole = async (userId: string, force = false) => {
+      if (!force && lastCheckedUserId.current === userId) {
+        if (isMounted) {
+          setAdminChecked(true);
+          setLoading(false);
+        }
+        return;
+      }
+
       try {
         const { data } = await supabase
           .from('user_roles')
@@ -20,10 +29,12 @@ export function useAuth() {
           .eq('user_id', userId)
           .eq('role', 'admin')
           .maybeSingle();
+
         if (isMounted) {
           setIsAdmin(!!data);
           setAdminChecked(true);
           setLoading(false);
+          lastCheckedUserId.current = userId;
         }
       } catch {
         if (isMounted) {
@@ -34,29 +45,35 @@ export function useAuth() {
       }
     };
 
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        if (!isMounted) return;
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          // Use setTimeout to avoid deadlock with auth state change
-          setTimeout(() => checkAdminRole(session.user.id), 0);
-        } else {
-          setIsAdmin(false);
-          setAdminChecked(true);
-          setLoading(false);
-        }
-      }
-    );
-
-    // Then check current session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       if (!isMounted) return;
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (!session?.user) {
+
+      setSession(nextSession);
+      setUser(nextSession?.user ?? null);
+
+      if (nextSession?.user) {
+        setTimeout(() => {
+          void checkAdminRole(nextSession.user.id);
+        }, 0);
+      } else {
+        lastCheckedUserId.current = null;
+        setIsAdmin(false);
+        setAdminChecked(true);
+        setLoading(false);
+      }
+    });
+
+    supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
+      if (!isMounted) return;
+
+      setSession(initialSession);
+      setUser(initialSession?.user ?? null);
+
+      if (initialSession?.user) {
+        void checkAdminRole(initialSession.user.id, true);
+      } else {
+        lastCheckedUserId.current = null;
+        setIsAdmin(false);
         setAdminChecked(true);
         setLoading(false);
       }
@@ -79,3 +96,4 @@ export function useAuth() {
 
   return { user, session, loading, isAdmin, adminChecked, signIn, signOut };
 }
+

@@ -64,12 +64,33 @@ const AdminPanel = () => {
   const [editingTransport, setEditingTransport] = useState<Partial<TransportSchedule> | null>(null);
 
   useEffect(() => {
-    if (!loading && adminChecked && !user) navigate('/admin/login');
-    if (!loading && adminChecked && user && !isAdmin) {
-      toast({ title: 'Access denied', description: 'You are not an admin.', variant: 'destructive' });
-      navigate('/');
-    }
-  }, [loading, user, isAdmin, adminChecked]);
+    if (loading || !adminChecked) return;
+
+    let cancelled = false;
+
+    const verifySessionAndRedirect = async () => {
+      const { data: { session: latestSession } } = await supabase.auth.getSession();
+      if (cancelled) return;
+
+      const currentUser = latestSession?.user ?? user;
+
+      if (!currentUser) {
+        navigate('/admin/login');
+        return;
+      }
+
+      if (!isAdmin) {
+        toast({ title: 'Access denied', description: 'You are not an admin.', variant: 'destructive' });
+        navigate('/');
+      }
+    };
+
+    void verifySessionAndRedirect();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [loading, user, isAdmin, adminChecked, navigate, toast]);
 
   useEffect(() => {
     if (isAdmin) {
