@@ -11,14 +11,12 @@ export function useAuth() {
     let isMounted = true;
     const checkAdminRole = async (userId: string) => {
       try {
-        const { data } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', userId)
-          .eq('role', 'admin')
-          .maybeSingle();
+        const { data, error } = await supabase.rpc('has_role', {
+          _user_id: userId,
+          _role: 'admin',
+        });
         if (isMounted) {
-          setIsAdmin(!!data);
+          setIsAdmin(error ? false : !!data);
           setAdminChecked(true);
           setLoading(false);
         }
