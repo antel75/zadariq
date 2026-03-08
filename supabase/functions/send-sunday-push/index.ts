@@ -14,20 +14,12 @@ function extractRawPrivateKey(pkcs8Base64Url: string): string {
   const padding = '='.repeat((4 - base64.length % 4) % 4);
   const binary = atob(base64 + padding);
   const bytes = new Uint8Array([...binary].map(c => c.charCodeAt(0)));
-  // Raw 32-byte key starts at offset 36 in PKCS#8 EC key
+  // PKCS#8 EC P-256: raw 32-byte key at offset 36
   const raw = bytes.slice(36, 68);
-  // Convert back to URL-safe base64
+  // Convert to URL-safe base64
   let b64 = btoa(String.fromCharCode(...raw));
   return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
-
-const vapidPrivateKey = extractRawPrivateKey(Deno.env.get("VAPID_PRIVATE_KEY")!);
-
-webpush.setVapidDetails(
-  "mailto:admin@zadariq.city",
-  Deno.env.get("VAPID_PUBLIC_KEY")!,
-  vapidPrivateKey
-);
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -35,6 +27,24 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const rawPrivateKey = Deno.env.get("VAPID_PRIVATE_KEY")!;
+    const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY")!;
+    
+    // Detect if key is PKCS#8 (starts with MIG) or already raw 32-byte
+    let privateKey: string;
+    if (rawPrivateKey.startsWith("MIG")) {
+      privateKey = extractRawPrivateKey(rawPrivateKey);
+      console.log(`Extracted raw key length (base64url): ${privateKey.length} chars`);
+    } else {
+      privateKey = rawPrivateKey;
+    }
+
+    webpush.setVapidDetails(
+      "mailto:admin@zadariq.city",
+      vapidPublicKey,
+      privateKey
+    );
+
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
