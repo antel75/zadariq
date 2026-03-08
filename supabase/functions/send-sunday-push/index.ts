@@ -8,41 +8,16 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-// Extract raw 32-byte private key from PKCS#8 DER encoding
-function extractRawPrivateKey(pkcs8Base64Url: string): string {
-  const base64 = pkcs8Base64Url.replace(/-/g, '+').replace(/_/g, '/');
-  const padding = '='.repeat((4 - base64.length % 4) % 4);
-  const binary = atob(base64 + padding);
-  const bytes = new Uint8Array([...binary].map(c => c.charCodeAt(0)));
-  // PKCS#8 EC P-256: raw 32-byte key at offset 36
-  const raw = bytes.slice(36, 68);
-  // Convert to URL-safe base64
-  let b64 = btoa(String.fromCharCode(...raw));
-  return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-}
-
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
 
   try {
-    const rawPrivateKey = Deno.env.get("VAPID_PRIVATE_KEY")!;
-    const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY")!;
-    
-    // Detect if key is PKCS#8 (starts with MIG) or already raw 32-byte
-    let privateKey: string;
-    if (rawPrivateKey.startsWith("MIG")) {
-      privateKey = extractRawPrivateKey(rawPrivateKey);
-      console.log(`Extracted raw key length (base64url): ${privateKey.length} chars`);
-    } else {
-      privateKey = rawPrivateKey;
-    }
-
     webpush.setVapidDetails(
       "mailto:admin@zadariq.city",
-      vapidPublicKey,
-      privateKey
+      Deno.env.get("VAPID_PUBLIC_KEY")!,
+      Deno.env.get("VAPID_PRIVATE_KEY")!
     );
 
     const supabase = createClient(
