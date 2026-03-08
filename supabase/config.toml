@@ -39,3 +39,5 @@ project_id = "yxfaovaigwdbziewnppx"
     verify_jwt = false
   [functions.verify-ownership-code]
     verify_jwt = false
+  [functions.send-sunday-push]
+    verify_jwt = false

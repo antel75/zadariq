@@ -8,6 +8,7 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { Footer } from '@/components/Footer';
 import { ReportModal } from '@/components/ReportModal';
 import { HomeDashboard } from '@/components/dashboard/HomeDashboard';
+import { PushOptInBanner } from '@/components/PushOptInBanner';
 import { Business } from '@/data/types';
 import { Siren, Briefcase } from 'lucide-react';
 
@@ -55,6 +56,7 @@ const Index = () => {
         onClose={() => setReportTarget(null)}
       />
       <FieldReportButton />
+      <PushOptInBanner />
       <Footer />
     </div>
   );
