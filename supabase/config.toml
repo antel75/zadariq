@@ -41,3 +41,4 @@ project_id = "yxfaovaigwdbziewnppx"
     verify_jwt = false
   [functions.send-sunday-push]
     verify_jwt = false
+    schedule = "0 11 * * 6"
