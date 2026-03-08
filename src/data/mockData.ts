@@ -345,6 +345,15 @@ export const businesses: Business[] = [
   { id: 'sh45', name: 'Studenac — Bibinje', category: 'shops', address: 'Jadranska Magistrala 14A, Bibinje', phone: '023 350 007', website: 'https://www.studenac.hr/', workingHours: wh('06:00–21:00', '06:30–21:00', '—'), verified: true, lastVerified: '2026-02-28', reportCount: 0, verificationStatus: 'community', communityConfirmedAt: hoursAgo(1), lastAutoChecked: hoursAgo(1), trustScore: 70, lat: 44.0825606, lng: 15.2843227 },
   { id: 'sh40', name: 'Konzum — Frane Petrića', category: 'shops', address: 'Frane Petrića 10, Zadar', phone: '023 302 401', website: 'https://www.konzum.hr/', workingHours: wh('06:30–21:00', '07:00–21:00', '—'), verified: true, lastVerified: '2026-02-22', reportCount: 0, verificationStatus: 'community', communityConfirmedAt: hoursAgo(1), lastAutoChecked: hoursAgo(1), trustScore: 74, lat: 44.1258302, lng: 15.2368965 },
 
+  // STUDENAC — Velebitska (Google Maps: 44.117312, 15.234312)
+  { id: 'sh46', name: 'Studenac — Velebitska', category: 'shops', address: 'Velebitska ulica 14, Zadar', phone: '072 000 990', website: 'https://www.studenac.hr/', workingHours: wh('06:00–21:00', '06:30–21:00', '—'), verified: true, lastVerified: '2026-03-08', reportCount: 0, verificationStatus: 'community', communityConfirmedAt: hoursAgo(1), lastAutoChecked: hoursAgo(1), trustScore: 70, lat: 44.117312, lng: 15.234312 },
+
+  // SPAR — City Galleria, Polačišće 4 (Google Maps: 44.1100502, 15.23719)
+  { id: 'sh47', name: 'SPAR — City Galleria', category: 'shops', address: 'Polačišće ul. 4, Zadar', phone: '023 233 680', website: 'https://www.spar.hr/', workingHours: wh('07:00–21:00', '07:00–21:00', '07:00–14:00'), verified: true, lastVerified: '2026-03-08', reportCount: 0, verificationStatus: 'community', communityConfirmedAt: hoursAgo(1), lastAutoChecked: hoursAgo(1), trustScore: 74, lat: 44.1100502, lng: 15.23719 },
+
+  // RIBOLA — Zrinsko Frankopanska 18 (Google Maps: 44.1159, 15.2237)
+  { id: 'sh48', name: 'Ribola — Frankopanska', category: 'shops', address: 'Ulica Zrinsko Frankopanska 18, Zadar', phone: '091 617 6623', website: 'https://www.ribola.hr/', workingHours: wh('06:30–21:00', '06:30–21:00', '—'), verified: true, lastVerified: '2026-03-08', reportCount: 0, verificationStatus: 'community', communityConfirmedAt: hoursAgo(1), lastAutoChecked: hoursAgo(1), trustScore: 72, lat: 44.1159, lng: 15.2237 },
+
   // LIDL
   { id: 'sh50', name: 'Lidl — Zadar', category: 'shops', address: 'Put Bokanjca 2, Zadar', phone: '0800 555 500', website: 'https://www.lidl.hr/', workingHours: wh('07:00–21:00', '07:00–21:00', '—'), verified: true, lastVerified: '2026-02-22', reportCount: 0, verificationStatus: 'community', communityConfirmedAt: hoursAgo(1), lastAutoChecked: hoursAgo(1), trustScore: 74, lat: 44.1275, lng: 15.2130 },
 
