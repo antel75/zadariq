@@ -43,33 +43,57 @@ function getDistance(lat1: number, lng1: number, lat2: number, lng2: number): nu
   return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
 }
 
-function getTodaySundayString(): string {
-  const d = new Date();
+function formatDateString(d: Date): string {
   return d.toISOString().split('T')[0];
+}
+
+function getNextSundayDate(): string {
+  const d = new Date();
+  const day = d.getDay();
+  const daysUntil = (7 - day) % 7 || 7;
+  d.setDate(d.getDate() + daysUntil);
+  return formatDateString(d);
+}
+
+function computeDayState() {
+  const now = new Date();
+  const day = now.getDay();
+  const hour = now.getHours();
+
+  const isSunday = day === 0;
+  const isLiveSunday = isSunday && hour >= 7 && hour < 22;
+  const isSaturday = day === 6;
+
+  const targetDate = isLiveSunday ? formatDateString(now) : getNextSundayDate();
+
+  return { isSunday, isLiveSunday, isSaturday, targetDate };
 }
 
 export default function SundayRadar() {
   const { language } = useLanguage();
   const navigate = useNavigate();
-  const lang = language as string;
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMapRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
 
   const [shops, setShops] = useState<ShopOnMap[]>([]);
   const [userLocation, setUserLocation] = useState<{lat: number; lng: number} | null>(null);
-  const [isSunday, setIsSunday] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedShop, setSelectedShop] = useState<ShopOnMap | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [dayState, setDayState] = useState(computeDayState);
+
+  // Recompute day state every minute
+  useEffect(() => {
+    const interval = setInterval(() => setDayState(computeDayState()), 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
-    const day = new Date().getDay();
-    setIsSunday(day === 0);
-    loadShops();
+    loadShops(dayState.targetDate, dayState.isLiveSunday);
     loadLeaflet();
     getLocation();
-  }, []);
+  }, [dayState.targetDate]);
 
   const loadLeaflet = () => {
     if ((window as any).L) { setMapLoaded(true); return; }
@@ -84,7 +108,7 @@ export default function SundayRadar() {
     const link3 = document.createElement('link');
     link3.rel = 'stylesheet';
     link3.href = 'https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css';
-    document.head.appendChild(link);
+    document.head.appendChild(link3);
     const script = document.createElement('script');
     script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
     script.onload = () => {
@@ -105,8 +129,9 @@ export default function SundayRadar() {
     );
   };
 
-  // Wake Lock - prevent screen from sleeping
+  // Wake Lock - only active on live Sunday
   useEffect(() => {
+    if (!dayState.isLiveSunday) return;
     let wakeLock: any = null;
     const requestWakeLock = async () => {
       try {
@@ -124,14 +149,13 @@ export default function SundayRadar() {
       document.removeEventListener('visibilitychange', handleVisibility);
       if (wakeLock) wakeLock.release();
     };
-  }, []);
+  }, [dayState.isLiveSunday]);
 
-  const loadShops = async () => {
-    const today = getTodaySundayString();
+  const loadShops = async (targetDate: string, isLive: boolean) => {
     const { data } = await supabase
       .from('shop_sunday_schedule')
       .select('*')
-      .eq('sunday_date', today);
+      .eq('sunday_date', targetDate);
 
     const entries: SundayEntry[] = data || [];
     const result: ShopOnMap[] = [];
@@ -139,15 +163,17 @@ export default function SundayRadar() {
     for (const entry of entries) {
       const biz = businesses.find(b => b.id === entry.business_id);
       if (!biz || !(biz as any).lat) continue;
+      const openT = entry.open_time || '08:00';
+      const closeT = entry.close_time || '21:00';
       result.push({
         id: biz.id,
         name: biz.name,
         address: biz.address || '',
         lat: (biz as any).lat,
         lng: (biz as any).lng,
-        open_time: entry.open_time || '08:00',
-        close_time: entry.close_time || '21:00',
-        isOpenNow: isOpenNow(entry.open_time || '08:00', entry.close_time || '21:00'),
+        open_time: openT,
+        close_time: closeT,
+        isOpenNow: isLive ? isOpenNow(openT, closeT) : false,
       });
     }
     setShops(result);
@@ -172,11 +198,9 @@ export default function SundayRadar() {
     const L = (window as any).L;
     const map = leafletMapRef.current;
 
-    // Clear old markers
     markersRef.current.forEach(m => map.removeLayer(m));
     markersRef.current = [];
 
-    // User location marker
     if (userLocation) {
       const userIcon = L.divIcon({
         html: `<div style="width:16px;height:16px;background:#3b82f6;border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3)"></div>`,
@@ -186,26 +210,14 @@ export default function SundayRadar() {
       markersRef.current.push(m);
     }
 
-    // Create cluster group
-    const clusterGroup = (window as any).L.markerClusterGroup({
-      maxClusterRadius: 40,
-      iconCreateFunction: (cluster: any) => {
-        const count = cluster.getChildCount();
-        return L.divIcon({
-          html: `<div style="background:#22c55e;color:white;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;border:2px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3)">${count}</div>`,
-          iconSize: [36, 36], iconAnchor: [18, 18], className: ''
-        });
-      }
-    });
-
-    // Shop markers
     const shopsWithDist = shops.map(s => ({
       ...s,
       distance: userLocation ? getDistance(userLocation.lat, userLocation.lng, s.lat, s.lng) : undefined
     }));
 
     for (const shop of shopsWithDist) {
-      const color = shop.isOpenNow ? '#22c55e' : '#6b7280';
+      // Green only if live Sunday AND currently open, grey otherwise
+      const color = (dayState.isLiveSunday && shop.isOpenNow) ? '#22c55e' : '#6b7280';
       const icon = L.divIcon({
         html: `<div style="width:18px;height:18px;background:${color};border-radius:50%;border:2.5px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.35)"></div>`,
         iconSize: [18, 18], iconAnchor: [9, 9], className: ''
@@ -217,7 +229,7 @@ export default function SundayRadar() {
     }
 
     setShops(shopsWithDist);
-  }, [mapLoaded, shops.length, userLocation]);
+  }, [mapLoaded, shops.length, userLocation, dayState.isLiveSunday]);
 
   // Pan to user
   useEffect(() => {
@@ -227,8 +239,52 @@ export default function SundayRadar() {
   }, [userLocation]);
 
   const openCount = shops.filter(s => s.isOpenNow).length;
-  const today = new Date();
-  const isActuallySunday = today.getDay() === 0;
+  const shopCount = shops.length;
+  const isEn = language === 'en';
+  const noData = !loading && shops.length === 0;
+
+  const getBannerContent = () => {
+    if (noData) {
+      return {
+        emoji: '📅',
+        text: isEn ? 'Data for next Sunday not available yet.' : 'Podaci za sljedeću nedjelju još nisu dostupni.',
+        variant: 'muted' as const,
+      };
+    }
+    if (dayState.isLiveSunday) {
+      return {
+        emoji: '🟢',
+        text: isEn ? 'Sunday radar — live' : 'Nedjelja radar — uživo',
+        variant: 'live' as const,
+      };
+    }
+    if (dayState.isSaturday) {
+      return {
+        emoji: '📅',
+        text: isEn ? `Tomorrow ${shopCount} shops are open` : `Sutra radi ${shopCount} dućana`,
+        variant: 'preview' as const,
+      };
+    }
+    return {
+      emoji: '📅',
+      text: isEn ? `Next Sunday ${shopCount} shops open` : `Sljedeće nedjelje radi ${shopCount} dućana`,
+      variant: 'preview' as const,
+    };
+  };
+
+  const banner = getBannerContent();
+
+  const bannerColors = {
+    live: 'bg-green-500/10 border-green-500/20 text-green-400',
+    preview: 'bg-amber-500/10 border-amber-500/20 text-amber-500',
+    muted: 'bg-muted/50 border-border text-muted-foreground',
+  };
+
+  const sortedShops = [...shops].sort((a, b) => {
+    const tA = a.open_time || '99:99';
+    const tB = b.open_time || '99:99';
+    return tA.localeCompare(tB);
+  });
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -241,9 +297,9 @@ export default function SundayRadar() {
             <div>
               <h1 className="text-lg font-bold text-foreground">🛒 Sunday Radar</h1>
               <p className="text-[11px] text-muted-foreground">
-                {isActuallySunday
-                  ? (openCount > 0 ? `${openCount} dućana otvoreno` : 'Nema otvorenih dućana')
-                  : 'Aktivno nedjeljom'}
+                {dayState.isLiveSunday
+                  ? (openCount > 0 ? `${openCount} ${isEn ? 'shops open now' : 'dućana otvoreno'}` : (isEn ? 'No shops open now' : 'Nema otvorenih dućana'))
+                  : `${shopCount} ${isEn ? 'shops scheduled' : 'dućana planirano'}`}
               </p>
             </div>
           </div>
@@ -251,28 +307,19 @@ export default function SundayRadar() {
         </div>
       </header>
 
-      {!isActuallySunday && (
-        <div className="mx-4 mt-4 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-center">
-          <p className="text-2xl mb-2">😴</p>
-          <p className="text-sm font-semibold text-foreground">Danas nije nedjelja</p>
-          <p className="text-xs text-muted-foreground mt-1">Sunday Radar se aktivira nedjeljom i pokazuje koji dućani rade.</p>
-          <p className="text-xs text-amber-500 mt-2 font-medium">
-            Sljedeća nedjelja: {(() => {
-              const d = new Date();
-              const daysUntil = (7 - d.getDay()) % 7 || 7;
-              d.setDate(d.getDate() + daysUntil);
-              return d.toLocaleDateString('hr-HR', { day: 'numeric', month: 'long' });
-            })()}
-          </p>
+      {/* Banner */}
+      <div className="mx-4 mt-4 mb-2">
+        <div className={`p-3 rounded-2xl border text-center text-sm font-medium ${bannerColors[banner.variant]}`}>
+          {banner.emoji} {banner.text}
         </div>
-      )}
+      </div>
 
       {/* Map */}
       <div className="flex-1 relative" style={{minHeight: '400px'}}>
         <div ref={mapRef} style={{width: '100%', height: '400px'}} />
         {!mapLoaded && (
           <div className="absolute inset-0 flex items-center justify-center bg-secondary/50">
-            <p className="text-sm text-muted-foreground">Učitavanje karte...</p>
+            <p className="text-sm text-muted-foreground">{isEn ? 'Loading map...' : 'Učitavanje karte...'}</p>
           </div>
         )}
         {userLocation && (
@@ -293,16 +340,20 @@ export default function SundayRadar() {
               <h3 className="font-bold text-foreground text-sm">{selectedShop.name}</h3>
               <p className="text-xs text-muted-foreground">{selectedShop.address}</p>
               <div className="flex items-center gap-3 mt-2">
-                <span className={`flex items-center gap-1 text-xs font-semibold ${selectedShop.isOpenNow ? 'text-green-500' : 'text-muted-foreground'}`}>
-                  <span className={`w-2 h-2 rounded-full ${selectedShop.isOpenNow ? 'bg-green-500' : 'bg-gray-400'}`} />
-                  {selectedShop.isOpenNow ? 'Otvoreno' : 'Zatvoreno'}
-                </span>
+                {dayState.isLiveSunday && (
+                  <span className={`flex items-center gap-1 text-xs font-semibold ${selectedShop.isOpenNow ? 'text-green-500' : 'text-muted-foreground'}`}>
+                    <span className={`w-2 h-2 rounded-full ${selectedShop.isOpenNow ? 'bg-green-500' : 'bg-gray-400'}`} />
+                    {selectedShop.isOpenNow ? (isEn ? 'Open' : 'Otvoreno') : (isEn ? 'Closed' : 'Zatvoreno')}
+                  </span>
+                )}
                 <span className="flex items-center gap-1 text-xs text-muted-foreground">
                   <Clock className="h-3 w-3" />
                   {selectedShop.open_time?.slice(0,5)}–{selectedShop.close_time?.slice(0,5)}
                 </span>
-                {selectedShop.distance && (
-                  <span className="text-xs text-muted-foreground">📍 {selectedShop.distance}m</span>
+                {selectedShop.distance != null && (
+                  <span className="text-xs text-muted-foreground">
+                    📍 {selectedShop.distance >= 1000 ? `${(selectedShop.distance / 1000).toFixed(1)}km` : `${selectedShop.distance}m`}
+                  </span>
                 )}
               </div>
             </div>
@@ -315,25 +366,30 @@ export default function SundayRadar() {
       <div className="px-4 pb-8 mt-3 space-y-2">
         <h2 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
           <Store className="h-4 w-4" />
-          {isActuallySunday ? 'Dućani danas' : 'Prethodna nedjelja'} ({shops.length})
+          {isEn ? 'Shops' : 'Dućani'} ({shopCount})
         </h2>
         {loading ? (
-          <p className="text-sm text-muted-foreground text-center py-4">Učitavanje...</p>
+          <p className="text-sm text-muted-foreground text-center py-4">{isEn ? 'Loading...' : 'Učitavanje...'}</p>
         ) : shops.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-4">Nema podataka za danas.</p>
+          <p className="text-sm text-muted-foreground text-center py-4">{isEn ? 'No data for this Sunday.' : 'Nema podataka za ovu nedjelju.'}</p>
         ) : (
-          [...shops].sort((a, b) => (a.distance || 9999) - (b.distance || 9999)).map(shop => (
+          sortedShops.map(shop => (
             <div key={shop.id}
               onClick={() => { setSelectedShop(shop); leafletMapRef.current?.setView([shop.lat, shop.lng], 16); }}
               className="flex items-center gap-3 p-3 rounded-xl border border-border bg-card cursor-pointer hover:border-accent/40 transition-all">
-              <span className={`w-3 h-3 rounded-full shrink-0 ${shop.isOpenNow ? 'bg-green-500' : 'bg-gray-400'}`} />
+              <span className={`w-3 h-3 rounded-full shrink-0 ${(dayState.isLiveSunday && shop.isOpenNow) ? 'bg-green-500' : 'bg-gray-400'}`} />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground truncate">{shop.name}</p>
-                <p className="text-xs text-muted-foreground">{shop.open_time?.slice(0,5)}–{shop.close_time?.slice(0,5)}{shop.distance ? ` · ${shop.distance}m` : ''}</p>
+                <p className="text-xs text-muted-foreground">
+                  {shop.open_time?.slice(0,5)} – {shop.close_time?.slice(0,5)}
+                  {shop.distance != null && ` · ${shop.distance >= 1000 ? `${(shop.distance / 1000).toFixed(1)}km` : `${shop.distance}m`}`}
+                </p>
               </div>
-              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${shop.isOpenNow ? 'bg-green-500/10 text-green-500' : 'bg-gray-500/10 text-gray-400'}`}>
-                {shop.isOpenNow ? 'Otvoreno' : 'Zatvoreno'}
-              </span>
+              {dayState.isLiveSunday && (
+                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${shop.isOpenNow ? 'bg-green-500/10 text-green-500' : 'bg-gray-500/10 text-gray-400'}`}>
+                  {shop.isOpenNow ? (isEn ? 'Open' : 'Otvoreno') : (isEn ? 'Closed' : 'Zatvoreno')}
+                </span>
+              )}
             </div>
           ))
         )}
