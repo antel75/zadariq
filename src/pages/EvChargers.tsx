@@ -84,6 +84,10 @@ export default function EvChargers() {
           </div>
         )}
 
+        {!isLoading && sorted.length > 0 && (
+          <EvChargersMap chargers={sorted} />
+        )}
+
         {isLoading ? (
           <p className="text-sm text-muted-foreground text-center py-8">Učitavanje punjača...</p>
         ) : sorted.length === 0 ? (
