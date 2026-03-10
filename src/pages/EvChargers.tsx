@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Zap, MapPin } from 'lucide-react';
 import { useEvChargers, distanceKm } from '@/hooks/useEvChargers';
 import { EvChargerCard } from '@/components/ev/EvChargerCard';
+import { EvChargersMap } from '@/components/ev/EvChargersMap';
 import { supabase } from '@/integrations/supabase/client';
 
 export default function EvChargers() {
@@ -81,6 +82,10 @@ export default function EvChargers() {
               Uključi lokaciju za sortiranje po udaljenosti
             </p>
           </div>
+        )}
+
+        {!isLoading && sorted.length > 0 && (
+          <EvChargersMap chargers={sorted} />
         )}
 
         {isLoading ? (
