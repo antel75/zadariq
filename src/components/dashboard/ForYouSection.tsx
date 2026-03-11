@@ -6,6 +6,7 @@ import { LucideIcon } from 'lucide-react';
 import { useMorningRoutine, MorningSuggestion } from '@/hooks/useMorningRoutine';
 import { businesses, isBusinessOpen } from '@/data/mockData';
 import { getZadarHour } from '@/hooks/useSituationalMode';
+import { useMemo } from 'react';
 
 type TimeSlot = 'morning' | 'noon' | 'evening' | 'night';
 
@@ -13,11 +14,39 @@ function getTimeSlot(): TimeSlot {
   const h = getZadarHour();
   const m = parseInt(new Date().toLocaleString('en-US', { timeZone: 'Europe/Zagreb', minute: 'numeric' }), 10);
   const totalMin = h * 60 + m;
-  // Morning engine: 05:30–10:30
   if (totalMin >= 330 && totalMin < 630) return 'morning';
   if (h >= 11 && h < 16) return 'noon';
   if (h >= 16 && h < 21) return 'evening';
   return 'night';
+}
+
+/** Deterministic seeded PRNG (mulberry32) */
+function mulberry32(seed: number) {
+  return () => {
+    let t = (seed += 0x6d2b79f5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/** Returns a rotation seed that changes every 30 minutes, deterministic per day+slot */
+function getRotationSeed(): number {
+  const now = new Date();
+  const zagreb = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Zagreb' }));
+  const dayOfYear = Math.floor((zagreb.getTime() - new Date(zagreb.getFullYear(), 0, 0).getTime()) / 86400000);
+  const halfHourSlot = Math.floor((zagreb.getHours() * 60 + zagreb.getMinutes()) / 30);
+  return dayOfYear * 100 + halfHourSlot;
+}
+
+/** Deterministic shuffle */
+function seededShuffle<T>(arr: T[], rng: () => number): T[] {
+  const result = [...arr];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
 }
 
 const slotConfig: Record<Exclude<TimeSlot, 'morning'>, { icon: LucideIcon; titleKey: string; categories: string[] }> = {
@@ -49,6 +78,7 @@ export function ForYouSection({ onReport }: ForYouSectionProps) {
   const { t, language } = useLanguage();
   const slot = getTimeSlot();
   const morningSuggestions = useMorningRoutine();
+  const rotationSeed = getRotationSeed();
 
   // Morning: use the routine engine
   if (slot === 'morning') {
@@ -74,13 +104,17 @@ export function ForYouSection({ onReport }: ForYouSectionProps) {
     );
   }
 
-  // Other time slots: keep existing behaviour
+  // Other time slots: deterministic rotation every 30 min
   const config = slotConfig[slot];
   const Icon = config.icon;
 
-  const suggested = businesses
-    .filter((b) => config.categories.includes(b.category) && isBusinessOpen(b))
-    .slice(0, 3);
+  const suggested = useMemo(() => {
+    const open = businesses.filter(
+      (b) => config.categories.includes(b.category) && isBusinessOpen(b)
+    );
+    const rng = mulberry32(rotationSeed * 7919 + config.categories.join('').length);
+    return seededShuffle(open, rng).slice(0, 3);
+  }, [rotationSeed, config.categories]);
 
   if (suggested.length === 0) return null;
 
