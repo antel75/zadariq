@@ -80,6 +80,18 @@ export function ForYouSection({ onReport }: ForYouSectionProps) {
   const morningSuggestions = useMorningRoutine();
   const rotationSeed = getRotationSeed();
 
+  // Other time slots: deterministic rotation every 30 min
+  const config = slot !== 'morning' ? slotConfig[slot] : null;
+
+  const suggested = useMemo(() => {
+    if (!config) return [];
+    const open = businesses.filter(
+      (b) => config.categories.includes(b.category) && isBusinessOpen(b)
+    );
+    const rng = mulberry32(rotationSeed * 7919 + config.categories.join('').length);
+    return seededShuffle(open, rng).slice(0, 3);
+  }, [rotationSeed, config]);
+
   // Morning: use the routine engine
   if (slot === 'morning') {
     if (morningSuggestions.length === 0) return null;
@@ -104,19 +116,9 @@ export function ForYouSection({ onReport }: ForYouSectionProps) {
     );
   }
 
-  // Other time slots: deterministic rotation every 30 min
-  const config = slotConfig[slot];
+  if (!config || suggested.length === 0) return null;
+
   const Icon = config.icon;
-
-  const suggested = useMemo(() => {
-    const open = businesses.filter(
-      (b) => config.categories.includes(b.category) && isBusinessOpen(b)
-    );
-    const rng = mulberry32(rotationSeed * 7919 + config.categories.join('').length);
-    return seededShuffle(open, rng).slice(0, 3);
-  }, [rotationSeed, config.categories]);
-
-  if (suggested.length === 0) return null;
 
   return (
     <div>
