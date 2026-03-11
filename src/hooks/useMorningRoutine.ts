@@ -148,7 +148,7 @@ export function useMorningRoutine(): MorningSuggestion[] {
 
     // Priority order (pharmacy last)
     const categoryOrder: MorningCategory[] = seededShuffle(
-      ['cafes', 'shops', 'parking', 'restaurants'] as MorningCategory[],
+      ['cafes', 'shops', 'parking'] as MorningCategory[],
       rng
     );
 
