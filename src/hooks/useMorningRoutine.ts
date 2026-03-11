@@ -8,14 +8,13 @@ import { Business } from '@/data/types';
 // Goal: daily-life suggestions, not database ranking
 
 /** Morning-relevant category mapping (order = priority) */
-const MORNING_CATEGORIES = ['cafes', 'shops', 'parking', 'restaurants', 'pharmacy'] as const;
+const MORNING_CATEGORIES = ['cafes', 'shops', 'parking', 'pharmacy'] as const;
 type MorningCategory = typeof MORNING_CATEGORIES[number];
 
 const CATEGORY_LABELS: Record<MorningCategory, { hr: string; en: string }> = {
   cafes: { hr: 'Kafić za jutro ☕', en: 'Morning coffee ☕' },
   shops: { hr: 'Trgovina / pekara 🛒', en: 'Grocery / bakery 🛒' },
   parking: { hr: 'Parking info 🅿️', en: 'Parking info 🅿️' },
-  restaurants: { hr: 'Doručak 🥐', en: 'Breakfast spot 🥐' },
   pharmacy: { hr: 'Ljekarna 💊', en: 'Pharmacy 💊' },
 };
 
