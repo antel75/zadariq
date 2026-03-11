@@ -6,7 +6,7 @@ import { LucideIcon } from 'lucide-react';
 import { useMorningRoutine, MorningSuggestion } from '@/hooks/useMorningRoutine';
 import { businesses, isBusinessOpen } from '@/data/mockData';
 import { getZadarHour } from '@/hooks/useSituationalMode';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 
 type TimeSlot = 'morning' | 'noon' | 'evening' | 'night';
 
@@ -78,7 +78,16 @@ export function ForYouSection({ onReport }: ForYouSectionProps) {
   const { t, language } = useLanguage();
   const slot = getTimeSlot();
   const morningSuggestions = useMorningRoutine();
-  const rotationSeed = getRotationSeed();
+
+  // Re-render when 30-min rotation window changes
+  const [rotationSeed, setRotationSeed] = useState(getRotationSeed);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const newSeed = getRotationSeed();
+      setRotationSeed((prev) => (prev !== newSeed ? newSeed : prev));
+    }, 30_000); // check every 30s
+    return () => clearInterval(interval);
+  }, []);
 
   // Other time slots: deterministic rotation every 30 min
   const config = slot !== 'morning' ? slotConfig[slot] : null;
