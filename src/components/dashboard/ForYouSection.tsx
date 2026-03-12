@@ -134,7 +134,16 @@ export function ForYouSection({ onReport }: ForYouSectionProps) {
     const start = halfHourSlot % baseOrder.length;
     const rotated = [...baseOrder.slice(start), ...baseOrder.slice(0, start)];
 
-    return rotated.slice(0, 3);
+    const topThree = rotated.slice(0, 3);
+    const containsForbiddenTrio =
+      topThree.length === 3 && topThree.every((b) => FORBIDDEN_RESTAURANT_TRIO.has(b.id));
+
+    if (!containsForbiddenTrio) return topThree;
+
+    const replacement = rotated.find((b) => !FORBIDDEN_RESTAURANT_TRIO.has(b.id));
+    if (!replacement) return topThree;
+
+    return [topThree[0], topThree[1], replacement];
   }, [rotationSeed, config]);
 
   // Morning: use the routine engine
