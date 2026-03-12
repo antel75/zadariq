@@ -119,11 +119,22 @@ export function ForYouSection({ onReport }: ForYouSectionProps) {
 
   const suggested = useMemo(() => {
     if (!config) return [];
+
     const open = businesses.filter(
       (b) => config.categories.includes(b.category) && isBusinessOpen(b)
     );
-    const rng = mulberry32(rotationSeed * 7919 + config.categories.join('').length);
-    return seededShuffle(open, rng).slice(0, 3);
+    if (open.length === 0) return [];
+
+    const dayOfYear = Math.floor(rotationSeed / 100);
+    const halfHourSlot = rotationSeed % 100;
+
+    // Keep one stable daily base order, then rotate start index every 30min slot
+    const dailySeed = dayOfYear * 7919 + getCategorySeed(config.categories);
+    const baseOrder = seededShuffle(open, mulberry32(dailySeed));
+    const start = halfHourSlot % baseOrder.length;
+    const rotated = [...baseOrder.slice(start), ...baseOrder.slice(0, start)];
+
+    return rotated.slice(0, 3);
   }, [rotationSeed, config]);
 
   // Morning: use the routine engine
