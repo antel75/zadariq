@@ -80,7 +80,7 @@ const slotConfig: Record<Exclude<TimeSlot, 'morning'>, { icon: LucideIcon; title
   night: { icon: Moon, titleKey: 'foryou.night', categories: ['pharmacy'] },
 };
 
-interface ForYouSectionProps {
+const FORBIDDEN_RESTAURANT_TRIO = new Set(['rs1', 'rs2', 'rs3']);
   onReport: (b: Business) => void;
 }
 
