@@ -129,7 +129,7 @@ export function ForYouSection({ onReport }: ForYouSectionProps) {
     const halfHourSlot = rotationSeed % 100;
 
     // Keep one stable daily base order, then rotate start index every 30min slot
-    const dailySeed = dayOfYear * 7919 + getCategorySeed(config.categories);
+    const dailySeed = dayOfYear * 7919 + getCategorySeed(config.categories) + 42;
     const baseOrder = seededShuffle(open, mulberry32(dailySeed));
     const start = halfHourSlot % baseOrder.length;
     const rotated = [...baseOrder.slice(start), ...baseOrder.slice(0, start)];
