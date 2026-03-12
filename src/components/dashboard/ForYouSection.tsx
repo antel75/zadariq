@@ -81,6 +81,8 @@ const slotConfig: Record<Exclude<TimeSlot, 'morning'>, { icon: LucideIcon; title
 };
 
 const FORBIDDEN_RESTAURANT_TRIO = new Set(['rs1', 'rs2', 'rs3']);
+
+interface ForYouSectionProps {
   onReport: (b: Business) => void;
 }
 
