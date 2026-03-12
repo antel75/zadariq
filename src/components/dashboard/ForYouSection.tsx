@@ -70,6 +70,10 @@ function seededShuffle<T>(arr: T[], rng: () => number): T[] {
   return result;
 }
 
+function getCategorySeed(categories: string[]): number {
+  return categories.join('|').split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+}
+
 const slotConfig: Record<Exclude<TimeSlot, 'morning'>, { icon: LucideIcon; titleKey: string; categories: string[] }> = {
   noon: { icon: Sun, titleKey: 'foryou.noon', categories: ['restaurants', 'cafes'] },
   evening: { icon: Sunset, titleKey: 'foryou.evening', categories: ['cafes', 'restaurants'] },
