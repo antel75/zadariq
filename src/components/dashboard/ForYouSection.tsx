@@ -5,18 +5,42 @@ import { Sunrise, Sun, Sunset, Moon } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 import { useMorningRoutine, MorningSuggestion } from '@/hooks/useMorningRoutine';
 import { businesses, isBusinessOpen } from '@/data/mockData';
-import { getZadarHour } from '@/hooks/useSituationalMode';
 import { useMemo, useState, useEffect } from 'react';
 
 type TimeSlot = 'morning' | 'noon' | 'evening' | 'night';
 
+const zagrebTimeFormatter = new Intl.DateTimeFormat('en-GB', {
+  timeZone: 'Europe/Zagreb',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: false,
+});
+
+function getZagrebNowParts() {
+  const parts = zagrebTimeFormatter.formatToParts(new Date());
+  const get = (type: Intl.DateTimeFormatPartTypes) => Number(parts.find((p) => p.type === type)?.value ?? 0);
+
+  const year = get('year');
+  const month = get('month');
+  const day = get('day');
+  const hour = get('hour');
+  const minute = get('minute');
+
+  const dayOfYear = Math.floor((Date.UTC(year, month - 1, day) - Date.UTC(year, 0, 0)) / 86400000);
+  const halfHourSlot = Math.floor((hour * 60 + minute) / 30);
+
+  return { hour, minute, dayOfYear, halfHourSlot };
+}
+
 function getTimeSlot(): TimeSlot {
-  const h = getZadarHour();
-  const m = parseInt(new Date().toLocaleString('en-US', { timeZone: 'Europe/Zagreb', minute: 'numeric' }), 10);
-  const totalMin = h * 60 + m;
+  const { hour, minute } = getZagrebNowParts();
+  const totalMin = hour * 60 + minute;
   if (totalMin >= 330 && totalMin < 630) return 'morning';
-  if (h >= 11 && h < 16) return 'noon';
-  if (h >= 16 && h < 21) return 'evening';
+  if (hour >= 11 && hour < 16) return 'noon';
+  if (hour >= 16 && hour < 21) return 'evening';
   return 'night';
 }
 
@@ -32,10 +56,7 @@ function mulberry32(seed: number) {
 
 /** Returns a rotation seed that changes every 30 minutes, deterministic per day+slot */
 function getRotationSeed(): number {
-  const now = new Date();
-  const zagreb = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Zagreb' }));
-  const dayOfYear = Math.floor((zagreb.getTime() - new Date(zagreb.getFullYear(), 0, 0).getTime()) / 86400000);
-  const halfHourSlot = Math.floor((zagreb.getHours() * 60 + zagreb.getMinutes()) / 30);
+  const { dayOfYear, halfHourSlot } = getZagrebNowParts();
   return dayOfYear * 100 + halfHourSlot;
 }
 
@@ -47,6 +68,10 @@ function seededShuffle<T>(arr: T[], rng: () => number): T[] {
     [result[i], result[j]] = [result[j], result[i]];
   }
   return result;
+}
+
+function getCategorySeed(categories: string[]): number {
+  return categories.join('|').split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
 }
 
 const slotConfig: Record<Exclude<TimeSlot, 'morning'>, { icon: LucideIcon; titleKey: string; categories: string[] }> = {
@@ -94,11 +119,22 @@ export function ForYouSection({ onReport }: ForYouSectionProps) {
 
   const suggested = useMemo(() => {
     if (!config) return [];
+
     const open = businesses.filter(
       (b) => config.categories.includes(b.category) && isBusinessOpen(b)
     );
-    const rng = mulberry32(rotationSeed * 7919 + config.categories.join('').length);
-    return seededShuffle(open, rng).slice(0, 3);
+    if (open.length === 0) return [];
+
+    const dayOfYear = Math.floor(rotationSeed / 100);
+    const halfHourSlot = rotationSeed % 100;
+
+    // Keep one stable daily base order, then rotate start index every 30min slot
+    const dailySeed = dayOfYear * 7919 + getCategorySeed(config.categories);
+    const baseOrder = seededShuffle(open, mulberry32(dailySeed));
+    const start = halfHourSlot % baseOrder.length;
+    const rotated = [...baseOrder.slice(start), ...baseOrder.slice(0, start)];
+
+    return rotated.slice(0, 3);
   }, [rotationSeed, config]);
 
   // Morning: use the routine engine
