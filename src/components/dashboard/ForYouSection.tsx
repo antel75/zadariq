@@ -172,14 +172,15 @@ export function ForYouSection({ onReport }: ForYouSectionProps) {
 
     const topThree = rotated.slice(0, 3);
     const containsForbiddenTrio =
-      topThree.length === 3 && topThree.every((b) => FORBIDDEN_RESTAURANT_TRIO.has(b.id));
+      topThree.length === 3 && hasForbiddenRestaurantTrio(topThree);
 
     if (!containsForbiddenTrio) return topThree;
 
-    const replacement = rotated.find((b) => !FORBIDDEN_RESTAURANT_TRIO.has(b.id));
-    if (!replacement) return topThree;
+    const replacement = rotated.find((b) => !isForbiddenRestaurant(b));
+    if (replacement) return [topThree[0], topThree[1], replacement];
 
-    return [topThree[0], topThree[1], replacement];
+    // Absolute guard: never show Kaštel+Foša+Kornat together
+    return topThree.slice(0, 2);
   }, [rotationSeed, config]);
 
   // Morning: use the routine engine
