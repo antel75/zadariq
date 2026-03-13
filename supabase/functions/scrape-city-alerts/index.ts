@@ -17,7 +17,6 @@ interface AlertInput {
   geo_relevance?: string;
 }
 
-// Simple hash for dedup
 function simpleHash(str: string): string {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
@@ -35,80 +34,95 @@ async function parseGradZadarPromet(): Promise<AlertInput[]> {
     const res = await fetch("https://www.grad-zadar.hr/pocetna/obavijesti-o-prometu-29/", {
       headers: { "User-Agent": "ZadarIQ/1.0 CityInfoBot" },
     });
-    if (!res.ok) return alerts;
+    if (!res.ok) {
+      console.error("Grad Zadar fetch failed:", res.status);
+      return alerts;
+    }
     const html = await res.text();
+    console.log("Grad Zadar HTML length:", html.length);
 
-    // Extract article blocks - simplified regex parsing
-    const articlePattern = /<article[^>]*>([\s\S]*?)<\/article>/gi;
-    const titlePattern = /<h[2-4][^>]*>([\s\S]*?)<\/h[2-4]>/i;
-    const linkPattern = /href="([^"]+)"/i;
-    const datePattern = /(\d{1,2}\.\d{1,2}\.\d{4})/;
+    // 1) Featured article: div.singledout > h2 > a
+    const featuredPattern = /<div[^>]*class="[^"]*singledout[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<!--\s*col-sm-6/i;
+    const featuredMatch = html.match(featuredPattern);
+    if (featuredMatch) {
+      const block = featuredMatch[1];
+      const linkMatch = block.match(/<h2[^>]*class="bigger"[^>]*>\s*<a\s+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/i);
+      if (linkMatch) {
+        const url = linkMatch[1];
+        const title = linkMatch[2].replace(/<[^>]+>/g, "").trim();
+        // Get summary from the next h2 or p
+        const summaryMatch = block.match(/<\/h2>\s*<h2>([\s\S]*?)<\/h2>/i);
+        const summary = summaryMatch
+          ? summaryMatch[1].replace(/<[^>]+>/g, "").trim()
+          : title;
 
+        if (title) {
+          const highPriorityKeywords = ["zatvoren", "radovi", "privremena regulacija", "zabran", "ograničen"];
+          const isHigh = highPriorityKeywords.some(k => title.toLowerCase().includes(k));
+
+          alerts.push({
+            title: title.slice(0, 40),
+            summary: (summary || title).slice(0, 80),
+            source: "grad-zadar",
+            source_url: url,
+            priority: isHigh ? 80 : 60,
+            valid_until: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+            type: "traffic",
+            geo_relevance: "zadar-city",
+          });
+          console.log("Featured article:", title.slice(0, 50));
+        }
+      }
+    }
+
+    // 2) Carousel items: div.col-sm-4 with h2 > a links to /vijest/obavijesti
+    const carouselPattern = /<div[^>]*class="col-sm-4"[^>]*>([\s\S]*?)<\/div>\s*<!--\s*col-sm-4/gi;
     let match;
-    let count = 0;
-    while ((match = articlePattern.exec(html)) !== null && count < 5) {
+    while ((match = carouselPattern.exec(html)) !== null && alerts.length < 8) {
       const block = match[1];
-      const titleMatch = block.match(titlePattern);
-      if (!titleMatch) continue;
+      const linkMatch = block.match(/<h2>\s*<a\s+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>\s*<\/h2>/i);
+      if (!linkMatch) continue;
 
-      const rawTitle = titleMatch[1].replace(/<[^>]+>/g, "").trim();
-      if (!rawTitle) continue;
+      const url = linkMatch[1];
+      // Only traffic/transport notices
+      if (!url.includes("obavijesti") && !url.includes("promet") && !url.includes("regulacij")) continue;
 
-      // Check if older than 3 days
-      const dateMatch = block.match(datePattern);
+      const title = linkMatch[2].replace(/<[^>]+>/g, "").trim();
+      if (!title) continue;
+
+      // Get date from <time datetime="...">
+      const dateMatch = block.match(/<time\s+datetime="([^"]+)"/i);
       if (dateMatch) {
-        const parts = dateMatch[1].split(".");
-        const d = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
-        const threeDaysAgo = new Date();
-        threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-        if (d < threeDaysAgo) continue;
+        const d = new Date(dateMatch[1]);
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        if (d < thirtyDaysAgo) continue;
       }
 
-      const linkMatch = block.match(linkPattern);
-      const url = linkMatch ? (linkMatch[1].startsWith("http") ? linkMatch[1] : `https://www.grad-zadar.hr${linkMatch[1]}`) : "https://www.grad-zadar.hr/pocetna/obavijesti-o-prometu-29/";
+      // Get summary from <p>
+      const pMatch = block.match(/<\/h2>\s*<p>([\s\S]*?)<\/p>/i);
+      const summary = pMatch ? pMatch[1].replace(/<[^>]+>/g, "").trim() : title;
+
+      // Avoid duplicates within this batch
+      if (alerts.some(a => a.source_url === url)) continue;
 
       const highPriorityKeywords = ["zatvoren", "radovi", "privremena regulacija", "zabran", "ograničen"];
-      const isHigh = highPriorityKeywords.some(k => rawTitle.toLowerCase().includes(k));
+      const isHigh = highPriorityKeywords.some(k => title.toLowerCase().includes(k));
 
       alerts.push({
-        title: rawTitle.slice(0, 40),
-        summary: rawTitle.slice(0, 80),
+        title: title.slice(0, 40),
+        summary: (summary || title).slice(0, 80),
         source: "grad-zadar",
         source_url: url,
         priority: isHigh ? 80 : 60,
-        valid_until: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        valid_until: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
         type: "traffic",
         geo_relevance: "zadar-city",
       });
-      count++;
+      console.log("Carousel item:", title.slice(0, 50));
     }
 
-    // Fallback: try simpler pattern if no articles found
-    if (alerts.length === 0) {
-      const listPattern = /<li[^>]*class="[^"]*news[^"]*"[^>]*>([\s\S]*?)<\/li>/gi;
-      while ((match = listPattern.exec(html)) !== null && count < 5) {
-        const block = match[1];
-        const titleMatch = block.match(titlePattern);
-        if (!titleMatch) continue;
-        const rawTitle = titleMatch[1].replace(/<[^>]+>/g, "").trim();
-        if (!rawTitle) continue;
-
-        const linkMatch = block.match(linkPattern);
-        const url = linkMatch ? (linkMatch[1].startsWith("http") ? linkMatch[1] : `https://www.grad-zadar.hr${linkMatch[1]}`) : "https://www.grad-zadar.hr";
-
-        alerts.push({
-          title: rawTitle.slice(0, 40),
-          summary: rawTitle.slice(0, 80),
-          source: "grad-zadar",
-          source_url: url,
-          priority: 60,
-          valid_until: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-          type: "traffic",
-          geo_relevance: "zadar-city",
-        });
-        count++;
-      }
-    }
+    console.log(`Grad Zadar parser: found ${alerts.length} alerts`);
   } catch (e) {
     console.error("Grad Zadar parser error:", e);
   }
@@ -131,11 +145,7 @@ async function parseHAK(): Promise<AlertInput[]> {
     if (!res.ok) return alerts;
     const html = await res.text();
 
-    // Extract text content blocks
-    const blockPattern = /<div[^>]*class="[^"]*road[^"]*"[^>]*>([\s\S]*?)<\/div>/gi;
     const allText = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
-
-    // Split into sentences/sections
     const sentences = allText.split(/[.!]\s+/).filter(s => s.length > 20);
 
     for (const sentence of sentences) {
@@ -149,16 +159,13 @@ async function parseHAK(): Promise<AlertInput[]> {
       else if (lower.includes("zimski uvjeti") || lower.includes("snijeg") || lower.includes("led")) priority = 85;
       else if (lower.includes("pojačan promet") || lower.includes("gužva")) priority = 70;
 
-      const title = sentence.trim().slice(0, 40);
-      const summary = sentence.trim().slice(0, 80);
-
       alerts.push({
-        title,
-        summary,
+        title: sentence.trim().slice(0, 40),
+        summary: sentence.trim().slice(0, 80),
         source: "hak",
         source_url: "https://m.hak.hr/stanje.asp?id=1",
         priority,
-        valid_until: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // 2h
+        valid_until: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
         type: "roads",
         geo_relevance: "zadar-region",
       });
@@ -181,12 +188,10 @@ async function parseKKZadar(): Promise<AlertInput[]> {
     if (!res.ok) return alerts;
     const html = await res.text();
 
-    // Try to find latest result
     const resultPattern = /(\d{2,3})\s*[-:]\s*(\d{2,3})/;
     const teamPattern = /zadar/i;
     const text = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
 
-    // Look for score patterns near "Zadar"
     const segments = text.split(/[.!]\s+/);
     for (const seg of segments) {
       if (!teamPattern.test(seg)) continue;
@@ -221,7 +226,6 @@ Deno.serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Parse which sources to run (or all)
     let sources = ["grad-zadar", "hak", "kk-zadar"];
     try {
       const body = await req.json();
@@ -247,7 +251,6 @@ Deno.serve(async (req) => {
 
     console.log(`Parsed ${allAlerts.length} alerts from sources: ${sources.join(", ")}`);
 
-    // Upsert alerts with dedup hash
     let inserted = 0;
     for (const alert of allAlerts) {
       const hash = simpleHash(`${alert.source}:${alert.title}:${alert.summary}`);
