@@ -80,7 +80,41 @@ const slotConfig: Record<Exclude<TimeSlot, 'morning'>, { icon: LucideIcon; title
   night: { icon: Moon, titleKey: 'foryou.night', categories: ['pharmacy'] },
 };
 
-const FORBIDDEN_RESTAURANT_TRIO = new Set(['rs1', 'rs2', 'rs3']);
+const FORBIDDEN_RESTAURANT_IDS = new Set(['rs1', 'rs2', 'rs3']);
+
+function normalizeName(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
+function hasRestaurantNameToken(name: string, token: string): boolean {
+  return normalizeName(name).includes(token);
+}
+
+function isForbiddenRestaurant(business: Business): boolean {
+  if (FORBIDDEN_RESTAURANT_IDS.has(business.id)) return true;
+  return (
+    hasRestaurantNameToken(business.name, 'kastel') ||
+    hasRestaurantNameToken(business.name, 'fosa') ||
+    hasRestaurantNameToken(business.name, 'kornat')
+  );
+}
+
+function hasForbiddenRestaurantTrio(items: Business[]): boolean {
+  const flags = new Set<string>();
+
+  for (const item of items) {
+    const name = normalizeName(item.name);
+    if (name.includes('kastel')) flags.add('kastel');
+    if (name.includes('fosa')) flags.add('fosa');
+    if (name.includes('kornat')) flags.add('kornat');
+    if (flags.size === 3) return true;
+  }
+
+  return flags.size === 3;
+}
 
 interface ForYouSectionProps {
   onReport: (b: Business) => void;
@@ -138,14 +172,15 @@ export function ForYouSection({ onReport }: ForYouSectionProps) {
 
     const topThree = rotated.slice(0, 3);
     const containsForbiddenTrio =
-      topThree.length === 3 && topThree.every((b) => FORBIDDEN_RESTAURANT_TRIO.has(b.id));
+      topThree.length === 3 && hasForbiddenRestaurantTrio(topThree);
 
     if (!containsForbiddenTrio) return topThree;
 
-    const replacement = rotated.find((b) => !FORBIDDEN_RESTAURANT_TRIO.has(b.id));
-    if (!replacement) return topThree;
+    const replacement = rotated.find((b) => !isForbiddenRestaurant(b));
+    if (replacement) return [topThree[0], topThree[1], replacement];
 
-    return [topThree[0], topThree[1], replacement];
+    // Absolute guard: never show Kaštel+Foša+Kornat together
+    return topThree.slice(0, 2);
   }, [rotationSeed, config]);
 
   // Morning: use the routine engine
