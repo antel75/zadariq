@@ -25,7 +25,7 @@ interface CityEvent {
 }
 
 type RegionFilter = 'all' | 'zadar' | 'zrce' | 'tisno';
-type CategoryFilter = 'all' | 'kultura' | 'nocni-zivot' | 'festival' | 'sport';
+type CategoryFilter = 'all' | 'kultura' | 'nocni-zivot' | 'festival' | 'festa' | 'sport' | 'koncerti' | 'gastro' | 'izlozbe';
 
 const REGION_LABELS: Record<RegionFilter, Record<string, string>> = {
   all:    { hr: 'Sve', en: 'All', de: 'Alle', it: 'Tutti' },
@@ -35,18 +35,26 @@ const REGION_LABELS: Record<RegionFilter, Record<string, string>> = {
 };
 
 const CATEGORY_LABELS: Record<CategoryFilter, Record<string, string>> = {
-  all:           { hr: 'Sve', en: 'All', de: 'Alle', it: 'Tutti' },
-  kultura:       { hr: '🎭 Kultura', en: '🎭 Culture', de: '🎭 Kultur', it: '🎭 Cultura' },
-  'nocni-zivot': { hr: '🎉 Noćni život', en: '🎉 Nightlife', de: '🎉 Nachtleben', it: '🎉 Vita notturna' },
-  festival:      { hr: '🎪 Festivali', en: '🎪 Festivals', de: '🎪 Festivals', it: '🎪 Festival' },
-  sport:         { hr: '🏃 Sport', en: '🏃 Sport', de: '🏃 Sport', it: '🏃 Sport' },
+  all:           { hr: 'Sve',           en: 'All',          de: 'Alle',           it: 'Tutti' },
+  kultura:       { hr: '🎭 Kultura',    en: '🎭 Culture',   de: '🎭 Kultur',      it: '🎭 Cultura' },
+  'nocni-zivot': { hr: '🎉 Noćni život',en: '🎉 Nightlife', de: '🎉 Nachtleben',  it: '🎉 Vita notturna' },
+  festival:      { hr: '🎪 Festivali',  en: '🎪 Festivals', de: '🎪 Festivals',   it: '🎪 Festival' },
+  festa:         { hr: '🎊 Fešte',      en: '🎊 Feasts',    de: '🎊 Feste',       it: '🎊 Feste' },
+  sport:         { hr: '🏃 Sport',      en: '🏃 Sport',     de: '🏃 Sport',       it: '🏃 Sport' },
+  koncerti:      { hr: '🎵 Koncerti',   en: '🎵 Concerts',  de: '🎵 Konzerte',    it: '🎵 Concerti' },
+  gastro:        { hr: '🍷 Gastro',     en: '🍷 Gastro',    de: '🍷 Gastro',      it: '🍷 Gastro' },
+  izlozbe:       { hr: '🎨 Izložbe',    en: '🎨 Exhibitions',de: '🎨 Ausstellungen',it: '🎨 Mostre' },
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
   kultura:       'bg-purple-500/10 text-purple-400 border-purple-500/20',
   'nocni-zivot': 'bg-pink-500/10 text-pink-400 border-pink-500/20',
   festival:      'bg-orange-500/10 text-orange-400 border-orange-500/20',
+  festa:         'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
   sport:         'bg-green-500/10 text-green-400 border-green-500/20',
+  koncerti:      'bg-blue-500/10 text-blue-400 border-blue-500/20',
+  gastro:        'bg-red-500/10 text-red-400 border-red-500/20',
+  izlozbe:       'bg-teal-500/10 text-teal-400 border-teal-500/20',
 };
 
 function formatDateRange(from: string | null, to: string | null, lang: string): string {
