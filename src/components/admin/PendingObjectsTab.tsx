@@ -126,6 +126,20 @@ export function PendingObjectsTab() {
                     {p.proposed_address}
                   </p>
                   {p.phone && <p className="text-xs text-muted-foreground mt-0.5">📞 {p.phone}</p>}
+                  {p.website && <p className="text-xs text-muted-foreground mt-0.5">🌐 {p.website}</p>}
+                  {(p as any).details?.subcategory && <p className="text-xs text-muted-foreground mt-0.5">📂 {(p as any).details.subcategory}</p>}
+                  {(p as any).details?.forte && <p className="text-xs text-muted-foreground mt-0.5">⭐ {(p as any).details.forte}</p>}
+                  {(p as any).details?.hours && (
+                    <div className="mt-1 text-[10px] text-muted-foreground">
+                      🕐 {Object.entries((p as any).details.hours).map(([day, hours]: any) => `${day}: ${hours}`).join(' · ')}
+                    </div>
+                  )}
+                  {(p as any).lat && (p as any).lng && (
+                    <a href={`https://maps.google.com/?q=${(p as any).lat},${(p as any).lng}`} target="_blank" rel="noopener noreferrer"
+                      className="text-xs text-primary mt-0.5 block hover:underline">
+                      📍 Otvori na karti
+                    </a>
+                  )}
                   {p.submitter_email && <p className="text-xs text-muted-foreground mt-0.5">✉️ {p.submitter_email}</p>}
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-[10px] text-muted-foreground">Pušenje: {smokingLabel(p.proposed_smoking_status)}</span>
