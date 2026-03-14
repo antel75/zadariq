@@ -17,16 +17,31 @@ export default function OwnerDashboard() {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) { navigate('/owner/login'); return; }
       setUser(user);
-      loadProfile(user.id);
+      loadProfile(user.id, user.email || '', user.user_metadata);
     });
   }, []);
 
-  const loadProfile = async (userId: string) => {
-    const { data: prof } = await supabase
+  const loadProfile = async (userId: string, email: string, metadata?: any) => {
+    let { data: prof } = await supabase
       .from('owner_profiles')
       .select('*')
       .eq('user_id', userId)
       .single();
+
+    // Auto-create profile if it doesn't exist (e.g. first login after email confirmation)
+    if (!prof) {
+      const { data: newProf } = await supabase
+        .from('owner_profiles')
+        .upsert({
+          user_id: userId,
+          email: email,
+          full_name: metadata?.full_name || null,
+          phone: metadata?.phone || null,
+        })
+        .select()
+        .single();
+      prof = newProf;
+    }
     setProfile(prof);
 
     const { data: businesses } = await supabase
