@@ -46,19 +46,21 @@ export default function OwnerEdit() {
       const { data: place } = await supabase
         .from('pending_places')
         .select('*')
-        .eq('submitted_by', user.id)
+        .eq('submitter_email', user.email)
         .order('created_at', { ascending: false })
+        .limit(1)
         .maybeSingle();
 
       if (place) {
+        const notes = place.notes ? (() => { try { return JSON.parse(place.notes); } catch { return {}; } })() : {};
         setForm({
-          name: place.name || '',
-          address: place.address || '',
+          name: place.proposed_name || '',
+          address: place.proposed_address || '',
           phone: place.phone || '',
           website: place.website || '',
-          description: place.description || '',
-          forte: place.details?.forte || '',
-          hours: place.details?.hours || {
+          description: notes.description || '',
+          forte: notes.forte || '',
+          hours: notes.hours || {
             Ponedjeljak: '', Utorak: '', Srijeda: '',
             Četvrtak: '', Petak: '', Subota: '', Nedjelja: ''
           }
