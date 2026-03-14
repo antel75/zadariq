@@ -17,7 +17,7 @@ export default function OwnerDashboard() {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) { navigate('/owner/login'); return; }
       setUser(user);
-      loadProfile(user.id);
+      loadProfile(user.id, user.email || '', user.user_metadata);
     });
   }, []);
 
