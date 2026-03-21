@@ -157,7 +157,7 @@ export function ForYouSection({ onReport }: ForYouSectionProps) {
     if (!config) return [];
 
     const open = businesses.filter(
-      (b) => config.categories.includes(b.category) && isBusinessOpen(b)
+      (b) => config.categories.includes(b.category) && isBusinessOpen(b) && !isForbiddenRestaurant(b)
     );
     if (open.length === 0) return [];
 
