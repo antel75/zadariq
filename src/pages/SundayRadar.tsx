@@ -258,11 +258,18 @@ export default function SundayRadar() {
         variant: 'live' as const,
       };
     }
+    if (dayState.isSaturdayPreview) {
+      return {
+        emoji: '🛒',
+        text: isEn ? `Tomorrow ${shopCount} shops are open` : `Sutra radi ${shopCount} dućana — Preview`,
+        variant: 'preview' as const,
+      };
+    }
     if (dayState.isSaturday) {
       return {
         emoji: '📅',
-        text: isEn ? `Tomorrow ${shopCount} shops are open` : `Sutra radi ${shopCount} dućana`,
-        variant: 'preview' as const,
+        text: isEn ? `Sunday radar available from noon` : `Sunday Radar dostupan od 12:00`,
+        variant: 'muted' as const,
       };
     }
     return {
