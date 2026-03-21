@@ -12,7 +12,7 @@ export function SundayRadarBanner() {
       const now = new Date();
       const day = now.getDay();
       const h = now.getHours();
-      setVisible(day === 0 && h >= 6 && h < 22);
+      setVisible((day === 0 && h >= 6 && h < 22) || (day === 6 && h >= 12));
     };
     check();
     const interval = setInterval(check, 60000);
@@ -24,7 +24,13 @@ export function SundayRadarBanner() {
   const label: Record<string, string> = {
     hr: 'Sunday Radar', en: 'Sunday Radar', de: 'Sunday Radar', it: 'Sunday Radar'
   };
-  const sub: Record<string, string> = {
+  const isSaturday = new Date().getDay() === 6;
+  const sub: Record<string, string> = isSaturday ? {
+    hr: 'Provjeri što radi sutra →',
+    en: 'Check what\'s open tomorrow →',
+    de: 'Was ist morgen geöffnet →',
+    it: 'Cosa è aperto domani →',
+  } : {
     hr: 'Otkrij što radi danas',
     en: 'Discover what\'s open today',
     de: 'Entdecke was heute geöffnet ist',
