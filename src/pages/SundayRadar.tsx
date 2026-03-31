@@ -63,10 +63,11 @@ function computeDayState() {
   const isSunday = day === 0;
   const isLiveSunday = isSunday && hour >= 7 && hour < 22;
   const isSaturday = day === 6;
+  const isSaturdayPreview = isSaturday && hour >= 12;
 
   const targetDate = isLiveSunday ? formatDateString(now) : getNextSundayDate();
 
-  return { isSunday, isLiveSunday, isSaturday, targetDate };
+  return { isSunday, isLiveSunday, isSaturday, isSaturdayPreview, targetDate };
 }
 
 export default function SundayRadar() {
