@@ -449,6 +449,7 @@ const AdminPanel = () => {
             <PendingChangesTab />
           </TabsContent>
           <TabsContent value="objects"><PendingObjectsTab /></TabsContent>
+          <TabsContent value="health"><HealthPlacesTab /></TabsContent>
         </Tabs>
       </main>
     </div>
