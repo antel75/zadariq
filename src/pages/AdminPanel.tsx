@@ -21,6 +21,7 @@ import { ShopSundayTab } from '@/components/admin/ShopSundayTab';
 import { OutagesTab } from '@/components/admin/OutagesTab';
 import { EventsTab } from '@/components/admin/EventsTab';
 import { PendingObjectsTab } from '@/components/admin/PendingObjectsTab';
+import { HealthPlacesTab } from '@/components/admin/HealthPlacesTab';
 
 type DutyService = {
   id: string;
@@ -193,6 +194,7 @@ const AdminPanel = () => {
             <TabsTrigger value="corrections" className="flex-1 text-xs">Corrections</TabsTrigger>
             <TabsTrigger value="events" className="flex-1 text-xs">Eventi</TabsTrigger>
             <TabsTrigger value="objects" className="flex-1 text-xs">Objekti</TabsTrigger>
+            <TabsTrigger value="health" className="flex-1 text-xs">Zdravstvo</TabsTrigger>
           </TabsList>
 
           {/* DUTY SERVICES */}
@@ -447,6 +449,7 @@ const AdminPanel = () => {
             <PendingChangesTab />
           </TabsContent>
           <TabsContent value="objects"><PendingObjectsTab /></TabsContent>
+          <TabsContent value="health"><HealthPlacesTab /></TabsContent>
         </Tabs>
       </main>
     </div>
