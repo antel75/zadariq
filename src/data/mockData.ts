@@ -25,6 +25,39 @@ export async function loadHoursOverrides() {
 // Call this early (fire and forget)
 loadHoursOverrides();
 
+// --- Public holidays cache (Europe/Zagreb) ---
+let _holidaysCache: Set<string> = new Set();
+let _holidaysFetched = false;
+
+export async function loadPublicHolidays() {
+  if (_holidaysFetched) return;
+  const { data } = await supabase
+    .from('public_holidays')
+    .select('holiday_date');
+  _holidaysCache = new Set((data || []).map((d: any) => d.holiday_date));
+  _holidaysFetched = true;
+}
+loadPublicHolidays();
+
+function todayIsHolidayZagreb(): boolean {
+  // YYYY-MM-DD in Europe/Zagreb
+  const fmt = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Zagreb',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+  });
+  const today = fmt.format(new Date());
+  return _holidaysCache.has(today);
+}
+
+// Categories that close on public holidays (except 24/7 emergency services).
+// Restaurants, cafes, gas stations, parking etc. typically work — so excluded.
+const HOLIDAY_CLOSED_CATEGORIES = new Set<string>([
+  'pharmacy', 'doctor', 'dentist', 'medicine',
+  'bank', 'post', 'government', 'library',
+  'shops', 'shopping', 'market', 'beauty', 'hair', 'barber',
+  'service', 'mechanic', 'carwash',
+]);
+
 export const categories: { id: CategoryId; icon: string; labelKey: string }[] = [
   { id: 'pharmacy', icon: 'Pill', labelKey: 'category.pharmacy' },
   { id: 'doctor', icon: 'Stethoscope', labelKey: 'category.doctor' },
