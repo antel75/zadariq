@@ -5,6 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Pill, Stethoscope, Ship, Car, CloudRain, Zap, Droplets, AlertTriangle, Sunset, Sunrise, Phone, MapPin, Fuel, ShieldAlert, Coffee, UtensilsCrossed, Film, ShoppingBag, Landmark, Trophy, WifiOff } from 'lucide-react';
 import { useSmartFerry, formatTime, getTimeRemaining } from '@/hooks/useTransportSchedules';
 import { getParkingStatus } from '@/data/parkingData';
+import { useIsHoliday } from '@/hooks/useIsHoliday';
 import { useWeather, getWindType } from '@/hooks/useWeather';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -289,7 +290,8 @@ export function NowInZadar({ mode = 'day', appMode = 'normal' }: NowInZadarProps
   const { data: meteoAlerts } = useMeteoAlerts();
   const { data: sportsEvents } = useSportsForNow();
   const { data: fetchStatus } = useSportsFetchStatus();
-  const parkingStatus = getParkingStatus();
+  const { data: holidayInfo } = useIsHoliday();
+  const parkingStatus = getParkingStatus(new Date(), holidayInfo?.isHoliday ?? false);
   const apiDown = fetchStatus && fetchStatus.ok === false;
 
   // Derived contacts from DB
