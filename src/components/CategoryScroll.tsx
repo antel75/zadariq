@@ -21,8 +21,8 @@ const iconMap: Record<string, ComponentType<{ className?: string }>> = {
   ParkingSquare, Bus, Siren, CalendarDays, Building2, Film, ToothIcon, Anchor,
 };
 
-// Hide 'medicine' subcategory — doctor and dentist are now separate top-level
-const hiddenCategories: CategoryId[] = ['medicine', 'pharmacy', 'emergency', 'transport', 'parking'];
+// Hide subcategories — 'doctor' acts as umbrella (Medicina) with internal sub-filters for dentists
+const hiddenCategories: CategoryId[] = ['medicine', 'dentist', 'pharmacy', 'emergency', 'transport', 'parking'];
 const mainCategories = categories.filter(c => !hiddenCategories.includes(c.id));
 
 // Public services submenu items
