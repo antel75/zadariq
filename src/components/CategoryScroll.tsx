@@ -16,9 +16,17 @@ const ToothIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+// International red cross on white square — universal health symbol
+const HealthCross = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="2" y="2" width="20" height="20" rx="3" fill="#FFFFFF" stroke="#DC2626" strokeWidth="1.2" />
+    <path d="M10 5h4v5h5v4h-5v5h-4v-5H5v-4h5z" fill="#DC2626" />
+  </svg>
+);
+
 const iconMap: Record<string, ComponentType<{ className?: string }>> = {
   Pill, Stethoscope, ShoppingBag, UtensilsCrossed, Coffee, Fuel,
-  ParkingSquare, Bus, Siren, CalendarDays, Building2, Film, ToothIcon, Anchor,
+  ParkingSquare, Bus, Siren, CalendarDays, Building2, Film, ToothIcon, Anchor, HealthCross,
 };
 
 // Hide subcategories — 'doctor' acts as umbrella (Medicina) with internal sub-filters for dentists
