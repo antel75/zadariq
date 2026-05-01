@@ -60,7 +60,7 @@ const HOLIDAY_CLOSED_CATEGORIES = new Set<string>([
 
 export const categories: { id: CategoryId; icon: string; labelKey: string }[] = [
   { id: 'pharmacy', icon: 'Pill', labelKey: 'category.pharmacy' },
-  { id: 'doctor', icon: 'Stethoscope', labelKey: 'category.doctor' },
+  { id: 'doctor', icon: 'HealthCross', labelKey: 'category.doctor' },
   { id: 'dentist', icon: 'ToothIcon', labelKey: 'category.dentist' },
   { id: 'medicine', icon: 'Stethoscope', labelKey: 'category.medicine' },
   { id: 'shops', icon: 'ShoppingBag', labelKey: 'category.shops' },
