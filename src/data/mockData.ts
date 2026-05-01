@@ -25,6 +25,39 @@ export async function loadHoursOverrides() {
 // Call this early (fire and forget)
 loadHoursOverrides();
 
+// --- Public holidays cache (Europe/Zagreb) ---
+let _holidaysCache: Set<string> = new Set();
+let _holidaysFetched = false;
+
+export async function loadPublicHolidays() {
+  if (_holidaysFetched) return;
+  const { data } = await supabase
+    .from('public_holidays')
+    .select('holiday_date');
+  _holidaysCache = new Set((data || []).map((d: any) => d.holiday_date));
+  _holidaysFetched = true;
+}
+loadPublicHolidays();
+
+function todayIsHolidayZagreb(): boolean {
+  // YYYY-MM-DD in Europe/Zagreb
+  const fmt = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Zagreb',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+  });
+  const today = fmt.format(new Date());
+  return _holidaysCache.has(today);
+}
+
+// Categories that close on public holidays (except 24/7 emergency services).
+// Restaurants, cafes, gas stations, parking etc. typically work — so excluded.
+const HOLIDAY_CLOSED_CATEGORIES = new Set<string>([
+  'pharmacy', 'doctor', 'dentist', 'medicine',
+  'bank', 'post', 'government', 'library',
+  'shops', 'shopping', 'market', 'beauty', 'hair', 'barber',
+  'service', 'mechanic', 'carwash',
+]);
+
 export const categories: { id: CategoryId; icon: string; labelKey: string }[] = [
   { id: 'pharmacy', icon: 'Pill', labelKey: 'category.pharmacy' },
   { id: 'doctor', icon: 'Stethoscope', labelKey: 'category.doctor' },
@@ -438,14 +471,43 @@ export function isBusinessOpen(business: Business): boolean | null {
   const openMin = parseInt(match[1]) * 60 + parseInt(match[2]);
   const closeMin = parseInt(match[3]) * 60 + parseInt(match[4]);
 
+  // Public-holiday rule: certain categories close on holidays.
+  // 24/7 places (00:00–24:00) stay open (e.g. dežurna ljekarna).
+  const is247 = openMin === 0 && closeMin === 24 * 60;
+  if (
+    !override &&
+    !is247 &&
+    HOLIDAY_CLOSED_CATEGORIES.has(business.category as string) &&
+    todayIsHolidayZagreb()
+  ) {
+    return false;
+  }
+
   if (closeMin <= openMin) return nowMin >= openMin || nowMin < closeMin;
   return nowMin >= openMin && nowMin < closeMin;
 }
 
 export function getTodayHours(business: Business): string {
-  const dayIndex = new Date().getDay();
+  const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Zagreb' }));
+  const dayIndex = now.getDay();
   const dayKeys: (keyof Business['workingHours'])[] = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-  return business.workingHours[dayKeys[dayIndex]];
+  const raw = business.workingHours[dayKeys[dayIndex]];
+
+  // If it's a public holiday and category typically closes — show holiday label.
+  const match = raw?.match(/(\d{2}):(\d{2})–(\d{2}):(\d{2})/);
+  if (match) {
+    const openMin = parseInt(match[1]) * 60 + parseInt(match[2]);
+    const closeMin = parseInt(match[3]) * 60 + parseInt(match[4]);
+    const is247 = openMin === 0 && closeMin === 24 * 60;
+    if (
+      !is247 &&
+      HOLIDAY_CLOSED_CATEGORIES.has(business.category as string) &&
+      todayIsHolidayZagreb()
+    ) {
+      return 'Zatvoreno (praznik)';
+    }
+  }
+  return raw;
 }
 
 export function searchBusinesses(query: string, categoryFilter?: CategoryId, extraBusinesses?: Business[]): Business[] {
