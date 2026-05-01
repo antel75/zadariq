@@ -471,6 +471,18 @@ export function isBusinessOpen(business: Business): boolean | null {
   const openMin = parseInt(match[1]) * 60 + parseInt(match[2]);
   const closeMin = parseInt(match[3]) * 60 + parseInt(match[4]);
 
+  // Public-holiday rule: certain categories close on holidays.
+  // 24/7 places (00:00–24:00) stay open (e.g. dežurna ljekarna).
+  const is247 = openMin === 0 && closeMin === 24 * 60;
+  if (
+    !override &&
+    !is247 &&
+    HOLIDAY_CLOSED_CATEGORIES.has(business.category as string) &&
+    todayIsHolidayZagreb()
+  ) {
+    return false;
+  }
+
   if (closeMin <= openMin) return nowMin >= openMin || nowMin < closeMin;
   return nowMin >= openMin && nowMin < closeMin;
 }
