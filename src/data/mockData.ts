@@ -488,9 +488,26 @@ export function isBusinessOpen(business: Business): boolean | null {
 }
 
 export function getTodayHours(business: Business): string {
-  const dayIndex = new Date().getDay();
+  const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Zagreb' }));
+  const dayIndex = now.getDay();
   const dayKeys: (keyof Business['workingHours'])[] = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-  return business.workingHours[dayKeys[dayIndex]];
+  const raw = business.workingHours[dayKeys[dayIndex]];
+
+  // If it's a public holiday and category typically closes — show holiday label.
+  const match = raw?.match(/(\d{2}):(\d{2})–(\d{2}):(\d{2})/);
+  if (match) {
+    const openMin = parseInt(match[1]) * 60 + parseInt(match[2]);
+    const closeMin = parseInt(match[3]) * 60 + parseInt(match[4]);
+    const is247 = openMin === 0 && closeMin === 24 * 60;
+    if (
+      !is247 &&
+      HOLIDAY_CLOSED_CATEGORIES.has(business.category as string) &&
+      todayIsHolidayZagreb()
+    ) {
+      return 'Zatvoreno (praznik)';
+    }
+  }
+  return raw;
 }
 
 export function searchBusinesses(query: string, categoryFilter?: CategoryId, extraBusinesses?: Business[]): Business[] {
