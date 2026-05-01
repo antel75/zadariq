@@ -3,6 +3,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { ArrowLeft, Car, MessageSquare, ExternalLink } from 'lucide-react';
 import { Footer } from '@/components/Footer';
+import { useIsHoliday } from '@/hooks/useIsHoliday';
 import {
   parkingZones,
   getCurrentRegime,
@@ -12,8 +13,10 @@ import {
 
 type ZoneStatus = 'free' | 'cheap' | 'expensive';
 
-function getZoneStatus(zoneId: string, regime: ParkingRegime, now: Date, price?: { eurPerHour: number }): ZoneStatus {
+function getZoneStatus(zoneId: string, regime: ParkingRegime, now: Date, price?: { eurPerHour: number }, isHoliday: boolean = false): ZoneStatus {
   if (price && price.eurPerHour === 0) return 'free';
+  // Public holidays: free except in peak summer & Zona 0 (always charged)
+  if (isHoliday && regime !== 'peakSummer' && zoneId !== 'zona-0') return 'free';
   const day = now.getDay();
   const h = now.getHours();
   const m = now.getMinutes();
@@ -32,7 +35,7 @@ function getZoneStatus(zoneId: string, regime: ParkingRegime, now: Date, price?:
   return 'free';
 }
 
-function getUntilLabel(zoneId: string, regime: ParkingRegime, now: Date, language: string): string {
+function getUntilLabel(zoneId: string, regime: ParkingRegime, now: Date, language: string, isHoliday: boolean = false): string {
   const day = now.getDay();
   const h = now.getHours();
   const m = now.getMinutes();
@@ -44,6 +47,11 @@ function getUntilLabel(zoneId: string, regime: ParkingRegime, now: Date, languag
 
   const freeLabel = language === 'hr' ? 'Besplatno' : 'Free';
   const paidUntil = (until: string) => language === 'hr' ? `Naplata do ${until}` : `Paid until ${until}`;
+
+  // Public holidays: free (except peak summer)
+  if (isHoliday && regime !== 'peakSummer') {
+    return language === 'hr' ? 'Besplatno (praznik)' : 'Free (holiday)';
+  }
 
   if (regime === 'winter') {
     if (day === 0) return freeLabel;
@@ -77,6 +85,8 @@ const Parking = () => {
   const now = new Date();
   const regime = getCurrentRegime(now);
   const regimeLabel = getRegimeLabel(regime);
+  const { data: holidayInfo } = useIsHoliday();
+  const isHoliday = holidayInfo?.isHoliday ?? false;
 
   return (
     <div className="min-h-screen bg-background">
@@ -110,10 +120,10 @@ const Parking = () => {
           </h2>
           <div className="flex flex-col gap-2">
             {parkingZones.map(zone => {
-              const zoneStatus = getZoneStatus(zone.id, regime, now, zone[regime]);
+              const zoneStatus = getZoneStatus(zone.id, regime, now, zone[regime], isHoliday);
               const colors = statusColors[zoneStatus];
               const price = zone[regime];
-              const until = getUntilLabel(zone.id, regime, now, language);
+              const until = getUntilLabel(zone.id, regime, now, language, isHoliday);
 
               return (
                 <div key={zone.id} className={`rounded-xl border p-3 ${colors.bg} ${colors.border}`}>
