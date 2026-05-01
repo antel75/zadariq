@@ -564,6 +564,78 @@ export type Database = {
         }
         Relationships: []
       }
+      health_places: {
+        Row: {
+          address: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          display_order: number
+          enabled: boolean
+          head_doctor: string | null
+          hours: Json | null
+          id: string
+          lat: number | null
+          lng: number | null
+          name: string
+          neighborhood: string | null
+          notes: string | null
+          phone: string | null
+          specialty: string | null
+          subcategory: string
+          updated_at: string
+          updated_by: string | null
+          verified: boolean
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          display_order?: number
+          enabled?: boolean
+          head_doctor?: string | null
+          hours?: Json | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          name: string
+          neighborhood?: string | null
+          notes?: string | null
+          phone?: string | null
+          specialty?: string | null
+          subcategory: string
+          updated_at?: string
+          updated_by?: string | null
+          verified?: boolean
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          display_order?: number
+          enabled?: boolean
+          head_doctor?: string | null
+          hours?: Json | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          name?: string
+          neighborhood?: string | null
+          notes?: string | null
+          phone?: string | null
+          specialty?: string | null
+          subcategory?: string
+          updated_at?: string
+          updated_by?: string | null
+          verified?: boolean
+          website?: string | null
+        }
+        Relationships: []
+      }
       kino_zona_movies: {
         Row: {
           country: string | null
