@@ -8,6 +8,7 @@ import { Business, CategoryId } from '@/data/types';
 import { ArrowLeft, Filter, Plus, MapPin, AlertTriangle } from 'lucide-react';
 import { Footer } from '@/components/Footer';
 import { useApprovedPlaces } from '@/hooks/useApprovedPlaces';
+import { useHealthPlaces, healthPlaceToBusiness } from '@/hooks/useHealthPlaces';
 
 function distanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const R = 6371;
@@ -57,6 +58,7 @@ export default function CategoryBrowse() {
   const [openOnly, setOpenOnly] = useState(searchParams.get('open') === '1' || useProximity);
   const [reportTarget, setReportTarget] = useState<Business | null>(null);
   const { data: approvedPlaces } = useApprovedPlaces();
+  const { data: healthPlaces } = useHealthPlaces();
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   // Health umbrella sub-filter: 'all' | 'general' | 'dental' | 'specialist' | 'hospital'
   const [healthSub, setHealthSub] = useState<'all' | 'general' | 'dental' | 'specialist' | 'hospital'>('all');
@@ -74,7 +76,8 @@ export default function CategoryBrowse() {
   const category = categories.find(c => c.id === categoryId);
 
   const results = useMemo(() => {
-    const allBusinesses = [...businesses, ...(approvedPlaces || [])];
+    const dbHealth = (healthPlaces || []).map(healthPlaceToBusiness);
+    const allBusinesses = [...businesses, ...(approvedPlaces || []), ...dbHealth];
     let r = allBusinesses.filter(b => {
       if (categoryId === 'doctor') {
         const isMedical = b.category === 'doctor' || b.category === 'dentist' || b.category === 'medicine';
@@ -125,7 +128,7 @@ export default function CategoryBrowse() {
       r.sort((a, b) => getSortKey(a.name).localeCompare(getSortKey(b.name), 'hr'));
     }
     return r;
-  }, [categoryId, openOnly, approvedPlaces, userLocation, useProximity, healthSub]);
+  }, [categoryId, openOnly, approvedPlaces, healthPlaces, userLocation, useProximity, healthSub]);
 
   return (
     <div className="min-h-screen bg-background">
