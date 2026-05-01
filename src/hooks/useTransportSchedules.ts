@@ -53,8 +53,20 @@ export function useTransportSchedules(types?: TransportType[]) {
     queryKey: ['transport-schedules', types],
     queryFn: async () => {
       // Get current day of week (1=Mon ... 7=Sun)
-      const jsDay = new Date().getDay(); // 0=Sun, 1=Mon...
-      const isoDay = jsDay === 0 ? 7 : jsDay;
+      const now = new Date();
+      const jsDay = now.getDay(); // 0=Sun, 1=Mon...
+      let isoDay = jsDay === 0 ? 7 : jsDay;
+
+      // Check if today is a public holiday → treat as Sunday (day 7)
+      const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      const { data: holiday } = await supabase
+        .from('public_holidays')
+        .select('holiday_date')
+        .eq('holiday_date', todayStr)
+        .maybeSingle();
+      if (holiday) {
+        isoDay = 7;
+      }
 
       let query = supabase
         .from('transport_schedules')
