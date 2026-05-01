@@ -5,7 +5,7 @@ import { businesses, isBusinessOpen, categories } from '@/data/mockData';
 import { BusinessCard } from '@/components/BusinessCard';
 import { ReportModal } from '@/components/ReportModal';
 import { Business, CategoryId } from '@/data/types';
-import { ArrowLeft, Filter, Plus, MapPin } from 'lucide-react';
+import { ArrowLeft, Filter, Plus, MapPin, AlertTriangle } from 'lucide-react';
 import { Footer } from '@/components/Footer';
 import { useApprovedPlaces } from '@/hooks/useApprovedPlaces';
 
@@ -58,6 +58,9 @@ export default function CategoryBrowse() {
   const [reportTarget, setReportTarget] = useState<Business | null>(null);
   const { data: approvedPlaces } = useApprovedPlaces();
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  // Health umbrella sub-filter: 'all' | 'general' | 'dental' | 'specialist' | 'hospital'
+  const [healthSub, setHealthSub] = useState<'all' | 'general' | 'dental' | 'specialist' | 'hospital'>('all');
+  const isHealth = categoryId === 'doctor';
 
   // Request geolocation for proximity-sorted categories
   useEffect(() => {
@@ -74,7 +77,37 @@ export default function CategoryBrowse() {
     const allBusinesses = [...businesses, ...(approvedPlaces || [])];
     let r = allBusinesses.filter(b => {
       if (categoryId === 'doctor') {
-        return b.category === 'doctor' || b.category === 'dentist' || b.category === 'medicine';
+        const isMedical = b.category === 'doctor' || b.category === 'dentist' || b.category === 'medicine';
+        if (!isMedical) return false;
+        if (healthSub === 'all') return true;
+        if (healthSub === 'dental') return b.category === 'dentist';
+        if (healthSub === 'hospital') {
+          const n = b.name.toLowerCase();
+          return n.includes('bolnica') || n.includes('opća bolnica') || n.includes('hitna') || n.includes('odjel') || (b as any).hospitalDept === true;
+        }
+        if (healthSub === 'specialist') {
+          if (b.category !== 'medicine') return false;
+          const n = b.name.toLowerCase();
+          // Specialists: anything that is NOT a general/family doctor
+          const generalMarkers = ['dr. med.', 'opće prakse', 'obiteljska', 'opća medicina'];
+          const specialistMarkers = ['pedijatar', 'pedijatrij', 'ginekolog', 'internist', 'okulist', 'oftalmolog', 'dermatolog', 'kardiolog', 'neurolog', 'orl', 'otorinolar', 'urolog', 'ortoped', 'psihijatar', 'endokrinolog', 'reumatolog', 'gastroenterolog', 'pulmolog', 'alergolog', 'radiolog', 'poliklinika', 'specijalist', 'kirurg'];
+          const hasSpecialist = specialistMarkers.some(m => n.includes(m));
+          if (hasSpecialist) return true;
+          // If it's flagged manually
+          if ((b as any).medicalKind === 'specialist') return true;
+          return false;
+        }
+        if (healthSub === 'general') {
+          if (b.category !== 'medicine') return false;
+          const n = b.name.toLowerCase();
+          const specialistMarkers = ['pedijatar', 'pedijatrij', 'ginekolog', 'internist', 'okulist', 'oftalmolog', 'dermatolog', 'kardiolog', 'neurolog', 'orl', 'otorinolar', 'urolog', 'ortoped', 'psihijatar', 'endokrinolog', 'reumatolog', 'gastroenterolog', 'pulmolog', 'alergolog', 'radiolog', 'poliklinika', 'kirurg'];
+          const hospitalMarkers = ['bolnica', 'odjel', 'hitna'];
+          if (specialistMarkers.some(m => n.includes(m))) return false;
+          if (hospitalMarkers.some(m => n.includes(m))) return false;
+          if ((b as any).medicalKind === 'specialist' || (b as any).hospitalDept) return false;
+          return true;
+        }
+        return true;
       }
       return b.category === categoryId;
     });
@@ -92,7 +125,7 @@ export default function CategoryBrowse() {
       r.sort((a, b) => getSortKey(a.name).localeCompare(getSortKey(b.name), 'hr'));
     }
     return r;
-  }, [categoryId, openOnly, approvedPlaces, userLocation, useProximity]);
+  }, [categoryId, openOnly, approvedPlaces, userLocation, useProximity, healthSub]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -108,6 +141,44 @@ export default function CategoryBrowse() {
       </header>
 
       <main className="max-w-lg mx-auto px-4 pb-8">
+        {isHealth && (
+          <>
+            {/* Sub-filter chips for Health umbrella */}
+            <div className="flex gap-2 overflow-x-auto no-scrollbar mt-4 -mx-1 px-1">
+              {([
+                { key: 'all', label: t('health.subAll') },
+                { key: 'general', label: t('health.subGeneral') },
+                { key: 'dental', label: t('health.subDental') },
+                { key: 'specialist', label: t('health.subSpecialist') },
+                { key: 'hospital', label: t('health.subHospital') },
+              ] as const).map((tab) => {
+                const active = healthSub === tab.key;
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={() => setHealthSub(tab.key)}
+                    className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                      active
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+            {/* Data-in-preparation warning */}
+            {(healthSub === 'specialist' || healthSub === 'hospital') && (
+              <div className="flex items-start gap-2 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 mt-3">
+                <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                <p className="text-xs text-amber-900 dark:text-amber-200 leading-snug">
+                  {t('health.inPreparation')}
+                </p>
+              </div>
+            )}
+          </>
+        )}
         {useProximity && !userLocation && (
           <div className="flex items-center gap-2 p-3 rounded-xl bg-primary/5 border border-primary/10 mt-4 mb-2">
             <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
