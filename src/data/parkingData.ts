@@ -99,12 +99,18 @@ export function getCurrentRegime(date: Date = new Date()): ParkingRegime {
 /**
  * Determine if parking is currently free based on oil.hr rules
  */
-export function getParkingStatus(date: Date = new Date()): ParkingStatus {
+export function getParkingStatus(date: Date = new Date(), isHoliday: boolean = false): ParkingStatus {
   const regime = getCurrentRegime(date);
   const day = date.getDay(); // 0=Sun
   const hour = date.getHours();
   const minute = date.getMinutes();
   const timeInMinutes = hour * 60 + minute;
+
+  // Public holidays: free parking (oil.hr: "Besplatno parkiranje nedjeljom i praznicima")
+  // Exception: in peak summer (15.6-31.8) holidays remain paid like Sundays
+  if (isHoliday && regime !== 'peakSummer') {
+    return 'free';
+  }
 
   // Sunday: always free in winter/summer, paid in peak summer (15.6-31.8)
   if (day === 0) {
@@ -126,8 +132,9 @@ export function getParkingStatus(date: Date = new Date()): ParkingStatus {
 /**
  * Get a descriptive string for the current parking hours
  */
-export function getParkingHoursLabel(date: Date = new Date()): string {
+export function getParkingHoursLabel(date: Date = new Date(), isHoliday: boolean = false): string {
   const regime = getCurrentRegime(date);
+  if (isHoliday && regime !== 'peakSummer') return 'Besplatno (praznik)';
   if (regime === 'winter') {
     const day = date.getDay();
     if (day === 0) return 'Besplatno nedjeljom';
