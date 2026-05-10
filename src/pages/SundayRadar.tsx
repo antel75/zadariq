@@ -61,7 +61,8 @@ function computeDayState() {
   const hour = now.getHours();
 
   const isSunday = day === 0;
-  const isLiveSunday = isSunday && hour >= 7 && hour < 22;
+  // Live cijeli nedjeljni dan (do 22h); preview prikaz ranojutarnjih sati i dalje pokazuje današnje dućane
+  const isLiveSunday = isSunday && hour < 22;
   const isSaturday = day === 6;
   const isSaturdayPreview = isSaturday && hour >= 12;
 
@@ -159,19 +160,44 @@ export default function SundayRadar() {
       .eq('sunday_date', targetDate);
 
     const entries: SundayEntry[] = data || [];
-    const result: ShopOnMap[] = [];
 
+    // Skupi sve ap_* ID-jeve i dohvati ih iz pending_places
+    const apIds = entries
+      .filter(e => e.business_id.startsWith('ap_'))
+      .map(e => e.business_id.replace(/^ap_/, ''));
+
+    let approvedMap = new Map<string, { name: string; address: string; lat: number | null; lng: number | null }>();
+    if (apIds.length > 0) {
+      const { data: approved } = await supabase
+        .from('pending_places')
+        .select('id, proposed_name, proposed_address, lat, lng')
+        .in('id', apIds);
+      (approved || []).forEach(p => approvedMap.set(`ap_${p.id}`, {
+        name: p.proposed_name,
+        address: p.proposed_address,
+        lat: p.lat,
+        lng: p.lng,
+      }));
+    }
+
+    const result: ShopOnMap[] = [];
     for (const entry of entries) {
-      const biz = businesses.find(b => b.id === entry.business_id);
-      if (!biz || !(biz as any).lat) continue;
+      let info: { name: string; address: string; lat: number | null; lng: number | null } | null = null;
+      if (entry.business_id.startsWith('ap_')) {
+        info = approvedMap.get(entry.business_id) || null;
+      } else {
+        const biz = businesses.find(b => b.id === entry.business_id);
+        if (biz) info = { name: biz.name, address: biz.address || '', lat: (biz as any).lat ?? null, lng: (biz as any).lng ?? null };
+      }
+      if (!info || info.lat == null || info.lng == null) continue;
       const openT = entry.open_time || '08:00';
       const closeT = entry.close_time || '21:00';
       result.push({
-        id: biz.id,
-        name: biz.name,
-        address: biz.address || '',
-        lat: (biz as any).lat,
-        lng: (biz as any).lng,
+        id: entry.business_id,
+        name: info.name,
+        address: info.address,
+        lat: info.lat,
+        lng: info.lng,
         open_time: openT,
         close_time: closeT,
         isOpenNow: isLive ? isOpenNow(openT, closeT) : false,
