@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { useQuery } from '@tanstack/react-query';
@@ -110,6 +111,34 @@ const Events = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Događanja u Zadru — koncerti, festivali, izložbe | ZadarIQ</title>
+        <meta name="description" content="Aktualna događanja u Zadru, na Zrću i u Tisnom: koncerti, festivali, fešte, izložbe, sport i gastro događaji s datumom i lokacijom." />
+        <link rel="canonical" href="https://zadariq.lovable.app/events" />
+        <meta property="og:title" content="Događanja u Zadru — koncerti, festivali, izložbe" />
+        <meta property="og:description" content="Aktualna događanja u Zadru, Zrću i Tisnom — datumi, lokacije, kategorije." />
+        <meta property="og:url" content="https://zadariq.lovable.app/events" />
+        {events && events.length > 0 && (
+          <script type="application/ld+json">{JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'ItemList',
+            itemListElement: events.slice(0, 20).map((e, i) => ({
+              '@type': 'ListItem',
+              position: i + 1,
+              item: {
+                '@type': 'Event',
+                name: e.title,
+                startDate: e.event_date_from || undefined,
+                endDate: e.event_date_to || undefined,
+                location: e.venue || e.location ? { '@type': 'Place', name: e.venue || e.location, address: e.location || undefined } : undefined,
+                image: e.image_url || undefined,
+                url: e.website_url || undefined,
+                description: e.description || undefined,
+              },
+            })),
+          })}</script>
+        )}
+      </Helmet>
       <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-lg border-b border-border">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
