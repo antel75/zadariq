@@ -1,0 +1,27 @@
+# ZadarIQ
+
+> Live city guide for Zadar, Croatia — what's open right now (pharmacies, dentists, shops), public transport, parking, EV chargers, events, and city alerts. Multilingual (HR/EN/DE/IT).
+
+## Pages
+
+- [Početna / Home](/): Live "now in Zadar" dashboard with weather, alerts, situational recommendations.
+- [Pretraživanje / Search](/search): Search businesses and places across Zadar.
+- [Hitno / Emergency](/emergency): Emergency numbers and on-call pharmacies/dentists.
+- [Prijevoz / Transport](/transport): Bus and ferry schedules for Zadar region.
+- [Parking](/parking): Public parking zones, prices, and availability.
+- [Kino / Cinema](/cinema): Movie schedules in Zadar (CineStar, Kino Zona).
+- [Događanja / Events](/events): Concerts, festivals, exhibitions in Zadar, Zrće, and Tisno.
+- [Sunday Radar](/sunday-radar): Which shops are open this Sunday in Zadar.
+- [EV punionice / EV Chargers](/ev-chargers): Electric vehicle charging stations.
+- [Znamenitosti / Sights](/znamenitosti): Tourist attractions in Zadar.
+- [Javne službe / Public services](/public-services): Government and city services directory.
+- [Komunalna poduzeća / Utility companies](/utility-companies): Water, electricity, waste, and utility contacts.
+- [Digitalni Zadar](/digital-zadar): Digital city services portal.
+- [Za tvrtke / For business](/for-business): Information for business owners.
+- [Pravne informacije](/pravne-informacije): Legal disclaimers and data sources.
+- [Izvori podataka / Data sources](/data-sources): Public data sources used.
+
+## Optional
+
+- [Uvjeti / Terms](/terms): Terms of use.
+- [Privatnost / Privacy](/privacy): Privacy policy.
