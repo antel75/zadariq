@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { businesses, isBusinessOpen, getTodayHours, getRelativeTime } from '@/data/mockData';
 import { ReportModal } from '@/components/ReportModal';
@@ -38,8 +39,31 @@ export default function BusinessDetail() {
   const open = isBusinessOpen(business);
   const hideOpenBadge = business.reportCount >= 5;
 
+  const canonical = `https://zadariq.lovable.app/business/${business.id}`;
+  const metaTitle = `${business.name} — ${business.category} u Zadru | ZadarIQ`.slice(0, 60);
+  const metaDesc = `${business.name}${business.address ? `, ${business.address}` : ''} — radno vrijeme, kontakt i status (otvoreno/zatvoreno) u realnom vremenu na ZadarIQ.`.slice(0, 160);
+  const ldJson: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    name: business.name,
+    url: canonical,
+  };
+  if (business.address) ldJson.address = { '@type': 'PostalAddress', streetAddress: business.address, addressLocality: 'Zadar', addressCountry: 'HR' };
+  if (business.phone) ldJson.telephone = business.phone;
+  if (business.lat && business.lng) ldJson.geo = { '@type': 'GeoCoordinates', latitude: business.lat, longitude: business.lng };
+
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>{metaTitle}</title>
+        <meta name="description" content={metaDesc} />
+        <link rel="canonical" href={canonical} />
+        <meta property="og:title" content={metaTitle} />
+        <meta property="og:description" content={metaDesc} />
+        <meta property="og:url" content={canonical} />
+        <meta property="og:type" content="business.business" />
+        <script type="application/ld+json">{JSON.stringify(ldJson)}</script>
+      </Helmet>
       <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-lg border-b border-border">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center gap-3">
           <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-xl hover:bg-muted transition-colors">
