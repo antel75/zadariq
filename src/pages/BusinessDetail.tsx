@@ -61,7 +61,7 @@ export default function BusinessDetail() {
         <meta property="og:title" content={metaTitle} />
         <meta property="og:description" content={metaDesc} />
         <meta property="og:url" content={canonical} />
-        <meta property="og:type" content="business.business" />
+        <meta property="og:type" content="website" />
         <script type="application/ld+json">{JSON.stringify(ldJson)}</script>
       </Helmet>
       <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-lg border-b border-border">
