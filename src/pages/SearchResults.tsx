@@ -9,6 +9,7 @@ import { Business, CategoryId } from '@/data/types';
 import { ArrowLeft, Filter, X } from 'lucide-react';
 import { Footer } from '@/components/Footer';
 import { useApprovedPlaces } from '@/hooks/useApprovedPlaces';
+import { PageSEO } from '@/components/PageSEO';
 
 export default function SearchResults() {
   const { t } = useLanguage();
@@ -31,6 +32,11 @@ export default function SearchResults() {
 
   return (
     <div className="min-h-screen bg-background">
+      <PageSEO
+        title="Pretraživanje mjesta u Zadru | ZadarIQ"
+        description="Pretraži ljekarne, zubare, dućane, kafiće, restorane i druge poslovne objekte u Zadru."
+        path="/search"
+      />
       <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-lg border-b border-border">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center gap-3">
           <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-xl hover:bg-muted transition-colors">

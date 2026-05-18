@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, Clock, Film, ExternalLink, Loader2 } from 'lucide-react';
 import { Footer } from '@/components/Footer';
+import { PageSEO } from '@/components/PageSEO';
 import { format, parseISO, isToday, isTomorrow, addDays } from 'date-fns';
 import { hr } from 'date-fns/locale';
 
@@ -84,6 +85,11 @@ export default function KinoZona() {
 
   return (
     <div className="min-h-screen bg-background pb-8">
+      <PageSEO
+        title="Kino Zona Zadar — raspored | ZadarIQ"
+        description="Raspored projekcija u Kino Zona Zadar (Kneževa palača). Današnji i tjedni termini filmova."
+        path="/kino-zona"
+      />
       <div className="bg-primary text-primary-foreground px-4 pt-12 pb-6">
         <div className="flex items-center gap-3 mb-4">
           <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-white/10 transition-colors">
@@ -114,7 +120,7 @@ export default function KinoZona() {
         </div>
       </div>
 
-      <div className="px-4 mt-4 space-y-3">
+      <main className="px-4 mt-4 space-y-3">
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
             <Loader2 className="w-6 h-6 animate-spin text-accent" />
@@ -196,7 +202,7 @@ export default function KinoZona() {
             );
           })
         )}
-      </div>
+      </main>
 
       <div className="px-4 mt-6 text-center">
         <p className="text-[10px] text-muted-foreground/50">

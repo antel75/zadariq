@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Footer } from '@/components/Footer';
+import { PageSEO } from '@/components/PageSEO';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { emergencyContacts } from '@/data/mockData';
 import { ArrowLeft, Phone, Siren } from 'lucide-react';
@@ -10,6 +11,25 @@ export default function Emergency() {
 
   return (
     <div className="min-h-screen bg-background">
+      <PageSEO
+        title="Hitne službe u Zadru — brojevi i kontakti | ZadarIQ"
+        description="Hitni brojevi i kontakti u Zadru: 112, policija, vatrogasci, hitna pomoć, dežurna ljekarna i zubar. Pozovi izravno."
+        path="/emergency"
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'ItemList',
+          name: 'Hitne službe Zadar',
+          itemListElement: emergencyContacts.map((c, i) => ({
+            '@type': 'ListItem',
+            position: i + 1,
+            item: {
+              '@type': 'Organization',
+              name: c.nameKey,
+              telephone: c.number,
+            },
+          })),
+        }}
+      />
       <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-lg border-b border-border">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center gap-3">
           <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-xl hover:bg-muted transition-colors">

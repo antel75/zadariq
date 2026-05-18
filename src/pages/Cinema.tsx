@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, Clock, MapPin, Film, Calendar, ExternalLink, Loader2 } from 'lucide-react';
 import { Footer } from '@/components/Footer';
+import { PageSEO } from '@/components/PageSEO';
 import { format, parseISO, isToday, isTomorrow, addDays } from 'date-fns';
 import { hr } from 'date-fns/locale';
 
@@ -127,6 +128,11 @@ export default function Cinema() {
 
   return (
     <div className="min-h-screen bg-background pb-8">
+      <PageSEO
+        title="CineStar Zadar — raspored projekcija | ZadarIQ"
+        description="Današnji i tjedni raspored filmova u CineStar Zadar (City Galleria). Brzi pregled termina projekcija."
+        path="/cinema"
+      />
       {/* Header */}
       <div className="bg-primary text-primary-foreground px-4 pt-12 pb-6">
         <div className="flex items-center gap-3 mb-4">
@@ -160,7 +166,7 @@ export default function Cinema() {
       </div>
 
       {/* Content */}
-      <div className="px-4 mt-4 space-y-3">
+      <main className="px-4 mt-4 space-y-3">
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
             <Loader2 className="w-6 h-6 animate-spin text-accent" />
@@ -276,7 +282,7 @@ export default function Cinema() {
             );
           })
         )}
-      </div>
+      </main>
 
       {/* Footer info */}
       <div className="px-4 mt-6 text-center">
