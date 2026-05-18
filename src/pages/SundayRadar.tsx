@@ -5,6 +5,7 @@ import { LanguageSelector } from '@/components/LanguageSelector';
 import { ArrowLeft, Navigation, Store, Clock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { businesses } from '@/data/mockData';
+import { PageSEO } from '@/components/PageSEO';
 
 interface SundayEntry {
   id: string;
@@ -322,6 +323,11 @@ export default function SundayRadar() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <PageSEO
+        title="Sunday Radar — radne nedjelje u Zadru | ZadarIQ"
+        description="Koje su prodavaonice u Zadru otvorene ove nedjelje? Live karta i raspored radnih nedjelja s pravnim limitom 16 nedjelja godišnje."
+        path="/sunday-radar"
+      />
       <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-lg border-b border-border shrink-0">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
