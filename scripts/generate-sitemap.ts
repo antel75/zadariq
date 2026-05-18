@@ -37,12 +37,12 @@ const publicServiceIds = ['grad-zadar','zadarska-zupanija','porezna-uprava','mup
 
 async function fetchBusinessIds(): Promise<string[]> {
   try {
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/approved_places?select=id&limit=1000`, {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/pending_places?select=id&status=eq.approved&limit=1000`, {
       headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${SUPABASE_ANON}` },
     });
     if (!r.ok) return [];
     const rows = await r.json() as Array<{ id: string }>;
-    return rows.map(r => r.id);
+    return rows.map(r => `ap_${r.id}`);
   } catch { return []; }
 }
 
