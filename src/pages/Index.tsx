@@ -9,6 +9,7 @@ import { Footer } from '@/components/Footer';
 import { ReportModal } from '@/components/ReportModal';
 import { HomeDashboard } from '@/components/dashboard/HomeDashboard';
 import { PushOptInBanner } from '@/components/PushOptInBanner';
+import { PageSEO } from '@/components/PageSEO';
 import { Business } from '@/data/types';
 import { Siren, Briefcase } from 'lucide-react';
 
@@ -19,6 +20,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen gradient-bg gradient-mesh">
+      <PageSEO
+        title="ZadarIQ — što je otvoreno u Zadru sada"
+        description="Brzo pronađi otvorenu ljekarnu, zubara, dućan, prijevoz, parking i događanja u Zadru u realnom vremenu."
+        path="/"
+      />
       {/* Header */}
       <header className="sticky top-0 z-30 glass border-b border-border/50">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
