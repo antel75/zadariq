@@ -3,6 +3,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { ArrowLeft, MapPin, Clock, ExternalLink } from 'lucide-react';
 import { Footer } from '@/components/Footer';
+import { PageSEO } from '@/components/PageSEO';
 
 const ATTRACTIONS = [
   { id: 'sv-donat', emoji: '⛪', name: { hr: 'Crkva sv. Donata', en: 'Church of St. Donat', de: 'Kirche St. Donat', it: 'Chiesa di San Donato' }, description: { hr: 'Najprepoznatljiviji simbol Zadra, predromanička rotonda iz 9. st. izgrađena na rimskom forumu. Poznata po izvrsnoj akustici.', en: 'The most recognizable symbol of Zadar, a pre-Romanesque rotunda from the 9th century built on a Roman forum. Known for excellent acoustics.', de: 'Das bekannteste Symbol Zadars, eine vorromanische Rotunde aus dem 9. Jh. Bekannt für hervorragende Akustik.', it: 'Il simbolo più riconoscibile di Zara, una rotonda preromanica del IX sec. Nota per la sua acustica eccellente.' }, address: 'Trg rimskog foruma, Zadar', hours: { hr: 'Lipanj–rujan: 9:00–21:00', en: 'June–Sept: 9:00–21:00', de: 'Juni–Sept: 9:00–21:00', it: 'Giugno–sett: 9:00–21:00' }, free: false, mapUrl: 'https://maps.google.com/?q=crkva+sv+donat+zadar', category: 'crkva' },
@@ -24,6 +25,27 @@ const Znamenitosti = () => {
   const lang = language as string;
   return (
     <div className="min-h-screen bg-background">
+      <PageSEO
+        title="Znamenitosti Zadra — što posjetiti | ZadarIQ"
+        description="Vodič kroz znamenitosti Zadra: Morske orgulje, Pozdrav Suncu, Sv. Donat, Katedrala sv. Stošije, Rimski forum i više."
+        path="/znamenitosti"
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'ItemList',
+          name: 'Znamenitosti Zadra',
+          itemListElement: ATTRACTIONS.map((a, i) => ({
+            '@type': 'ListItem',
+            position: i + 1,
+            item: {
+              '@type': 'TouristAttraction',
+              name: a.name.hr,
+              description: a.description.hr,
+              address: { '@type': 'PostalAddress', streetAddress: a.address, addressLocality: 'Zadar', addressCountry: 'HR' },
+              isAccessibleForFree: a.free,
+            },
+          })),
+        }}
+      />
       <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-lg border-b border-border">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
