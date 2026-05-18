@@ -19,4 +19,31 @@
   <url><loc>https://zadariq.lovable.app/data-sources</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
   <url><loc>https://zadariq.lovable.app/terms</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
   <url><loc>https://zadariq.lovable.app/privacy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://zadariq.lovable.app/category/health</loc><changefreq>daily</changefreq><priority>0.6</priority></url>
+  <url><loc>https://zadariq.lovable.app/category/pharmacies</loc><changefreq>daily</changefreq><priority>0.6</priority></url>
+  <url><loc>https://zadariq.lovable.app/category/dentists</loc><changefreq>daily</changefreq><priority>0.6</priority></url>
+  <url><loc>https://zadariq.lovable.app/category/restaurants</loc><changefreq>daily</changefreq><priority>0.6</priority></url>
+  <url><loc>https://zadariq.lovable.app/category/cafes</loc><changefreq>daily</changefreq><priority>0.6</priority></url>
+  <url><loc>https://zadariq.lovable.app/category/shops</loc><changefreq>daily</changefreq><priority>0.6</priority></url>
+  <url><loc>https://zadariq.lovable.app/category/services</loc><changefreq>daily</changefreq><priority>0.6</priority></url>
+  <url><loc>https://zadariq.lovable.app/category/beauty</loc><changefreq>daily</changefreq><priority>0.6</priority></url>
+  <url><loc>https://zadariq.lovable.app/category/automotive</loc><changefreq>daily</changefreq><priority>0.6</priority></url>
+  <url><loc>https://zadariq.lovable.app/category/sports</loc><changefreq>daily</changefreq><priority>0.6</priority></url>
+  <url><loc>https://zadariq.lovable.app/category/culture</loc><changefreq>daily</changefreq><priority>0.6</priority></url>
+  <url><loc>https://zadariq.lovable.app/category/tourism</loc><changefreq>daily</changefreq><priority>0.6</priority></url>
+  <url><loc>https://zadariq.lovable.app/public-services/grad-zadar</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/public-services/zadarska-zupanija</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/public-services/porezna-uprava</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/public-services/mup-zadar</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/public-services/fina</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/public-services/hzmo</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/public-services/hzzo</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/public-services/hzz</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/public-services/katastar</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/public-services/sudski-registar</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/public-services/obrtni-registar</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/public-services/dorh</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/public-services/centar-socijalna-skrb</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/public-services/dom-zdravlja</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/public-services/opca-bolnica</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
 </urlset>
