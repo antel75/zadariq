@@ -5,6 +5,7 @@ import { useEvChargers, distanceKm } from '@/hooks/useEvChargers';
 import { EvChargerCard } from '@/components/ev/EvChargerCard';
 import { EvChargersMap } from '@/components/ev/EvChargersMap';
 import { supabase } from '@/integrations/supabase/client';
+import { PageSEO } from '@/components/PageSEO';
 
 export default function EvChargers() {
   const navigate = useNavigate();
@@ -62,6 +63,11 @@ export default function EvChargers() {
 
   return (
     <div className="min-h-screen gradient-bg">
+      <PageSEO
+        title="EV punionice u Zadru — stanje uživo | ZadarIQ"
+        description="Pregled javnih punionica za električne automobile u Zadru i okolici. Status, lokacija, snaga i operator."
+        path="/ev-chargers"
+      />
       <header className="sticky top-0 z-30 glass border-b border-border/50">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center gap-3">
           <button onClick={() => navigate(-1)} className="p-1">
