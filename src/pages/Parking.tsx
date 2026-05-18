@@ -3,6 +3,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { ArrowLeft, Car, MessageSquare, ExternalLink } from 'lucide-react';
 import { Footer } from '@/components/Footer';
+import { PageSEO } from '@/components/PageSEO';
 import { useIsHoliday } from '@/hooks/useIsHoliday';
 import {
   parkingZones,
@@ -90,6 +91,11 @@ const Parking = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <PageSEO
+        title="Parking u Zadru — zone, cijene, radno vrijeme | ZadarIQ"
+        description="Parkirne zone u Zadru, cijene, radno vrijeme i besplatni period. Ljetni i zimski raspored, SMS plaćanje."
+        path="/parking"
+      />
       <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-lg border-b border-border">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
