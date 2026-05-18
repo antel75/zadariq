@@ -8,6 +8,7 @@ import {
   AlertTriangle, CheckCircle2, XCircle, Timer, Navigation, Loader2,
 } from 'lucide-react';
 import { Footer } from '@/components/Footer';
+import { PageSEO } from '@/components/PageSEO';
 import {
   useTransportSchedules,
   getBoardingStatus,
@@ -155,6 +156,11 @@ export default function Transport() {
 
   return (
     <div className="min-h-screen bg-background">
+      <PageSEO
+        title="Prijevoz u Zadru — autobus, trajekt, taxi | ZadarIQ"
+        description="Verificirani raspored autobusa i trajekata u Zadru i okolici. Liburnija, Jadrolinija, G&V Line — sve na jednom mjestu."
+        path="/transport"
+      />
       <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-lg border-b border-border">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center gap-3">
           <button onClick={() => navigate('/')} className="p-2 rounded-xl hover:bg-secondary transition-colors">
