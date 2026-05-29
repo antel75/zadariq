@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { ArrowLeft, Navigation, Store, Clock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { businesses } from '@/data/mockData';
 import { PageSEO } from '@/components/PageSEO';
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 
 interface SundayEntry {
   id: string;
@@ -75,6 +77,9 @@ function computeDayState() {
 export default function SundayRadar() {
   const { language } = useLanguage();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { isAdmin } = useAuth();
+  const previewParam = searchParams.get('preview'); // YYYY-MM-DD overrides date + forces preview
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMapRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
@@ -84,13 +89,22 @@ export default function SundayRadar() {
   const [loading, setLoading] = useState(true);
   const [selectedShop, setSelectedShop] = useState<ShopOnMap | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
-  const [dayState, setDayState] = useState(computeDayState);
+  const [dayState, setDayState] = useState(() => {
+    const base = computeDayState();
+    if (previewParam && /^\d{4}-\d{2}-\d{2}$/.test(previewParam)) {
+      return { ...base, isLiveSunday: false, isSaturdayPreview: true, targetDate: previewParam };
+    }
+    return base;
+  });
+
+  const editMode = !!previewParam && isAdmin;
 
   // Recompute day state every minute
   useEffect(() => {
+    if (previewParam) return; // freeze when previewing a specific date
     const interval = setInterval(() => setDayState(computeDayState()), 60000);
     return () => clearInterval(interval);
-  }, []);
+  }, [previewParam]);
 
   useEffect(() => {
     loadShops(dayState.targetDate, dayState.isLiveSunday);
@@ -246,18 +260,36 @@ export default function SundayRadar() {
     for (const shop of shopsWithDist) {
       // Green only if live Sunday AND currently open, grey otherwise
       const color = (dayState.isLiveSunday && shop.isOpenNow) ? '#22c55e' : '#6b7280';
+      const ring = editMode ? '#f59e0b' : 'white';
       const icon = L.divIcon({
-        html: `<div style="width:18px;height:18px;background:${color};border-radius:50%;border:2.5px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.35)"></div>`,
+        html: `<div style="width:18px;height:18px;background:${color};border-radius:50%;border:2.5px solid ${ring};box-shadow:0 2px 8px rgba(0,0,0,0.35)"></div>`,
         iconSize: [18, 18], iconAnchor: [9, 9], className: ''
       });
-      const marker = L.marker([shop.lat, shop.lng], { icon })
+      const marker = L.marker([shop.lat, shop.lng], { icon, draggable: editMode })
         .addTo(map)
         .on('click', () => setSelectedShop(shop));
+      if (editMode) {
+        marker.on('dragend', async (e: any) => {
+          const { lat, lng } = e.target.getLatLng();
+          setShops(prev => prev.map(s => s.id === shop.id ? { ...s, lat, lng } : s));
+          if (!shop.id.startsWith('ap_')) {
+            toast.error(`${shop.name}: nije custom mjesto (ne mogu spremiti)`);
+            return;
+          }
+          const pid = shop.id.replace(/^ap_/, '');
+          const { error } = await supabase
+            .from('pending_places')
+            .update({ lat, lng })
+            .eq('id', pid);
+          if (error) toast.error(`Greška: ${error.message}`);
+          else toast.success(`✓ ${shop.name}: ${lat.toFixed(5)}, ${lng.toFixed(5)}`);
+        });
+      }
       markersRef.current.push(marker);
     }
 
     setShops(shopsWithDist);
-  }, [mapLoaded, shops.length, userLocation, dayState.isLiveSunday]);
+  }, [mapLoaded, shops.length, userLocation, dayState.isLiveSunday, editMode]);
 
   // Pan to user
   useEffect(() => {
@@ -352,6 +384,12 @@ export default function SundayRadar() {
         <div className={`p-3 rounded-2xl border text-center text-sm font-medium ${bannerColors[banner.variant]}`}>
           {banner.emoji} {banner.text}
         </div>
+        {previewParam && (
+          <div className="mt-2 p-2 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-500 text-xs text-center">
+            🛠️ Preview za <strong>{previewParam}</strong>
+            {editMode ? ' — povuci pin za fino podešavanje (auto-save)' : ' — prijavi se kao admin za uređivanje'}
+          </div>
+        )}
       </div>
 
       {/* Map */}
