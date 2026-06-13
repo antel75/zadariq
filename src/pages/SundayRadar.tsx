@@ -85,6 +85,7 @@ export default function SundayRadar() {
   const markersRef = useRef<any[]>([]);
   const shopRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const [highlightId, setHighlightId] = useState<string | null>(null);
+  const isEn = language === 'en';
 
   const [shops, setShops] = useState<ShopOnMap[]>([]);
   const [userLocation, setUserLocation] = useState<{lat: number; lng: number} | null>(null);
