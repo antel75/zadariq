@@ -297,11 +297,6 @@ export default function SundayRadar() {
         .on('click', () => {
           setSelectedShop(shop);
           setHighlightId(shop.id);
-          // Scroll to the shop card in the list
-          const el = shopRefs.current[shop.id];
-          if (el) {
-            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
           // Clear highlight after a moment
           window.setTimeout(() => setHighlightId(prev => (prev === shop.id ? null : prev)), 2200);
         });
