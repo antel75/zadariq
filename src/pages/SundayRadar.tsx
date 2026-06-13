@@ -336,7 +336,6 @@ export default function SundayRadar() {
 
   const openCount = shops.filter(s => s.isOpenNow).length;
   const shopCount = shops.length;
-  const isEn = language === 'en';
   const noData = !loading && shops.length === 0;
 
   const getBannerContent = () => {
