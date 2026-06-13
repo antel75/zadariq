@@ -86,6 +86,7 @@ export default function SundayRadar() {
   const shopRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const [highlightId, setHighlightId] = useState<string | null>(null);
   const isEn = language === 'en';
+  const didInitialCenterRef = useRef(false);
 
   const [shops, setShops] = useState<ShopOnMap[]>([]);
   const [userLocation, setUserLocation] = useState<{lat: number; lng: number} | null>(null);
@@ -323,12 +324,15 @@ export default function SundayRadar() {
     setShops(shopsWithDist);
   }, [mapLoaded, shops.length, userLocation, dayState.isLiveSunday, editMode, isEn]);
 
-  // Pan to user
+  // Pan to user only on first fix; subsequent location updates must not recenter
+  // (watchPosition emits frequently and would yank the map back while the user
+  // is panning, zooming or reading a popup).
   useEffect(() => {
-    if (leafletMapRef.current && userLocation) {
-      leafletMapRef.current.setView([userLocation.lat, userLocation.lng], 14);
-    }
-  }, [userLocation]);
+    if (!leafletMapRef.current || !userLocation) return;
+    if (didInitialCenterRef.current) return;
+    leafletMapRef.current.setView([userLocation.lat, userLocation.lng], 14);
+    didInitialCenterRef.current = true;
+  }, [userLocation, mapLoaded]);
 
   const openCount = shops.filter(s => s.isOpenNow).length;
   const shopCount = shops.length;
