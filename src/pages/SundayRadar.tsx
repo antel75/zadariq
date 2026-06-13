@@ -83,6 +83,8 @@ export default function SundayRadar() {
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMapRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
+  const shopRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const [highlightId, setHighlightId] = useState<string | null>(null);
 
   const [shops, setShops] = useState<ShopOnMap[]>([]);
   const [userLocation, setUserLocation] = useState<{lat: number; lng: number} | null>(null);
@@ -265,9 +267,43 @@ export default function SundayRadar() {
         html: `<div style="width:18px;height:18px;background:${color};border-radius:50%;border:2.5px solid ${ring};box-shadow:0 2px 8px rgba(0,0,0,0.35)"></div>`,
         iconSize: [18, 18], iconAnchor: [9, 9], className: ''
       });
+      const distTxt = shop.distance != null
+        ? (shop.distance >= 1000 ? `${(shop.distance / 1000).toFixed(1)} km` : `${shop.distance} m`)
+        : '';
+      const statusTxt = dayState.isLiveSunday
+        ? (shop.isOpenNow
+            ? `<span style="color:#22c55e;font-weight:600">● ${isEn ? 'Open' : 'Otvoreno'}</span>`
+            : `<span style="color:#9ca3af;font-weight:600">● ${isEn ? 'Closed' : 'Zatvoreno'}</span>`)
+        : '';
+      const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${shop.lat},${shop.lng}`;
+      const safeName = shop.name.replace(/</g, '&lt;');
+      const safeAddr = (shop.address || '').replace(/</g, '&lt;');
+      const popupHtml = `
+        <div style="min-width:200px;font-family:inherit">
+          <div style="font-weight:700;font-size:13px;color:#0f172a;margin-bottom:2px">${safeName}</div>
+          ${safeAddr ? `<div style="font-size:11px;color:#64748b;margin-bottom:6px">${safeAddr}</div>` : ''}
+          <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:#475569;margin-bottom:8px;flex-wrap:wrap">
+            <span>🕒 ${shop.open_time?.slice(0,5)}–${shop.close_time?.slice(0,5)}</span>
+            ${distTxt ? `<span>📍 ${distTxt}</span>` : ''}
+            ${statusTxt}
+          </div>
+          <a href="${navUrl}" target="_blank" rel="noopener" style="display:inline-block;background:#0ea5e9;color:white;font-size:12px;font-weight:600;padding:6px 12px;border-radius:8px;text-decoration:none">${isEn ? 'Navigate' : 'Navigiraj'}</a>
+        </div>
+      `;
       const marker = L.marker([shop.lat, shop.lng], { icon, draggable: editMode })
         .addTo(map)
-        .on('click', () => setSelectedShop(shop));
+        .bindPopup(popupHtml, { offset: [0, -6], closeButton: true, autoPan: true })
+        .on('click', () => {
+          setSelectedShop(shop);
+          setHighlightId(shop.id);
+          // Scroll to the shop card in the list
+          const el = shopRefs.current[shop.id];
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+          // Clear highlight after a moment
+          window.setTimeout(() => setHighlightId(prev => (prev === shop.id ? null : prev)), 2200);
+        });
       if (editMode) {
         marker.on('dragend', async (e: any) => {
           const { lat, lng } = e.target.getLatLng();
@@ -289,7 +325,7 @@ export default function SundayRadar() {
     }
 
     setShops(shopsWithDist);
-  }, [mapLoaded, shops.length, userLocation, dayState.isLiveSunday, editMode]);
+  }, [mapLoaded, shops.length, userLocation, dayState.isLiveSunday, editMode, isEn]);
 
   // Pan to user
   useEffect(() => {
@@ -453,8 +489,24 @@ export default function SundayRadar() {
         ) : (
           sortedShops.map(shop => (
             <div key={shop.id}
-              onClick={() => { setSelectedShop(shop); leafletMapRef.current?.setView([shop.lat, shop.lng], 16); }}
-              className="flex items-center gap-3 p-3 rounded-xl border border-border bg-card cursor-pointer hover:border-accent/40 transition-all">
+              ref={el => { shopRefs.current[shop.id] = el; }}
+              onClick={() => {
+                setSelectedShop(shop);
+                setHighlightId(shop.id);
+                leafletMapRef.current?.setView([shop.lat, shop.lng], 16);
+                // Open marker popup
+                const marker = markersRef.current.find((m: any) => {
+                  const ll = m.getLatLng?.();
+                  return ll && Math.abs(ll.lat - shop.lat) < 1e-6 && Math.abs(ll.lng - shop.lng) < 1e-6;
+                });
+                marker?.openPopup?.();
+                window.setTimeout(() => setHighlightId(prev => (prev === shop.id ? null : prev)), 2200);
+              }}
+              className={`flex items-center gap-3 p-3 rounded-xl border bg-card cursor-pointer transition-all ${
+                highlightId === shop.id
+                  ? 'border-accent ring-2 ring-accent/40 shadow-lg scale-[1.01]'
+                  : 'border-border hover:border-accent/40'
+              }`}>
               <span className={`w-3 h-3 rounded-full shrink-0 ${(dayState.isLiveSunday && shop.isOpenNow) ? 'bg-green-500' : 'bg-gray-400'}`} />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground truncate">{shop.name}</p>
