@@ -142,10 +142,12 @@ export default function ZadarQuest() {
     const newCompleted = [...completedCps, cp.id];
     setCompletedCps(newCompleted);
     if (progressId) {
-      await supabase.from('quest_progress').update({
-        total_points: totalPoints + pts,
-        checkpoints_completed: newCompleted
-      }).eq('id', progressId);
+      await supabase.rpc('update_quest_progress', {
+        p_id: progressId,
+        p_session_id: getSessionId(),
+        p_total_points: totalPoints + pts,
+        p_checkpoints_completed: newCompleted,
+      });
     }
   };
 
@@ -164,9 +166,13 @@ export default function ZadarQuest() {
   const completeQuest = async () => {
     setQuestState('completed');
     if (progressId) {
-      await supabase.from('quest_progress').update({
-        status: 'completed', completed_at: new Date().toISOString(), total_points: totalPoints
-      }).eq('id', progressId);
+      await supabase.rpc('update_quest_progress', {
+        p_id: progressId,
+        p_session_id: getSessionId(),
+        p_status: 'completed',
+        p_completed_at: new Date().toISOString(),
+        p_total_points: totalPoints,
+      });
     }
   };
 
