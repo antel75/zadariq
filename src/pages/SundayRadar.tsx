@@ -495,13 +495,14 @@ export default function SundayRadar() {
               onClick={() => {
                 setSelectedShop(shop);
                 setHighlightId(shop.id);
-                leafletMapRef.current?.setView([shop.lat, shop.lng], 16);
-                // Open marker popup
-                const marker = markersRef.current.find((m: any) => {
-                  const ll = m.getLatLng?.();
-                  return ll && Math.abs(ll.lat - shop.lat) < 1e-6 && Math.abs(ll.lng - shop.lng) < 1e-6;
-                });
-                marker?.openPopup?.();
+                if (shop.lat != null && shop.lng != null) {
+                  leafletMapRef.current?.setView([shop.lat, shop.lng], 16);
+                  const marker = markersRef.current.find((m: any) => {
+                    const ll = m.getLatLng?.();
+                    return ll && Math.abs(ll.lat - shop.lat!) < 1e-6 && Math.abs(ll.lng - shop.lng!) < 1e-6;
+                  });
+                  marker?.openPopup?.();
+                }
                 window.setTimeout(() => setHighlightId(prev => (prev === shop.id ? null : prev)), 2200);
               }}
               className={`flex items-center gap-3 p-3 rounded-xl border bg-card cursor-pointer transition-all ${
