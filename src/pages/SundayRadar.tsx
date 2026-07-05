@@ -22,8 +22,8 @@ interface ShopOnMap {
   id: string;
   name: string;
   address: string;
-  lat: number;
-  lng: number;
+  lat: number | null;
+  lng: number | null;
   open_time: string;
   close_time: string;
   isOpenNow: boolean;
