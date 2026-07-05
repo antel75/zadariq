@@ -22,8 +22,8 @@ interface ShopOnMap {
   id: string;
   name: string;
   address: string;
-  lat: number;
-  lng: number;
+  lat: number | null;
+  lng: number | null;
   open_time: string;
   close_time: string;
   isOpenNow: boolean;
@@ -208,15 +208,15 @@ export default function SundayRadar() {
         const biz = businesses.find(b => b.id === entry.business_id);
         if (biz) info = { name: biz.name, address: biz.address || '', lat: (biz as any).lat ?? null, lng: (biz as any).lng ?? null };
       }
-      if (!info || info.lat == null || info.lng == null) continue;
+      if (!info) continue;
       const openT = entry.open_time || '08:00';
       const closeT = entry.close_time || '21:00';
       result.push({
         id: entry.business_id,
         name: info.name,
         address: info.address,
-        lat: info.lat,
-        lng: info.lng,
+        lat: info.lat as any,
+        lng: info.lng as any,
         open_time: openT,
         close_time: closeT,
         isOpenNow: isLive ? isOpenNow(openT, closeT) : false,
@@ -258,10 +258,13 @@ export default function SundayRadar() {
 
     const shopsWithDist = shops.map(s => ({
       ...s,
-      distance: userLocation ? getDistance(userLocation.lat, userLocation.lng, s.lat, s.lng) : undefined
+      distance: (userLocation && s.lat != null && s.lng != null)
+        ? getDistance(userLocation.lat, userLocation.lng, s.lat, s.lng)
+        : undefined
     }));
 
     for (const shop of shopsWithDist) {
+      if (shop.lat == null || shop.lng == null) continue;
       // Green only if live Sunday AND currently open, grey otherwise
       const color = (dayState.isLiveSunday && shop.isOpenNow) ? '#22c55e' : '#6b7280';
       const ring = editMode ? '#f59e0b' : 'white';
@@ -492,13 +495,14 @@ export default function SundayRadar() {
               onClick={() => {
                 setSelectedShop(shop);
                 setHighlightId(shop.id);
-                leafletMapRef.current?.setView([shop.lat, shop.lng], 16);
-                // Open marker popup
-                const marker = markersRef.current.find((m: any) => {
-                  const ll = m.getLatLng?.();
-                  return ll && Math.abs(ll.lat - shop.lat) < 1e-6 && Math.abs(ll.lng - shop.lng) < 1e-6;
-                });
-                marker?.openPopup?.();
+                if (shop.lat != null && shop.lng != null) {
+                  leafletMapRef.current?.setView([shop.lat, shop.lng], 16);
+                  const marker = markersRef.current.find((m: any) => {
+                    const ll = m.getLatLng?.();
+                    return ll && Math.abs(ll.lat - shop.lat!) < 1e-6 && Math.abs(ll.lng - shop.lng!) < 1e-6;
+                  });
+                  marker?.openPopup?.();
+                }
                 window.setTimeout(() => setHighlightId(prev => (prev === shop.id ? null : prev)), 2200);
               }}
               className={`flex items-center gap-3 p-3 rounded-xl border bg-card cursor-pointer transition-all ${
