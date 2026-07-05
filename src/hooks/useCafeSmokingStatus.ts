@@ -85,31 +85,13 @@ export function useCafeSmokingStatus(businessId: string) {
 
     const fingerprint = getFingerprint();
 
-    // Check 30-day cooldown per business per fingerprint
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString();
-    const { data: recent } = await supabase
-      .from('cafe_smoking_reports')
-      .select('id')
-      .eq('business_id', businessId)
-      .eq('fingerprint_hash', fingerprint)
-      .gte('created_at', thirtyDaysAgo)
-      .limit(1);
-
-    if (recent && recent.length > 0) {
-      setCooldown(true);
-      setSubmitting(false);
-      return;
-    }
-
-    // Check rate limit: max 5 reports in 10 min
-    const tenMinAgo = new Date(Date.now() - 10 * 60000).toISOString();
-    const { data: recentAll } = await supabase
-      .from('cafe_smoking_reports')
-      .select('id')
-      .eq('fingerprint_hash', fingerprint)
-      .gte('created_at', tenMinAgo);
-
-    if (recentAll && recentAll.length >= 5) {
+    // Cooldown + rate-limit checked server-side (RPC hides fingerprint_hash from public reads)
+    const { data: guard } = await supabase.rpc('check_cafe_smoking_cooldown', {
+      p_business_id: businessId,
+      p_fingerprint: fingerprint,
+    });
+    const g = (guard as { business_cooldown?: boolean; rate_limited?: boolean } | null) || {};
+    if (g.business_cooldown || g.rate_limited) {
       setCooldown(true);
       setSubmitting(false);
       return;

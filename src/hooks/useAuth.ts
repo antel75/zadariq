@@ -28,10 +28,12 @@ const emit = () => {
 
 const checkAdminRole = async (userId: string) => {
   try {
-    const { data, error } = await supabase.rpc('has_role', {
-      _user_id: userId,
-      _role: 'admin',
-    });
+    const { data, error } = await supabase
+      .from('user_roles')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('role', 'admin')
+      .maybeSingle();
 
     return error ? false : !!data;
   } catch {
