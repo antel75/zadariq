@@ -208,15 +208,15 @@ export default function SundayRadar() {
         const biz = businesses.find(b => b.id === entry.business_id);
         if (biz) info = { name: biz.name, address: biz.address || '', lat: (biz as any).lat ?? null, lng: (biz as any).lng ?? null };
       }
-      if (!info || info.lat == null || info.lng == null) continue;
+      if (!info) continue;
       const openT = entry.open_time || '08:00';
       const closeT = entry.close_time || '21:00';
       result.push({
         id: entry.business_id,
         name: info.name,
         address: info.address,
-        lat: info.lat,
-        lng: info.lng,
+        lat: info.lat as any,
+        lng: info.lng as any,
         open_time: openT,
         close_time: closeT,
         isOpenNow: isLive ? isOpenNow(openT, closeT) : false,
