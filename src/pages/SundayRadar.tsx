@@ -258,10 +258,13 @@ export default function SundayRadar() {
 
     const shopsWithDist = shops.map(s => ({
       ...s,
-      distance: userLocation ? getDistance(userLocation.lat, userLocation.lng, s.lat, s.lng) : undefined
+      distance: (userLocation && s.lat != null && s.lng != null)
+        ? getDistance(userLocation.lat, userLocation.lng, s.lat, s.lng)
+        : undefined
     }));
 
     for (const shop of shopsWithDist) {
+      if (shop.lat == null || shop.lng == null) continue;
       // Green only if live Sunday AND currently open, grey otherwise
       const color = (dayState.isLiveSunday && shop.isOpenNow) ? '#22c55e' : '#6b7280';
       const ring = editMode ? '#f59e0b' : 'white';
