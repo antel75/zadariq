@@ -1699,14 +1699,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
+      check_cafe_smoking_cooldown: {
+        Args: { p_business_id: string; p_fingerprint: string }
+        Returns: Json
       }
       increment_poll_vote: { Args: { p_option_id: string }; Returns: undefined }
+      update_quest_progress: {
+        Args: {
+          p_checkpoints_completed?: Json
+          p_completed_at?: string
+          p_id: string
+          p_session_id: string
+          p_status?: string
+          p_total_points?: number
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
