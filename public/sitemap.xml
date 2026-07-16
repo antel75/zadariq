@@ -46,6 +46,7 @@
   <url><loc>https://zadariq.lovable.app/public-services/centar-socijalna-skrb</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://zadariq.lovable.app/public-services/dom-zdravlja</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://zadariq.lovable.app/public-services/opca-bolnica</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_d1f91147-f29b-46a9-9a8e-3f4c0f601d94</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://zadariq.lovable.app/business/ap_4dd4ed62-f239-436a-85d9-798a90abc1e7</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://zadariq.lovable.app/business/ap_0d1c93a1-913f-4caf-855d-013d25bc5d72</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://zadariq.lovable.app/business/ap_0fb953df-3a00-4288-a8a5-8f0fb7a8e8fd</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
@@ -63,9 +64,12 @@
   <url><loc>https://zadariq.lovable.app/business/ap_7c9d1fc8-8d4e-47db-a77e-7e7e566ff9ae</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://zadariq.lovable.app/business/ap_279519ee-edde-4c6d-a930-1564dc591083</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://zadariq.lovable.app/business/ap_15e692e1-ccd9-4092-b220-5c5fae517b2b</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_2a9c9f8c-749e-46d4-aa55-cfbe43ecb1fc</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://zadariq.lovable.app/business/ap_d78793d5-624d-4388-8703-73bf66480c6e</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://zadariq.lovable.app/business/ap_801f956f-7539-45e8-8ff5-a94ccf1fddc7</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_864a0cce-68ad-4b3c-bae8-5b931cb6b225</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://zadariq.lovable.app/business/ap_5a06c8cf-76d8-4102-b21c-bf59bb6f193e</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_3d1ce7f5-eca3-4a63-84d3-705e3e4f8cf7</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://zadariq.lovable.app/business/ap_580d9170-813d-4727-8995-46f39e535536</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://zadariq.lovable.app/business/ap_9e405a09-4305-45a2-a0e5-0750bcc001a1</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://zadariq.lovable.app/business/ap_6af7ef24-1f35-4bcb-87eb-412a2004299c</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
@@ -131,6 +135,7 @@
   <url><loc>https://zadariq.lovable.app/business/ap_fde6393f-0574-489a-8357-550f4b2fb94b</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://zadariq.lovable.app/business/ap_eac3d632-2ab1-4f16-9a84-8aa862980adf</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://zadariq.lovable.app/business/ap_10c4f1f2-112d-4c3f-9acc-e5abf113aa46</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_c8e8a570-31f5-47a4-a397-c11e29eb2b43</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://zadariq.lovable.app/business/ap_c3e99d10-eb2d-4839-b7c3-7171994700cf</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://zadariq.lovable.app/business/ap_fe0813d1-0390-4b61-ada7-dd46f2df87e5</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://zadariq.lovable.app/business/ap_37758ae7-f33d-46a1-a960-ee189b13dbe0</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
@@ -154,6 +159,8 @@
   <url><loc>https://zadariq.lovable.app/business/ap_a832abbc-5cf6-4b19-bd39-f2bfd8f5de33</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://zadariq.lovable.app/business/ap_ad8d4435-168a-4dbd-8f0c-713bfbfb2872</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://zadariq.lovable.app/business/ap_95b2da07-c713-4b26-900d-089fdcb70ca4</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_80c534a4-6650-4a94-bf3f-9d2821934936</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_44b80ba0-ade0-4aa4-bc65-8e4295c50dcb</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://zadariq.lovable.app/business/ap_08535ca9-e50a-4f19-98b5-6aa8ea276df3</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://zadariq.lovable.app/business/ap_e80c9d9c-aa59-438c-ba4a-6284edc176f7</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://zadariq.lovable.app/business/ap_c577ef35-578e-4bd2-9d7c-b88494b20c87</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
@@ -168,6 +175,7 @@
   <url><loc>https://zadariq.lovable.app/business/ap_77d00615-a489-415b-a57d-7cff5162a820</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://zadariq.lovable.app/business/ap_dd5f1bec-9e10-473c-8368-28e1bfcb4240</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://zadariq.lovable.app/business/ap_4eac7f8d-3358-4510-a4d0-d6229bc224c6</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_01d9c7b1-8b8e-49c4-901e-eaf76f420b80</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://zadariq.lovable.app/business/ap_259a43f8-fc75-4b7e-8109-34788efd6723</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://zadariq.lovable.app/business/ap_ac81c486-1bb8-44c0-8c99-3ccb0cdfe516</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://zadariq.lovable.app/business/ap_7e6b71f4-459e-47fe-8adb-f0a799de1888</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
@@ -235,4 +243,79 @@
   <url><loc>https://zadariq.lovable.app/business/ap_e06c0b9d-53ce-41db-9d2a-0b9b611b0dcd</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://zadariq.lovable.app/business/ap_6b8c9f49-d664-45a7-bebf-321f38b35d51</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://zadariq.lovable.app/business/ap_fe93e373-dc34-4a7e-908c-156202b41422</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_3cad7408-25ed-49d2-ba26-94a09eddef26</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_73d93880-5328-4e93-a112-4da660859c3f</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_81bae21f-bc96-4d67-9b97-5df754b20da5</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_4d159725-5b26-4035-bb82-1d5f98d88395</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_c19207e7-4ccb-4623-9a89-d62127c36840</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_8f03a308-6e43-40c4-aab2-9b0153de037e</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_7e9d5dbf-20c1-45e7-8cd2-2ecde85a6152</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_63404fe8-be93-458d-a040-ae35a987f268</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_1bb33968-8674-4c6d-8b49-e9b9fc1cf52e</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_d7314ed8-fc57-456f-b951-b9fa15a0d9a4</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_4376972e-2d53-44cc-a440-3c8c58cee475</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_46222ca2-32dd-48f6-b35e-e6e9e70c28c8</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_994df81d-5061-4fc8-b71a-41f964115474</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_102b84b1-49c5-42d6-8850-990a85ec4a7b</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_96798777-2edd-44a8-a490-70e52cbaee00</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_d00b03ee-40ab-4447-8f9a-421102894099</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_1c4c670d-d9aa-4830-8db5-07299b89fc54</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_34291180-f4cd-4ddd-9ad4-6186addd0636</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_8b6d3952-2220-4d9a-9b38-8a9fc498708f</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_7513b38d-d0e8-4859-9056-9883ae0b4661</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_e70eb473-9607-4d1e-8795-01e6e62baa21</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_381cdf11-97aa-4740-aa61-d68630d00c05</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_e3088bfa-c638-42d9-a14b-bb226c93ab46</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_aa87df2e-5f0a-4576-a682-81fcb41bfc05</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_201068c4-7264-4f74-8b88-5383c8414e2d</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_aab824a0-3c7a-4ee3-a54f-1d245e31ec70</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_ea129f75-be0d-4bdd-a309-843a456ead30</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_667806a1-150b-467e-bfa2-a3a5d437f31c</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_e4ed3842-874b-4eba-a236-813ca1973f04</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_744359c8-16d7-4231-858c-45940aa23086</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_00661c09-f140-445b-a497-de3ad6fc4df1</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_c5d03738-e3cc-429e-b737-af1275fcc4a4</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_9e9e1b25-f453-49dd-bdeb-95b90c38ce52</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_dcedb69e-fc15-4ba1-8889-b9ae7c2da523</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_d5308b58-eda9-4fcd-aa18-824835b6b595</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_44673f4f-d16c-41d5-bf47-ff9fb99ac73c</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_0c4efd6b-57d0-44c8-aa45-3b75b6d6f404</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_df638727-11ea-491b-9605-6164f110d3f7</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_f66d4965-5934-4f64-ae93-ce0e0a462b30</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_5996488f-fd03-48bc-b70a-14e840ebd127</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_351455cb-7554-49e4-b921-db92851efbe5</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_0be7ab63-8bad-43a6-b85b-0782e15a94ee</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_b5a7aa04-2129-47be-9daf-feb32f0e3beb</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_cec0490a-4c49-4c53-980d-710a301f26e7</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_b11ca89e-0f0a-4c18-9201-e39e28a6e3eb</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_da83c913-238b-4e4f-a5f7-78646429dd25</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_6106ff33-b0c4-4140-963c-97dcfd81d853</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_6865b779-ed68-429b-990c-a8f17b9234a9</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_387b64f1-d0cb-457c-8bf9-a8a7ee6fc8b7</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_e0de7284-7f45-45ca-8795-5edb32e73743</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_17b8e163-31e6-4250-9564-ae713fd13edd</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_f5863122-4818-400c-b7b5-cacd8db9ab8d</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_9fe4f731-d50e-4328-93f8-3bb420ba8a99</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_6bf7ebac-d4fd-4295-8f01-c83953c7898a</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_8132a515-5604-4657-b4bd-453d96352c47</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_a332e56f-85bb-42af-a8dd-5857b1bc3f01</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_612ccadc-edf7-4d2f-b6af-a9f52a6447bf</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_ffffcc76-9568-478a-81a5-c870a4cfd5b7</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_ac918e82-4076-4b65-9f5b-00a834f9972c</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_2446ff79-5eb8-4783-916c-3e8076a206e0</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_d6c828fb-4fef-481d-b46a-287c26fb9216</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_1e92defb-1b89-48fc-bddb-a014c0226114</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_3a01f928-646a-40d5-abeb-e8c5e0aa74f1</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_b20cc7e7-0dac-4b2b-9959-4d0e50eaa6a6</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_c302978b-cd33-46fe-ab8b-9208415e37fc</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_b5d22178-d666-4773-bc26-912f36b696fb</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_ae55ce13-85f1-4fdb-b08d-b8fac21ef334</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_02d09716-98fd-46cf-a3d2-b027678856c4</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_67a7202b-e060-4319-ab56-8eec23e0f974</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_0355824e-2f27-4f7d-9997-51414cf30588</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_fe0741a5-9e74-4ff6-8f2d-1a4d5443abc0</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_2626aa18-a381-44d1-a0e6-82b6919871dd</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_5e69c52c-25fd-4841-8196-5baa6eed92ff</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_8858a913-a981-456d-adea-1d8d457091d3</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://zadariq.lovable.app/business/ap_117c4c65-060e-498c-b0cd-6ff4a46225b4</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
 </urlset>
