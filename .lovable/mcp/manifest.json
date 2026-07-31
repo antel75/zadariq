@@ -1,0 +1,120 @@
+{
+  "version": 1,
+  "sdk_version": "0.26.1",
+  "path": "/functions/v1/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://yxfaovaigwdbziewnppx.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "zadariq-mcp",
+      "version": "0.1.0",
+      "title": "ZadarIQ"
+    },
+    "tools": [
+      {
+        "name": "sunday_open_shops",
+        "title": "Shops open on Sunday",
+        "description": "List shops in Zadar that work on a given working Sunday, with address and opening hours. Defaults to the upcoming Sunday.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "sunday_date": {
+              "description": "Sunday date in YYYY-MM-DD format. Defaults to the upcoming Sunday.",
+              "type": "string"
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "city_alerts",
+        "title": "Active city alerts",
+        "description": "List currently active alerts for Zadar (traffic, outages, weather, earthquakes), sorted by priority.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "limit": {
+              "description": "Maximum number of alerts to return (default 10).",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "city_events",
+        "title": "Upcoming city events",
+        "description": "List upcoming events in Zadar and the surrounding region.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "days_ahead": {
+              "description": "How many days ahead to look (default 14).",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "category": {
+              "description": "Optional category filter.",
+              "type": "string"
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "search_places",
+        "title": "Search places",
+        "description": "Search approved places in Zadar (shops, cafes, services) by name or address. Returns address and coordinates.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "Name or address fragment to search for."
+            },
+            "category": {
+              "description": "Optional category filter, e.g. shop, cafes, pharmacy.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "query"
+          ]
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
