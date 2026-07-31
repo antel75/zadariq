@@ -46,6 +46,7 @@ import Privacy from "./pages/Privacy";
 import Events from "./pages/Events";
 import EmailConfirmed from "./pages/EmailConfirmed";
 import ResetPassword from "./pages/ResetPassword";
+import OAuthConsent from "./pages/OAuthConsent";
 
 const DataSources = lazy(() => import("./pages/DataSources"));
 
@@ -99,6 +100,7 @@ const App = () => (
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/email-confirmed" element={<EmailConfirmed />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <LegalNoticeBar />
