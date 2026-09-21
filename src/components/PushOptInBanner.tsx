@@ -147,7 +147,9 @@ export function PushOptInBanner() {
               ) : busy ? (
                 hr ? 'Uključujem…' : 'Enabling…'
               ) : hr ? (
-                'Dopusti obavijesti' : 'Allow notifications'
+                'Dopusti obavijesti'
+              ) : (
+                'Allow notifications'
               )}
             </Button>
             <button
