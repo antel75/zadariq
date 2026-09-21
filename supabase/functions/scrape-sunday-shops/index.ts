@@ -271,7 +271,7 @@ Deno.serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
-    const message = e instanceof Error ? e.message : String(e);
+    const message = e instanceof Error ? e.message : JSON.stringify(e);
     console.error("scrape-sunday-shops failed:", message);
 
     const { data: prev } = await supabase
