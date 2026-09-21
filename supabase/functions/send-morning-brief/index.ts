@@ -88,8 +88,8 @@ Deno.serve(async (req) => {
     // ── Send ──
     webpush.setVapidDetails(
       "mailto:admin@zadariq.city",
-      Deno.env.get("VAPID_PUBLIC_KEY")!,
-      Deno.env.get("VAPID_PRIVATE_KEY")!,
+      Deno.env.get("VAPID_PUBLIC_KEY_V2") ?? Deno.env.get("VAPID_PUBLIC_KEY")!,
+      Deno.env.get("VAPID_PRIVATE_KEY_V2") ?? Deno.env.get("VAPID_PRIVATE_KEY")!,
     );
 
     const { data: subs, error } = await supabase.from("push_subscriptions").select("*");
