@@ -40,7 +40,7 @@ export function SundayRadarBanner() {
   return (
     <div className="px-4 mb-4">
       <button
-        onClick={() => navigate('/sunday-radar')}
+        onClick={() => navigate('/radar?layer=sunday')}
         className="relative w-full overflow-hidden rounded-2xl"
         style={{
           background: 'linear-gradient(135deg, rgba(15,20,30,0.97) 0%, rgba(20,28,45,0.97) 50%, rgba(15,20,30,0.97) 100%)',
