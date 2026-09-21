@@ -16,8 +16,8 @@ Deno.serve(async (req) => {
   try {
     webpush.setVapidDetails(
       "mailto:admin@zadariq.city",
-      Deno.env.get("VAPID_PUBLIC_KEY")!,
-      Deno.env.get("VAPID_PRIVATE_KEY")!
+      Deno.env.get("VAPID_PUBLIC_KEY_V2") ?? Deno.env.get("VAPID_PUBLIC_KEY")!,
+      Deno.env.get("VAPID_PRIVATE_KEY_V2") ?? Deno.env.get("VAPID_PRIVATE_KEY")!
     );
 
     const supabase = createClient(

@@ -49,6 +49,7 @@ import ResetPassword from "./pages/ResetPassword";
 import OAuthConsent from "./pages/OAuthConsent";
 
 const DataSources = lazy(() => import("./pages/DataSources"));
+const ZadarDanas = lazy(() => import("./pages/ZadarDanas"));
 
 const queryClient = new QueryClient();
 
@@ -84,6 +85,7 @@ const App = () => (
               <Route path="/ev-chargers" element={<EvChargers />} />
               <Route path="/data-sources" element={<Suspense fallback={null}><DataSources /></Suspense>} />
               <Route path="/events" element={<Events />} />
+              <Route path="/danas" element={<Suspense fallback={null}><ZadarDanas /></Suspense>} />
               <Route path="/znamenitosti" element={<Znamenitosti />} />
               <Route path="/quest" element={<ZadarQuest />} />
               <Route path="/sunday-radar" element={<SundayRadar />} />
