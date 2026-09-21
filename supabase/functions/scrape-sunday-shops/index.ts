@@ -90,6 +90,15 @@ function addressKey(raw: string): string {
   return `${last}|${num ? num[0] : ""}`;
 }
 
+function brandToken(name: string): string {
+  const n = stripDiacritics(name.toLowerCase()).replace(/[^a-z0-9 ]/g, " ").trim();
+  return n.split(/\s+/)[0] || "";
+}
+
+function matchKey(name: string, address: string): string {
+  return `${brandToken(name)}|${addressKey(address)}`;
+}
+
 function zagrebNow(): Date {
   return new Date(new Date().toLocaleString("en-US", { timeZone: "Europe/Zagreb" }));
 }
@@ -160,11 +169,11 @@ Deno.serve(async (req) => {
       .eq("status", "approved")
       .limit(2000);
 
-    const index = new Map<string, string>(); // addressKey -> place id
+    const index = new Map<string, string>(); // brand + addressKey -> place id
     for (const p of places || []) {
       if (!p.proposed_address) continue;
-      const key = addressKey(p.proposed_address);
-      if (key !== "|" && !index.has(key)) index.set(key, p.id as string);
+      const key = matchKey(String(p.proposed_name || ""), p.proposed_address);
+      if (!index.has(key)) index.set(key, p.id as string);
     }
 
     const rows: Record<string, unknown>[] = [];
@@ -176,7 +185,7 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      const key = addressKey(shop.address);
+      const key = matchKey(shop.brand, shop.address);
       let placeId = index.get(key);
 
       if (!placeId) {
@@ -222,16 +231,20 @@ Deno.serve(async (req) => {
       });
     }
 
-    if (rows.length > 0) {
+    const deduped = Array.from(
+      new Map(rows.map((r) => [r.business_id as string, r])).values(),
+    );
+
+    if (deduped.length > 0) {
       const { error } = await supabase
         .from("shop_sunday_schedule")
-        .upsert(rows, { onConflict: "business_id,sunday_date" });
+        .upsert(deduped, { onConflict: "business_id,sunday_date" });
       if (error) throw error;
     }
 
     // Remove stale auto-scraped rows for this Sunday that are no longer listed.
     // Manually entered rows (source = 'manual') are never touched.
-    const keep = rows.map((r) => r.business_id as string);
+    const keep = deduped.map((r) => r.business_id as string);
     const del = supabase
       .from("shop_sunday_schedule")
       .delete()
@@ -266,7 +279,7 @@ Deno.serve(async (req) => {
         matched,
         created,
         skipped,
-        saved: rows.length,
+        saved: deduped.length,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
