@@ -242,7 +242,7 @@ export default function ZadarDanas() {
         </Card>
 
         {/* Sunday */}
-        <Card onClick={() => navigate('/sunday-radar')}>
+        <Card onClick={() => navigate('/radar?layer=sunday')}>
           <Row icon={<ShoppingCart className="h-4 w-4" />} title={lang === 'hr' ? 'Radna nedjelja' : 'Sunday shopping'} action>
             <p className="text-sm text-foreground">
               {sundayCount > 0
