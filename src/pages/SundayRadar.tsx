@@ -93,6 +93,7 @@ export default function SundayRadar() {
   const [loading, setLoading] = useState(true);
   const [selectedShop, setSelectedShop] = useState<ShopOnMap | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [sourceInfo, setSourceInfo] = useState<{ source: string; url: string | null; checkedAt: string } | null>(null);
   const [dayState, setDayState] = useState(() => {
     const base = computeDayState();
     if (previewParam && /^\d{4}-\d{2}-\d{2}$/.test(previewParam)) {
@@ -224,6 +225,18 @@ export default function SundayRadar() {
     }
     setShops(result);
     setLoading(false);
+
+    // Izvor i vrijeme zadnje provjere (automatski scraper)
+    const scraped = entries.find(e => (e as any).source && (e as any).source !== 'manual' && (e as any).fetched_at);
+    if (scraped) {
+      setSourceInfo({
+        source: (scraped as any).source,
+        url: (scraped as any).source_url ?? null,
+        checkedAt: (scraped as any).fetched_at,
+      });
+    } else {
+      setSourceInfo(null);
+    }
   };
 
   // Init map
