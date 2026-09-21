@@ -93,6 +93,7 @@ export default function SundayRadar() {
   const [loading, setLoading] = useState(true);
   const [selectedShop, setSelectedShop] = useState<ShopOnMap | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [sourceInfo, setSourceInfo] = useState<{ source: string; url: string | null; checkedAt: string } | null>(null);
   const [dayState, setDayState] = useState(() => {
     const base = computeDayState();
     if (previewParam && /^\d{4}-\d{2}-\d{2}$/.test(previewParam)) {
@@ -224,6 +225,18 @@ export default function SundayRadar() {
     }
     setShops(result);
     setLoading(false);
+
+    // Izvor i vrijeme zadnje provjere (automatski scraper)
+    const scraped = entries.find(e => (e as any).source && (e as any).source !== 'manual' && (e as any).fetched_at);
+    if (scraped) {
+      setSourceInfo({
+        source: (scraped as any).source,
+        url: (scraped as any).source_url ?? null,
+        checkedAt: (scraped as any).fetched_at,
+      });
+    } else {
+      setSourceInfo(null);
+    }
   };
 
   // Init map
@@ -427,6 +440,26 @@ export default function SundayRadar() {
             🛠️ Preview za <strong>{previewParam}</strong>
             {editMode ? ' — povuci pin za fino podešavanje (auto-save)' : ' — prijavi se kao admin za uređivanje'}
           </div>
+        )}
+        {sourceInfo && (
+          <p className="mt-2 text-[10px] text-muted-foreground text-center">
+            {isEn ? 'Source' : 'Izvor'}:{' '}
+            {sourceInfo.url ? (
+              <a href={sourceInfo.url} target="_blank" rel="noopener noreferrer" className="underline">
+                {sourceInfo.source}
+              </a>
+            ) : (
+              sourceInfo.source
+            )}{' '}
+            · {isEn ? 'checked' : 'provjereno'}{' '}
+            {new Date(sourceInfo.checkedAt).toLocaleString(isEn ? 'en-GB' : 'hr-HR', {
+              timeZone: 'Europe/Zagreb',
+              day: '2-digit',
+              month: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </p>
         )}
       </div>
 
