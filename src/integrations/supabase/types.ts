@@ -1348,9 +1348,12 @@ export type Database = {
           business_id: string
           close_time: string | null
           created_at: string
+          fetched_at: string | null
           id: string
           notes: string | null
           open_time: string | null
+          source: string
+          source_url: string | null
           sunday_date: string
           updated_at: string
         }
@@ -1358,9 +1361,12 @@ export type Database = {
           business_id: string
           close_time?: string | null
           created_at?: string
+          fetched_at?: string | null
           id?: string
           notes?: string | null
           open_time?: string | null
+          source?: string
+          source_url?: string | null
           sunday_date: string
           updated_at?: string
         }
@@ -1368,9 +1374,12 @@ export type Database = {
           business_id?: string
           close_time?: string | null
           created_at?: string
+          fetched_at?: string | null
           id?: string
           notes?: string | null
           open_time?: string | null
+          source?: string
+          source_url?: string | null
           sunday_date?: string
           updated_at?: string
         }
@@ -1580,6 +1589,51 @@ export type Database = {
           id?: string
           name?: string
           sport?: string
+        }
+        Relationships: []
+      }
+      sunday_scrape_status: {
+        Row: {
+          consecutive_failures: number
+          created_count: number
+          id: string
+          last_run_at: string
+          matched_count: number
+          message: string | null
+          ok: boolean
+          parsed_count: number
+          skipped_count: number
+          source_url: string | null
+          sunday_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          consecutive_failures?: number
+          created_count?: number
+          id: string
+          last_run_at?: string
+          matched_count?: number
+          message?: string | null
+          ok?: boolean
+          parsed_count?: number
+          skipped_count?: number
+          source_url?: string | null
+          sunday_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          consecutive_failures?: number
+          created_count?: number
+          id?: string
+          last_run_at?: string
+          matched_count?: number
+          message?: string | null
+          ok?: boolean
+          parsed_count?: number
+          skipped_count?: number
+          source_url?: string | null
+          sunday_date?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
