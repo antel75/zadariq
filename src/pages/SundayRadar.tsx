@@ -441,6 +441,26 @@ export default function SundayRadar() {
             {editMode ? ' — povuci pin za fino podešavanje (auto-save)' : ' — prijavi se kao admin za uređivanje'}
           </div>
         )}
+        {sourceInfo && (
+          <p className="mt-2 text-[10px] text-muted-foreground text-center">
+            {isEn ? 'Source' : 'Izvor'}:{' '}
+            {sourceInfo.url ? (
+              <a href={sourceInfo.url} target="_blank" rel="noopener noreferrer" className="underline">
+                {sourceInfo.source}
+              </a>
+            ) : (
+              sourceInfo.source
+            )}{' '}
+            · {isEn ? 'checked' : 'provjereno'}{' '}
+            {new Date(sourceInfo.checkedAt).toLocaleString(isEn ? 'en-GB' : 'hr-HR', {
+              timeZone: 'Europe/Zagreb',
+              day: '2-digit',
+              month: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </p>
+        )}
       </div>
 
       {/* Map */}
