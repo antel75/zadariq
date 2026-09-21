@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { LegalNoticeBar } from "@/components/LegalNoticeBar";
@@ -31,7 +31,7 @@ import EvChargers from "./pages/EvChargers";
 import NotFound from "./pages/NotFound";
 import Znamenitosti from "./pages/Znamenitosti";
 import ZadarQuest from "./pages/ZadarQuest";
-import SundayRadar from "./pages/SundayRadar";
+const CityRadar = lazy(() => import("./pages/CityRadar"));
 import Place from "./pages/Place";
 import Join from "./pages/Join";
 import OwnerLogin from "./pages/owner/Login";
@@ -88,7 +88,8 @@ const App = () => (
               <Route path="/danas" element={<Suspense fallback={null}><ZadarDanas /></Suspense>} />
               <Route path="/znamenitosti" element={<Znamenitosti />} />
               <Route path="/quest" element={<ZadarQuest />} />
-              <Route path="/sunday-radar" element={<SundayRadar />} />
+              <Route path="/radar" element={<Suspense fallback={null}><CityRadar /></Suspense>} />
+              <Route path="/sunday-radar" element={<Navigate to="/radar?layer=sunday" replace />} />
               <Route path="/place" element={<Place />} />
               <Route path="/join" element={<Join />} />
               <Route path="/owner/login" element={<OwnerLogin />} />

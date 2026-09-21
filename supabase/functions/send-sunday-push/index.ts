@@ -38,7 +38,7 @@ Deno.serve(async (req) => {
     const payload = JSON.stringify({
       title: "🛒 Sunday Radar",
       body: "Provjeri koji dućani rade sutra →",
-      url: "/sunday-radar",
+      url: "/radar?layer=sunday",
     });
 
     for (const sub of subs || []) {

@@ -173,3 +173,7 @@
     box-shadow: 0 8px 24px -8px hsl(187 72% 50% / 0.1);
   }
 }
+
+/* Horizontal layer chips on the radar map */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
