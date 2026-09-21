@@ -1,93 +1,64 @@
+# Karta kao glavna stvar u ZadarIQ-u
 
+Sunday radar prestaje biti "stranica za nedjelju" i postaje **živa karta grada** — glavni ekran na koji se ljudi vraćaju svaki dan. Nedjelja ostaje najjači sloj, ali samo jedan od više.
 
-# ZadarIQ — Smart City Assistant for Zadar
+## Zašto ovako
 
-## Overview
-A mobile-first web app that gives residents and tourists instant access to local business info, services, and emergency contacts in Zadar, Croatia. Designed for speed and simplicity — answers in under 5 seconds.
+Nedjelja je vrijedna 4 mjeseca u godini. Karta "što je sad otvoreno oko mene" vrijedna je svaki dan. Isti podaci, isto sučelje — samo širi razlog za dolazak.
 
----
+## Kako izgleda
 
-## Pages & Navigation
+Puni ekran karte, bez stranice koja se skrola ispod. Tri sloja sučelja:
 
-### 1. Home Screen (Main Experience)
-- Large search bar at top: *"Pitaj Zadar bilo što… / Ask Zadar anything…"*
-- Horizontal scrollable category buttons (Pharmacy, Doctor, Shops, Restaurants, Cafes, Parking, Transport, Emergency, Events, Public Services)
-- Below: trending/popular searches and nearby highlights
-- Language selector in top corner (HR / EN / DE / IT) with auto-detection
+```text
+┌─────────────────────────────┐
+│ [Otvoreno] [Nedjelja] [Gorivo]│ <- trake slojeva (horizontalno)
+│                             │
+│         K A R T A           │ <- puni ekran, pinovi grupirani
+│                             │
+│   ┌───────────────────────┐ │
+│   │ ▁▁ povuci gore        │ │ <- lista klizi preko karte
+│   │ Studenac  07-22  300m │ │
+│   │ dm        08-22  1.2km│ │
+│   └───────────────────────┘ │
+└─────────────────────────────┘
+```
 
-### 2. Search Results Page
-- Displays structured **Business Info Cards** with:
-  - Business name
-  - Large color-coded OPEN (green) / CLOSED (red) badge
-  - Today's working hours
-  - Address
-  - Call button & Navigation button (opens maps)
-  - "Last verified" timestamp
-  - "Report incorrect info" link
-- Filter/sort options (distance, open now, rating)
+1. **Karta** preko cijelog ekrana, pinovi u boji po stanju (otvoreno / zatvara uskoro / zatvoreno), grupiranje kad ih je puno.
+2. **Trake slojeva** na vrhu — biraš što gledaš. Više slojeva može biti upaljeno odjednom.
+3. **Lista koja klizi** odozdo (tri visine: skrivena, pola, cijeli ekran) — sortirana po udaljenosti, klik na red vodi pin u fokus i obrnuto.
 
-### 3. Business Detail Page
-- Full working hours for all days
-- Map preview
-- Contact info (phone, website)
-- "I am the owner" claim button
-- Crowdsourced correction: "Working hours wrong?" → options: closed / moved / wrong hours
-- Verification badge if owner-verified
+## Slojevi u prvoj verziji
 
-### 4. Category Browse Page
-- Grid/list of all businesses in a category
-- Quick filter: "Open now" toggle
+| Sloj | Izvor podataka | Kad se prikazuje |
+|---|---|---|
+| Otvoreno sada | postojeća baza mjesta + radna vremena | uvijek |
+| Radna nedjelja | shop_sunday_schedule | subota-nedjelja, inače na klik |
+| Dežurna ljekarna | duty_services | uvijek |
+| Gorivo | postojeća baza | uvijek |
+| EV punjači | postojeći EV podaci | uvijek |
+| Događanja danas | city_events | kad ih ima |
+| Parking | postojeće parking zone | uvijek |
 
-### 5. Emergency Info Page
-- Static page with key emergency numbers (police, ambulance, fire, hospital, tourist police)
-- Always accessible, no search needed
+Sloj se pamti — kad se vratiš, karta je kakvu si je ostavio.
 
-### 6. Owner Claim Flow (UI mockup)
-- "I am the owner" → email input → verification message
-- Dashboard mockup showing editable hours and pending status
-- Changes marked as "verified" or "pending moderation"
+## Što ostaje isto
 
----
+Sve što danas radi ostaje: dohvat podataka, automatski scraper za nedjelje, ručno pomicanje pinova u admin preview modu, navigacija na Google Maps, izvor i vrijeme provjere. Mijenja se samo sučelje i način na koji se podaci slažu na kartu.
 
-## Design System
-- **Primary color:** Deep blue
-- **Accent:** Cyan
-- **Open status:** Green badge
-- **Closed status:** Red badge
-- **Style:** iOS-like, minimal, large touch targets, rounded cards, clean typography
-- **Mobile-first** layout, responsive up to desktop
+## Redoslijed rada
 
----
+1. Nova karta preko cijelog ekrana s klizećom listom i trakama slojeva — prvo samo s nedjeljnim dućanima, da sve nastavi raditi kao sad.
+2. Dodati sloj "otvoreno sada" iz opće baze mjesta — to je korak koji kartu čini korisnom svaki dan.
+3. Dodati ostale slojeve (ljekarna, gorivo, EV, događanja, parking).
+4. Karta postaje glavni ulaz: gumb na početnoj vodi na nju, adresa /radar, stara /sunday-radar i dalje radi.
 
-## Multilingual Support
-- Four languages: Croatian (default), English, German, Italian
-- Language context provider with translations for all UI strings
-- Auto-detect browser language on first visit
+## Tehnički dio
 
----
-
-## Mock Data
-- 10 pharmacies with real Zadar names/addresses
-- 10 dentists
-- 10 cafes
-- 5 parking zones
-- Emergency contacts
-- Realistic Croatian business names, streets, and working hours
-- Some marked as "verified," others as community-sourced
-
----
-
-## Crowdsourced Corrections (Frontend)
-- "Report" button on each card
-- Modal with options: closed / moved / wrong hours
-- Counter showing number of reports
-- Visual indicator when 3+ users report an issue ("Possibly incorrect" warning badge)
-
----
-
-## Architecture Notes
-- All data stored in local mock data files, structured to mirror a future database schema (businesses, categories, reports, verifications)
-- Search logic with keyword matching and category filtering
-- Translation system via React context — ready for backend API swap
-- Component structure ready for future AI assistant, live parking data, and municipal integrations
-
+- Nova stranica `src/pages/CityRadar.tsx` na `/radar`; `/sunday-radar` preusmjerava na `/radar?layer=sunday` da postojeći linkovi i push poruke rade.
+- Slojevi kao zasebni moduli u `src/lib/radar/layers/` — svaki vraća `{ id, label, icon, load(): Promise<RadarPin[]> }`. Dodavanje novog sloja = jedan novi file, bez diranja karte.
+- Zajednički tip `RadarPin { id, name, address, lat, lng, status, subtitle, layerId, actions }`.
+- Leaflet ostaje, uz markercluster koji je već učitan; lista i karta dijele isto stanje odabira.
+- Klizeća lista: postojeći shadcn Drawer (vaul) s tri visine, bez nove biblioteke.
+- Odabrani slojevi u localStorage (`zadariq_radar_layers`).
+- Admin preview i povlačenje pinova prenosi se u sloj za nedjelje, nepromijenjeno.
