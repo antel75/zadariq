@@ -37,7 +37,9 @@ export const pharmacyLayer: RadarLayer = {
     const dutyNames = (duty.data || []).map((d: any) => normalize(d.name || ''));
 
     return places
-      .filter(p => p.lat != null && p.lng != null && (p.category === 'pharmacy' || p.category === 'medicine'))
+      .filter(p => p.category === 'pharmacy' || p.category === 'medicine')
+      .map(p => (p.lat == null && PHARMACY_COORDS[p.id] ? { ...p, lat: PHARMACY_COORDS[p.id][0], lng: PHARMACY_COORDS[p.id][1] } : p))
+      .filter(p => p.lat != null && p.lng != null)
       .map(p => {
         const pin = placeToPin(p, 'pharmacy');
         const isDuty = dutyNames.some(n => n && (n.includes(normalize(p.name)) || normalize(p.name).includes(n)));
