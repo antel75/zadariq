@@ -159,3 +159,5 @@ Prije objave još treba potvrditi Vercelovu autorizaciju za pravi prostor. Cjelo
 ### Jedan banner na početnoj
 
 HomeRadarBanner prikazuje Radar Zadar od ponedjeljka do subote, a samo Sunday Radar cijelu nedjelju prema Europe/Zagreb. Provjerava promjenu dana svakih 30 sekundi i pri povratku na karticu. Isti blok koristi rezidentni i turistički prikaz; uklonjena je subotnja najava i ograničenje 06–22.
+
+Dopuna: od srijede do subote Radar Zadar unutar iste kartice ima poveznicu „Otvoreno ovu nedjelju” na `/radar?layer=sunday`. Datum je nadolazeća nedjelja prema Zagrebu; bez objavljenog rasporeda prikazuje se postojeće stanje bez podataka. Ponedjeljkom i utorkom nema dodatne poveznice.
