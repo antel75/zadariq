@@ -6,12 +6,6 @@ import { PinStatus, RadarPin } from './types';
 let _placesCache: Business[] | null = null;
 let _placesFetchedAt = 0;
 
-const DEFAULT_HOURS_BY_CATEGORY: Record<string, Business['workingHours']> = {
-  cafes: { mon: '07:00–23:00', tue: '07:00–23:00', wed: '07:00–23:00', thu: '07:00–23:00', fri: '07:00–23:00', sat: '07:00–23:00', sun: '08:00–23:00' },
-  shops: { mon: '08:00–20:00', tue: '08:00–20:00', wed: '08:00–20:00', thu: '08:00–20:00', fri: '08:00–20:00', sat: '08:00–14:00', sun: '—' },
-  restaurants: { mon: '11:00–23:00', tue: '11:00–23:00', wed: '11:00–23:00', thu: '11:00–23:00', fri: '11:00–23:00', sat: '11:00–23:00', sun: '11:00–23:00' },
-};
-
 const EMPTY_HOURS: Business['workingHours'] = { mon: '—', tue: '—', wed: '—', thu: '—', fri: '—', sat: '—', sun: '—' };
 
 /**
@@ -22,11 +16,12 @@ export async function loadAllPlaces(): Promise<Business[]> {
   if (_placesCache && Date.now() - _placesFetchedAt < 5 * 60 * 1000) return _placesCache;
 
   await loadHoursOverrides();
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('pending_places')
     .select('id, proposed_name, proposed_address, category, phone, website, lat, lng, reviewed_at, created_at')
     .eq('status', 'approved');
 
+  if (error) throw error;
   const approved: Business[] = (data || []).map((p: any) => {
     const cat = (p.category as Business['category']) || 'cafes';
     return {
@@ -36,7 +31,7 @@ export async function loadAllPlaces(): Promise<Business[]> {
       address: p.proposed_address || '',
       phone: p.phone || '',
       website: p.website || undefined,
-      workingHours: DEFAULT_HOURS_BY_CATEGORY[cat as string] || EMPTY_HOURS,
+      workingHours: EMPTY_HOURS,
       verified: false,
       lastVerified: p.reviewed_at || p.created_at,
       reportCount: 0,

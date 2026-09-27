@@ -1,4 +1,17 @@
-# Welcome to your Lovable project
+# ZadarIQ
+
+Gradski informativni asistent za Zadar: otvoreni objekti, radne nedjelje, prijevoz, događanja i gradske usluge.
+
+- Produkcija: https://www.zadariq.city/
+- Repozitorij: https://github.com/antel75/zadariq
+- **Arhitektura, objave, izvori podataka i stanje preuzimanja:** [docs/PROJECT_HANDOVER.md](docs/PROJECT_HANDOVER.md)
+- Kontekst za daljnji razvoj: [AGENTS.md](AGENTS.md)
+
+Lokalno su potrebni `VITE_SUPABASE_URL` i `VITE_SUPABASE_PUBLISHABLE_KEY`. Prije instalacije ili objave pročitaj pregled projekta: postoje neusklađene lock datoteke i Bun prebuild korak. Nemoj koristiti serverske privatne ključeve u frontend varijablama.
+
+## Izvorni Lovable predložak
+
+Tekst ispod je sačuvan kao izvorni predložak. Placeholder poveznice i upute za Lovable objavu nisu potvrđeni operativni postupak za sadašnju Vercel produkciju; aktualni nalazi su u pregledu projekta iznad.
 
 ## Project info
 

@@ -2,6 +2,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { businesses } from '@/data/mockData';
 import { RadarLayer, RadarPin } from '../types';
 
+type SundayEntryWithSource = { source?: string; source_url?: string; fetched_at?: string };
+
 export interface SundaySourceInfo {
   source: string;
   url: string | null;
@@ -32,11 +34,12 @@ export const sundayLayer: RadarLayer = {
   color: '#22c55e',
   defaultOn: true,
   async load(ctx) {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('shop_sunday_schedule')
       .select('*')
       .eq('sunday_date', ctx.sundayDate);
 
+    if (error) throw error;
     const entries = data || [];
 
     const apIds = entries
@@ -45,10 +48,11 @@ export const sundayLayer: RadarLayer = {
 
     const approvedMap = new Map<string, { name: string; address: string; lat: number | null; lng: number | null }>();
     if (apIds.length > 0) {
-      const { data: approved } = await supabase
+      const { data: approved, error: approvedError } = await supabase
         .from('pending_places')
         .select('id, proposed_name, proposed_address, lat, lng')
         .in('id', apIds);
+      if (approvedError) throw approvedError;
       (approved || []).forEach((p: any) =>
         approvedMap.set(`ap_${p.id}`, {
           name: p.proposed_name,
@@ -75,10 +79,10 @@ export const sundayLayer: RadarLayer = {
       }
       if (!info) continue;
 
-      const openT = entry.open_time || '08:00';
-      const closeT = entry.close_time || '21:00';
-      const live = ctx.isLiveSunday && isOpenNowHR(openT, closeT);
-      const status = !ctx.isLiveSunday
+      const openT = entry.open_time;
+      const closeT = entry.close_time;
+      const live = ctx.isLiveSunday && openT && closeT && isOpenNowHR(openT, closeT);
+      const status = !ctx.isLiveSunday || !openT || !closeT
         ? 'unknown'
         : live
           ? (minutesLeft(closeT) <= 60 ? 'closing-soon' : 'open')
@@ -93,7 +97,10 @@ export const sundayLayer: RadarLayer = {
         lat: info.lat,
         lng: info.lng,
         status,
-        subtitle: `${openT.slice(0, 5)}–${closeT.slice(0, 5)}`,
+        subtitle: openT && closeT ? `${openT.slice(0, 5)}–${closeT.slice(0, 5)}` : undefined,
+        source: (entry as SundayEntryWithSource).source || 'ZadarIQ',
+        sourceUrl: (entry as SundayEntryWithSource).source_url,
+        fetchedAt: (entry as SundayEntryWithSource).fetched_at,
         draggableId: entry.business_id.startsWith('ap_') ? entry.business_id.replace(/^ap_/, '') : null,
       });
     }

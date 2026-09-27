@@ -95,7 +95,7 @@ export function SundayRadarBanner() {
                 background: 'rgba(74,222,128,0.15)',
                 border: '1px solid rgba(74,222,128,0.3)',
                 color: '#4ade80'
-              }}>LIVE</span>
+              }}>{isSaturday ? ({hr: 'SUTRA', en: 'TOMORROW', de: 'MORGEN', it: 'DOMANI'}[language] || 'SUTRA') : ({hr: 'NEDJELJA', en: 'SUNDAY', de: 'SONNTAG', it: 'DOMENICA'}[language] || 'NEDJELJA')}</span>
             </div>
             <p className="text-xs" style={{ color: 'rgba(255,255,255,0.45)', letterSpacing: '0.05em' }}>
               {sub[language] || sub.hr}

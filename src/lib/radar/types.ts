@@ -13,6 +13,9 @@ export interface RadarPin {
   status: PinStatus;
   /** Short line under the name in the list (hours, power, price…) */
   subtitle?: string;
+  source?: string;
+  sourceUrl?: string | null;
+  fetchedAt?: string | null;
   phone?: string | null;
   /** Route inside the app to open more detail */
   detailPath?: string;

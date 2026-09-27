@@ -3,10 +3,10 @@ import { MapPin, ChevronRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const COPY: Record<string, { title: string; sub: string }> = {
-  hr: { title: 'Radar Zadar', sub: 'Karta grada — što je sada otvoreno oko tebe' },
-  en: { title: 'Zadar Radar', sub: 'City map — what is open around you right now' },
-  de: { title: 'Zadar Radar', sub: 'Stadtkarte — was jetzt in deiner Nähe offen ist' },
-  it: { title: 'Radar Zadar', sub: 'Mappa della città — cosa è aperto ora vicino a te' },
+  hr: { title: 'Radar Zadar', sub: 'Pronađi otvorena mjesta i provjeri radno vrijeme' },
+  en: { title: 'Zadar Radar', sub: 'Find open places and check their hours' },
+  de: { title: 'Zadar Radar', sub: 'Offene Orte finden und Öffnungszeiten prüfen' },
+  it: { title: 'Radar Zadar', sub: 'Trova i locali aperti e controlla gli orari' },
 };
 
 export function RadarBanner() {

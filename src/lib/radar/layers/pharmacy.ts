@@ -44,6 +44,7 @@ export const pharmacyLayer: RadarLayer = {
         .gte('valid_until', today),
     ]);
 
+    if (duty.error) throw duty.error;
     const dutyNames = (duty.data || []).map((d: any) => normalize(d.name || ''));
 
     return places

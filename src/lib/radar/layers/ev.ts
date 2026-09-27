@@ -15,10 +15,11 @@ export const evLayer: RadarLayer = {
   color: '#10b981',
   defaultOn: false,
   async load() {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('ev_chargers')
       .select('id, name, address, lat, lng, power_kw, plug_count, status, operator');
 
+    if (error) throw error;
     return (data || []).map((c: any): RadarPin => ({
       id: `ev:${c.id}`,
       layerId: 'ev',

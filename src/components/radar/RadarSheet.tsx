@@ -59,7 +59,7 @@ export function RadarSheet({ pins, snap, selectedId, isEn, loading, onSnapChange
         <p className="text-center text-xs font-semibold text-foreground mt-2">
           {loading
             ? (isEn ? 'Loading…' : 'Učitavanje…')
-            : `${pins.length} ${isEn ? 'places' : 'mjesta'} ${isEn ? 'nearby' : 'u blizini'}`}
+            : `${isEn ? 'Results' : 'Rezultati'}: ${pins.length}`}
         </p>
       </div>
 
