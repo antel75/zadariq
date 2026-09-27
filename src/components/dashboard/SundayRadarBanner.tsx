@@ -1,36 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useEffect, useState } from 'react';
 
 export function SundayRadarBanner() {
   const navigate = useNavigate();
   const { language } = useLanguage();
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const check = () => {
-      const now = new Date();
-      const day = now.getDay();
-      const h = now.getHours();
-      setVisible((day === 0 && h >= 6 && h < 22) || (day === 6 && h >= 12));
-    };
-    check();
-    const interval = setInterval(check, 60000);
-    return () => clearInterval(interval);
-  }, []);
-
-  if (!visible) return null;
-
-  const label: Record<string, string> = {
-    hr: 'Sunday Radar', en: 'Sunday Radar', de: 'Sunday Radar', it: 'Sunday Radar'
-  };
-  const isSaturday = new Date().getDay() === 6;
-  const sub: Record<string, string> = isSaturday ? {
-    hr: 'Provjeri što radi sutra →',
-    en: 'Check what\'s open tomorrow →',
-    de: 'Was ist morgen geöffnet →',
-    it: 'Cosa è aperto domani →',
-  } : {
+  const sub: Record<string, string> = {
     hr: 'Otkrij što radi danas',
     en: 'Discover what\'s open today',
     de: 'Entdecke was heute geöffnet ist',
@@ -38,7 +12,7 @@ export function SundayRadarBanner() {
   };
 
   return (
-    <div className="px-4 mb-4">
+    <div>
       <button
         onClick={() => navigate('/radar?layer=sunday')}
         className="relative w-full overflow-hidden rounded-2xl"
@@ -95,7 +69,7 @@ export function SundayRadarBanner() {
                 background: 'rgba(74,222,128,0.15)',
                 border: '1px solid rgba(74,222,128,0.3)',
                 color: '#4ade80'
-              }}>{isSaturday ? ({hr: 'SUTRA', en: 'TOMORROW', de: 'MORGEN', it: 'DOMANI'}[language] || 'SUTRA') : ({hr: 'NEDJELJA', en: 'SUNDAY', de: 'SONNTAG', it: 'DOMENICA'}[language] || 'NEDJELJA')}</span>
+              }}>{({hr: 'NEDJELJA', en: 'SUNDAY', de: 'SONNTAG', it: 'DOMENICA'}[language] || 'NEDJELJA')}</span>
             </div>
             <p className="text-xs" style={{ color: 'rgba(255,255,255,0.45)', letterSpacing: '0.05em' }}>
               {sub[language] || sub.hr}

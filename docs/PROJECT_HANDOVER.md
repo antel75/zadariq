@@ -155,3 +155,7 @@ Korisnik je odobrio nastavak razvoja uz Lovable Cloud kao postojeći backend. Gr
 - Preglednik: stvarni nedjeljni podaci učitani, pretraga Bipa/Konzum, filtar otvorenosti, odabir buduće nedjelje bez rasporeda i prelazak popis/karta provjereni; mobilna širina 390 px pregledana; u pregledanim konzolnim zapisima nema pogrešaka.
 
 Prije objave još treba potvrditi Vercelovu autorizaciju za pravi prostor. Cjelovito sređivanje podataka, puna jezična lokalizacija radara (trenutačno HR/EN) i backend testno okruženje ostaju zasebni koraci.
+
+### Jedan banner na početnoj
+
+HomeRadarBanner prikazuje Radar Zadar od ponedjeljka do subote, a samo Sunday Radar cijelu nedjelju prema Europe/Zagreb. Provjerava promjenu dana svakih 30 sekundi i pri povratku na karticu. Isti blok koristi rezidentni i turistički prikaz; uklonjena je subotnja najava i ograničenje 06–22.

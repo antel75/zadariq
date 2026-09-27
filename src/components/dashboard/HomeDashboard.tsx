@@ -26,9 +26,8 @@ import { CityPulseSection } from './CityPulseSection';
 import { DailyPollCard } from './DailyPollCard';
 import { WhatIsHappeningToday } from './WhatIsHappeningToday';
 import { EventsWidget } from './EventsWidget';
-import { SundayRadarBanner } from './SundayRadarBanner';
+import { HomeRadarBanner } from './HomeRadarBanner';
 import { DanasBanner } from './DanasBanner';
-import { RadarBanner } from './RadarBanner';
 import { FeaturedNearby } from '@/components/FeaturedNearby';
 import { SearchBar } from '@/components/SearchBar';
 import { CategoryScroll } from '@/components/CategoryScroll';
@@ -220,10 +219,7 @@ export function HomeDashboard({ onReportTarget, reportTarget }: HomeDashboardPro
   );
 
   const sundayRadarBlock = (
-    <>
-      <Section className="mb-4"><RadarBanner /></Section>
-      <Section className="mb-0"><SundayRadarBanner /></Section>
-    </>
+    <Section className="mb-4"><HomeRadarBanner /></Section>
   );
 
   const whatIsHappeningBlock = (
